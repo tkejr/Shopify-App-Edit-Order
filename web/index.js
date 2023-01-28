@@ -54,6 +54,24 @@ app.get("/api/products/create", async (_req, res) => {
   }
   res.status(status).send({ success: status === 200, error });
 });
+app.get("/api/orders", async (_req, res) => {
+  const data = await shopify.api.rest.Order.all({
+    session: res.locals.shopify.session,
+    status:"any"
+  });
+  console.log(data)
+  res.status(200).send(data);
+});
+app.put("/api/orders/:id", async (_req, res) => {
+  const order = new shopify.api.rest.Order({session: res.locals.shopify.session});
+  order.id = _req['id']
+  order.note_attributes=[{"name":"colour","value":"red"}]
+  
+await order.save({
+  update: true,
+});
+//console.log(order)
+});
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 

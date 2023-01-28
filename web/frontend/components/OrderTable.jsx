@@ -112,6 +112,26 @@ export function OrderTable(props) {
     )
   );
 
+  const getAllOrders = async () => {
+    /* gets all orders */
+    const response = await fetch("/api/orders");
+    // will want to put it in some array after
+
+    
+  };
+  const updateOrder = async () => {
+    const requestOptions = {
+      method:'PUT',
+
+    }
+    // I did the one which has variable id's, not hardcoded, but it probably does not work as is
+    const response = await fetch("/api/orders" + 34, requestOptions);
+    
+
+    
+  };
+
+
   return (
     <Card>
       <IndexTable
