@@ -112,13 +112,30 @@ export function OrderTable(props) {
     )
   );
 
+  /* do not need to press a button, just fetches automatically 
   const getAllOrders = async () => {
-    /* gets all orders */
+    // gets all orders 
     const response = await fetch("/api/orders");
     // will want to put it in some array after
 
     
   };
+  */
+  const {
+    orderData,
+    isLoading3,
+    isRefetching2,
+  } = useAppQuery({
+    url: `/api/orders`,
+    reactQueryOptions: {
+      /* Disable refetching because the QRCodeForm component ignores changes to its props */
+      refetchOnReconnect: false,
+    },
+  });
+  //order data
+  console.log(orderData)
+
+  
   const updateOrder = async (id, newDate) => {
     //make sure you are passing them in correctly, the date needs to be the correct date format as a string
     const requestOptions = {

@@ -59,7 +59,7 @@ app.get("/api/orders", async (_req, res) => {
     session: res.locals.shopify.session,
     status:"any"
   });
-  console.log(data)
+  //console.log(data)
   res.status(200).send(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
