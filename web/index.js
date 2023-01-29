@@ -64,8 +64,9 @@ app.get("/api/orders", async (_req, res) => {
 });
 app.put("/api/orders/:id", async (_req, res) => {
   const order = new shopify.api.rest.Order({session: res.locals.shopify.session});
-  order.id = _req['id']
-  order.note_attributes=[{"name":"colour","value":"red"}]
+  order.id = _req.params['id']
+  const newDate = _req.body.date
+  order.created_at = newDate;
   
 await order.save({
   update: true,

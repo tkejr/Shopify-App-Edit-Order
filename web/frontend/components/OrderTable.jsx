@@ -119,13 +119,15 @@ export function OrderTable(props) {
 
     
   };
-  const updateOrder = async () => {
+  const updateOrder = async (id, newDate) => {
+    //make sure you are passing them in correctly, the date needs to be the correct date format as a string
     const requestOptions = {
       method:'PUT',
-
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: newDate })
     }
     // I did the one which has variable id's, not hardcoded, but it probably does not work as is
-    const response = await fetch("/api/orders" + 34, requestOptions);
+    const response = await fetch("/api/orders/" + id, requestOptions);
     
 
     
