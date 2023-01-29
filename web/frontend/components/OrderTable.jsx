@@ -5,11 +5,11 @@ import {
   useIndexResourceState,
 } from "@shopify/polaris";
 import React from "react";
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useAppQuery } from "../hooks";
 
 
 export function OrderTable(props) {
-  const fetch = useAuthenticatedFetch();
+  //const fetch = useAuthenticatedFetch();
   const customers = [
     {
       id: "3411",
@@ -125,33 +125,21 @@ export function OrderTable(props) {
   };
   */
   const {
-    orderData,
+    data,
     isLoading3,
     isRefetching2,
   } = useAppQuery({
     url: `/api/orders`,
     reactQueryOptions: {
-      /* Disable refetching because the QRCodeForm component ignores changes to its props */
+      
       refetchOnReconnect: false,
     },
   });
   //order data
-  console.log(orderData)
+  console.log(data)
 
 
-  const updateOrder = async (id, newDate) => {
-    //make sure you are passing them in correctly, the date needs to be the correct date format as a string
-    const requestOptions = {
-      method:'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: newDate })
-    }
-    // I did the one which has variable id's, not hardcoded, but it probably does not work as is
-    const response = await fetch("/api/orders/" + id, requestOptions);
-    
-
-    
-  };
+  
 
 
   return (

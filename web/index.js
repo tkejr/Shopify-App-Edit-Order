@@ -59,19 +59,28 @@ app.get("/api/orders", async (_req, res) => {
     session: res.locals.shopify.session,
     status:"any"
   });
-  //console.log(data)
+  //apparently this is very necessary lmaooo
+  console.log(data)
   res.status(200).send(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
   const order = new shopify.api.rest.Order({session: res.locals.shopify.session});
+  //need some really good checking in the frontend, for both of these params
+  //@ts-ignore
   order.id = _req.params['id']
   const newDate = _req.body.date
-  order.created_at = newDate;
+  try {
+    //@ts-ignore
+    order.created_at = newDate;
+    // @ts-ignore
+    await order.save({
+      update: true,
+    });
+  } catch (error) {
+    console.error(error);
+    
+  }
   
-await order.save({
-  update: true,
-});
-//console.log(order)
 });
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
