@@ -5,8 +5,11 @@ import {
   useIndexResourceState,
 } from "@shopify/polaris";
 import React from "react";
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+
 
 export function OrderTable(props) {
+  const fetch = useAuthenticatedFetch();
   const customers = [
     {
       id: "3411",
@@ -135,7 +138,7 @@ export function OrderTable(props) {
   //order data
   console.log(orderData)
 
-  
+
   const updateOrder = async (id, newDate) => {
     //make sure you are passing them in correctly, the date needs to be the correct date format as a string
     const requestOptions = {
