@@ -23,16 +23,23 @@ export default function HomePage() {
     }
   };
   const [orderId, setOrderId] = useState(0);
+  const [orderName, setName] = useState();
 
   return (
     <Page narrowWidth>
       <TitleBar title="Editify" primaryAction={null} />
       <Layout>
         <Layout.Section>
-          <OrderTable toggleShow={toggleShow} setOrderId={setOrderId} />
+          <OrderTable
+            toggleShow={toggleShow}
+            setOrderId={setOrderId}
+            setName={setName}
+          />
         </Layout.Section>
         <Layout.Section>
-          {show && <DatePickerExample orderId={orderId} />}
+          {show && (
+            <DatePickerExample orderId={orderId} orderName={orderName} />
+          )}
         </Layout.Section>
       </Layout>
     </Page>

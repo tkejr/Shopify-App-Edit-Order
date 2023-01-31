@@ -5,15 +5,33 @@ import {
   Heading,
   TextStyle,
   Card,
+  Toast,
+  Frame,
+  Page,
+  Button,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 export function DatePickerExample(props) {
+  const emptyToastProps = { content: null };
+  const [active, setActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [toastProps, setToastProps] = useState(emptyToastProps);
+
+  const toastMarkup = toastProps.content && (
+    <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
+  );
+
   const fetch = useAuthenticatedFetch();
-  const [{ month, year }, setDate] = useState({ month: 1, year: 2018 });
+  const currentDate = new Date();
+
+  const [{ month, year }, setDate] = useState({
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+  });
   const [selectedDates, setSelectedDates] = useState({
-    start: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
-    end: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
+    start: new Date(),
+    end: new Date(),
   });
 
   const handleMonthChange = useCallback(
@@ -28,7 +46,6 @@ export function DatePickerExample(props) {
 
   const submitDate = () => {
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
-    alert("Date Updated");
   };
   const updateOrder = async (id, newDate) => {
     //make sure you are passing them in correctly, the date needs to be the correct date format as a string
@@ -38,31 +55,48 @@ export function DatePickerExample(props) {
       body: JSON.stringify({ date: newDate }),
     };
     // I did the one which has variable id's, not hardcoded, but it probably does not work as is
+
+    setIsLoading(true);
     const response = await fetch("/api/orders/" + id, requestOptions);
+
+    if (response.ok) {
+      setToastProps({ content: "Date Updated" });
+    } else {
+      setIsLoading(false);
+      setToastProps({
+        content: "There was an error updating the date",
+        error: true,
+      });
+    }
   };
 
   return (
-    <Card
-      title={`Edit Date for ${props.orderId}`}
-      sectioned
-      primaryFooterAction={{
-        content: "Submit",
-        onAction: submitDate,
-      }}
-    >
-      <TextContainer spacing="loose">
-        <p>
-          You can Backdate an order by selecting a date from the calendar below.
-        </p>
-        <Heading element="h4">Pick Date</Heading>
-      </TextContainer>
-      <DatePicker
-        month={month}
-        year={year}
-        onChange={setSelectedDates}
-        onMonthChange={handleMonthChange}
-        selected={selectedDates}
-      />
-    </Card>
+    <Frame>
+      <Page>{toastMarkup}</Page>
+      <Card
+        title={`Edit Date for ${props.orderName}`}
+        sectioned
+        primaryFooterAction={{
+          content: "Submit",
+          onAction: submitDate,
+        }}
+      >
+        <TextContainer spacing="loose">
+          <p>
+            You can Backdate an order by selecting a date from the calendar
+            below.
+          </p>
+          <Heading element="h4">Pick Date</Heading>
+        </TextContainer>
+        <DatePicker
+          month={month}
+          year={year}
+          onChange={setSelectedDates}
+          onMonthChange={handleMonthChange}
+          disableDatesAfter={new Date()}
+          selected={selectedDates}
+        />
+      </Card>
+    </Frame>
   );
 }

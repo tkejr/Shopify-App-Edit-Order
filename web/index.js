@@ -74,8 +74,11 @@ app.put("/api/orders/:id", async (_req, res) => {
   });
   //need some really good checking in the frontend, for both of these params
   //@ts-ignore
+  let status = 200;
+  let error = null;
   order.id = _req.params["id"];
   const newDate = _req.body.date;
+
   try {
     //@ts-ignore
     order.created_at = newDate;
@@ -83,9 +86,12 @@ app.put("/api/orders/:id", async (_req, res) => {
     await order.save({
       update: true,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    console.log(`Failed to process products/create: ${e.message}`);
+    status = 500;
+    error = e.message;
   }
+  res.status(status).send({ success: status === 200, error });
 });
 
 app.use(serveStatic(STATIC_PATH, { index: false }));

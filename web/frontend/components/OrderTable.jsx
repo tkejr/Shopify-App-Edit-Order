@@ -3,15 +3,24 @@ import {
   Card,
   Button,
   useIndexResourceState,
+  Filters,
+  Select,
+  TextField,
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
+import { Spinner } from "@shopify/polaris";
+import { Pagination } from "@shopify/polaris";
 
 export function OrderTable(props) {
-  const [orderData, setData] = useState([]);
-  const fetch = useAuthenticatedFetch();
+  const [value, setValue] = useState("#");
+  const handleChange = (e) => {
+    //convert input text to lower case
+    var lowerCase = e.target.value.toLowerCase();
+    setInputText(lowerCase);
+  };
   let orders = [];
   const { data, status } = useAppQuery({
     url: `/api/orders`,
@@ -21,11 +30,11 @@ export function OrderTable(props) {
   });
   if (status === "success") {
     console.log(data);
-    orders = data;
+    orders = data.slice(0, 10);
   }
 
   const resourceName = {
-    singular: "orders",
+    singular: "order",
     plural: "orders",
   };
 
@@ -39,9 +48,10 @@ export function OrderTable(props) {
     return convertedDate;
   };
 
-  const orderClicked = (id) => {
+  const orderClicked = (id, name) => {
     props.toggleShow();
     props.setOrderId(id);
+    props.setName(name);
   };
   const rowMarkup = orders.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
@@ -55,7 +65,7 @@ export function OrderTable(props) {
           <Button
             dataPrimaryLink
             onClick={() => {
-              orderClicked(id);
+              orderClicked(id, name);
             }}
           >
             {name}
@@ -69,18 +79,16 @@ export function OrderTable(props) {
     )
   );
 
-  // const getAllOrders = () => {
-  //   const response = fetch("/api/orders").then((res) => res.json());
-  //   //order data
-  //   setData(response);
-  //   console.log(orderData);
-  //   console.log("WORKS");
-  // };
-
   return (
     <Card>
+      <TextField
+        label="Search orders"
+        value={value}
+        onChange={handleChange}
+        autoComplete="off"
+      />
       {status !== "success" ? (
-        <div>Loading</div>
+        <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (
         <IndexTable
           resourceName={resourceName}
