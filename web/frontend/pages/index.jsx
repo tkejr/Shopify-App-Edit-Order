@@ -26,7 +26,7 @@ export default function HomePage() {
 
   return (
     <Page narrowWidth>
-      <TitleBar title="App name" primaryAction={null} />
+      <TitleBar title="Editify" primaryAction={null} />
       <Layout>
         <Layout.Section>
           <OrderTable toggleShow={toggleShow} setOrderId={setOrderId} />

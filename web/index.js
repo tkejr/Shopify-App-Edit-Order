@@ -7,6 +7,8 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
+import bodyParser from "body-parser";
+import cors from "cors";
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -33,11 +35,15 @@ app.post(
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/api/products/count", async (_req, res) => {
   const countData = await shopify.api.rest.Product.count({
     session: res.locals.shopify.session,
   });
+
   res.status(200).send(countData);
 });
 
@@ -57,18 +63,19 @@ app.get("/api/products/create", async (_req, res) => {
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
-    status:"any"
+    status: "any",
   });
-  //apparently this is very necessary lmaooo
-  console.log(data)
-  res.status(200).send(data);
+
+  res.status(200).json(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
-  const order = new shopify.api.rest.Order({session: res.locals.shopify.session});
+  const order = new shopify.api.rest.Order({
+    session: res.locals.shopify.session,
+  });
   //need some really good checking in the frontend, for both of these params
   //@ts-ignore
-  order.id = _req.params['id']
-  const newDate = _req.body.date
+  order.id = _req.params["id"];
+  const newDate = _req.body.date;
   try {
     //@ts-ignore
     order.created_at = newDate;
@@ -78,9 +85,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     });
   } catch (error) {
     console.error(error);
-    
   }
-  
 });
 
 app.use(serveStatic(STATIC_PATH, { index: false }));

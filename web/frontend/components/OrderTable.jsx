@@ -6,101 +6,54 @@ import {
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
-
+import { useState } from "react";
+import { useAuthenticatedFetch } from "../hooks";
 
 export function OrderTable(props) {
-  //const fetch = useAuthenticatedFetch();
-  const customers = [
-    {
-      id: "3411",
-      url: "customers/341",
-      name: "Mae Jemison",
-      location: "Decatur, USA",
-      orders: 20,
-      amountSpent: "$2,400",
+  const [orderData, setData] = useState([]);
+  const fetch = useAuthenticatedFetch();
+  let orders = [];
+  const { data, status } = useAppQuery({
+    url: `/api/orders`,
+    reactQueryOptions: {
+      refetchOnReconnect: false,
     },
-    {
-      id: "2561",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2565",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2566",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2567",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2567",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2568",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-    {
-      id: "2569",
-      url: "customers/256",
-      name: "Ellen Ochoa",
-      location: "Los Angeles, USA",
-      orders: 30,
-      amountSpent: "$140",
-    },
-  ];
+  });
+  if (status === "success") {
+    console.log(data);
+    orders = data;
+  }
+
   const resourceName = {
-    singular: "customer",
-    plural: "customers",
+    singular: "orders",
+    plural: "orders",
   };
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(customers);
+    useIndexResourceState(orders);
+
+  const ConvertDate = (date) => {
+    const dateObj = new Date(date);
+    const options = { month: "long", day: "numeric", year: "numeric" };
+    const convertedDate = dateObj.toLocaleDateString("en-US", options);
+    return convertedDate;
+  };
 
   const orderClicked = (id) => {
     props.toggleShow();
-    console.log(id);
     props.setOrderId(id);
   };
-  const rowMarkup = customers.map(
-    ({ id, url, name, location, orders, amountSpent }, index) => (
+  const rowMarkup = orders.map(
+    ({ name, processed_at, customer, total_price, id }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
-        selected={selectedResources.includes(id)}
+        selected={selectedResources.includes(name)}
         position={index}
       >
         <IndexTable.Cell>
           <Button
             dataPrimaryLink
-            url={url}
             onClick={() => {
               orderClicked(id);
             }}
@@ -108,56 +61,42 @@ export function OrderTable(props) {
             {name}
           </Button>
         </IndexTable.Cell>
-        <IndexTable.Cell>{location}</IndexTable.Cell>
-        <IndexTable.Cell>{orders}</IndexTable.Cell>
-        <IndexTable.Cell>{amountSpent}</IndexTable.Cell>
+        <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
+
+        <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
+        <IndexTable.Cell>{total_price}</IndexTable.Cell>
       </IndexTable.Row>
     )
   );
 
-  /* do not need to press a button, just fetches automatically 
-  const getAllOrders = async () => {
-    // gets all orders 
-    const response = await fetch("/api/orders");
-    // will want to put it in some array after
-
-    
-  };
-  */
-  const {
-    data,
-    isLoading3,
-    isRefetching2,
-  } = useAppQuery({
-    url: `/api/orders`,
-    reactQueryOptions: {
-      
-      refetchOnReconnect: false,
-    },
-  });
-  //order data
-  console.log(data)
-
-
-  
-
+  // const getAllOrders = () => {
+  //   const response = fetch("/api/orders").then((res) => res.json());
+  //   //order data
+  //   setData(response);
+  //   console.log(orderData);
+  //   console.log("WORKS");
+  // };
 
   return (
     <Card>
-      <IndexTable
-        resourceName={resourceName}
-        itemCount={customers.length}
-        selectable={false}
-        onSelectionChange={handleSelectionChange}
-        headings={[
-          { title: "Name" },
-          { title: "Location" },
-          { title: "Order count" },
-          { title: "Amount spent", hidden: false },
-        ]}
-      >
-        {rowMarkup}
-      </IndexTable>
+      {status !== "success" ? (
+        <div>Loading</div>
+      ) : (
+        <IndexTable
+          resourceName={resourceName}
+          itemCount={orders.length}
+          selectable={false}
+          onSelectionChange={handleSelectionChange}
+          headings={[
+            { title: "Name" },
+            { title: "Date" },
+            { title: "Customer Name" },
+            { title: "Amount spent" },
+          ]}
+        >
+          {rowMarkup}
+        </IndexTable>
+      )}
     </Card>
   );
 }
