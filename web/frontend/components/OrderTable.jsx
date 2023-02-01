@@ -6,6 +6,7 @@ import {
   Filters,
   Select,
   TextField,
+  
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
@@ -13,8 +14,7 @@ import { useState, useCallback, useMemo, useEffect} from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
 import Paginate from "./Paginate";
-import Search from "./Search";
-
+import FiltersComponent from "./FiltersComponent";
 
 
 
@@ -41,9 +41,10 @@ export function OrderTable(props) {
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("#");
-  const ITEMS_PER_PAGE = 1;
+  const ITEMS_PER_PAGE = 10;
   const orderData = useMemo(() => {
   let computedOrders = orders;  
+  
   computedOrders = computedOrders.filter(post => {
     if (search === '#') {
       return post;
@@ -51,6 +52,7 @@ export function OrderTable(props) {
       return post;
     }
   })
+  
   setTotalItems(computedOrders.length);
   return computedOrders.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
@@ -89,6 +91,7 @@ export function OrderTable(props) {
     }
   })
 */
+
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
       <IndexTable.Row
@@ -109,23 +112,23 @@ export function OrderTable(props) {
         </IndexTable.Cell>
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
-        <IndexTable.Cell>{customer}</IndexTable.Cell>
+        <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
         <IndexTable.Cell>{total_price}</IndexTable.Cell>
       </IndexTable.Row>
       
     )
   );
+  
 
   return (
-    <Card>
-      <Search  onSearch={value => { setSearch(value);setCurrentPage(1);}}/>
-      
+    <Card >
+      <FiltersComponent onSearch={value => { setSearch(value);setCurrentPage(1);}}/>
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (
         <IndexTable
           resourceName={resourceName}
-          itemCount={orders.length}
+          itemCount={orderData.length}
           selectable={false}
           onSelectionChange={handleSelectionChange}
           headings={[
@@ -138,12 +141,14 @@ export function OrderTable(props) {
           {rowMarkup}
         </IndexTable>
       )}
+    
         <Paginate
             total={totalItems}
             itemsPerPage={ITEMS_PER_PAGE}
             currentPage={currentPage}
             onPageChange={page => setCurrentPage(page)}
         />
+     
     </Card>
   );
 }

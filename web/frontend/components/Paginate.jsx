@@ -1,8 +1,7 @@
 
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Pagination } from '@shopify/polaris'
-
+import { Card, Pagination } from '@shopify/polaris'
 
 const PaginationComponent = ({
     total,
@@ -22,6 +21,8 @@ const PaginationComponent = ({
     if (totalPages === 0) return null;
     
     return (
+        <Card >
+          <Card.Section >
         <Pagination
     hasPrevious
     onPrevious={() => {if(currentPage > 1)
@@ -30,6 +31,8 @@ const PaginationComponent = ({
     onNext={() => {if(currentPage < totalPages) 
         {onPageChange(currentPage + 1)}}}
   />
+        </Card.Section>
+        </Card>
     
     );
 };

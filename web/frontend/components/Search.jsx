@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const Search = ({ onSearch }) => {
     const [search, setSearch] = useState("");
 
-    const onInputChange = value => {
+    const onInputChange = (value )=> {
         setSearch(value);
         onSearch(value);
     };

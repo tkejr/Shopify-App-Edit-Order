@@ -12,6 +12,8 @@ import {
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
+
+
 export function DatePickerExample(props) {
   const emptyToastProps = { content: null };
   const [active, setActive] = useState(false);
@@ -30,8 +32,8 @@ export function DatePickerExample(props) {
     year: currentDate.getFullYear(),
   });
   const [selectedDates, setSelectedDates] = useState({
-    start: new Date(),
-    end: new Date(),
+    start: new Date('January 17, 2023 03:24:00'),
+    end: new Date('January 17, 2023 03:24:00'),
   });
 
   const handleMonthChange = useCallback(
