@@ -9,19 +9,18 @@ import {
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect} from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
-import { Pagination } from "@shopify/polaris";
+import Paginate from "./Paginate";
+import Search from "./Search";
+
+
+
 
 export function OrderTable(props) {
-  const [value, setValue] = useState("#");
-  const handleChange = (e) => {
-    //convert input text to lower case
-    var lowerCase = e.target.value.toLowerCase();
-    setInputText(lowerCase);
-  };
   let orders = [];
+  
   const { data, status } = useAppQuery({
     url: `/api/orders`,
     reactQueryOptions: {
@@ -30,8 +29,34 @@ export function OrderTable(props) {
   });
   if (status === "success") {
     console.log(data);
-    orders = data.slice(0, 10);
+    // dont slice it here
+    //orders = data.slice(0, 10);
+    orders = data
+    
+    
   }
+  //Pagination stuff
+  
+  const [once, setOnce] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("#");
+  const ITEMS_PER_PAGE = 1;
+  const orderData = useMemo(() => {
+  let computedOrders = orders;  
+  computedOrders = computedOrders.filter(post => {
+    if (search === '#') {
+      return post;
+    } else if (post.name.toLowerCase().includes(search.toLowerCase())) {
+      return post;
+    }
+  })
+  setTotalItems(computedOrders.length);
+  return computedOrders.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+  );
+  }, [once, currentPage, search]);
 
   const resourceName = {
     singular: "order",
@@ -53,7 +78,18 @@ export function OrderTable(props) {
     props.setOrderId(id);
     props.setName(name);
   };
-  const rowMarkup = orders.map(
+  
+  /*
+  orders.filter(post => {
+    if (value === '#') {
+      console.log('vn',post)
+      return post;
+    } else if (post.name.toLowerCase().includes(value.toLowerCase())) {
+      return post;
+    }
+  })
+*/
+  const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
       <IndexTable.Row
         id={id}
@@ -73,20 +109,17 @@ export function OrderTable(props) {
         </IndexTable.Cell>
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
-        <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
+        <IndexTable.Cell>{customer}</IndexTable.Cell>
         <IndexTable.Cell>{total_price}</IndexTable.Cell>
       </IndexTable.Row>
+      
     )
   );
 
   return (
     <Card>
-      <TextField
-        label="Search orders"
-        value={value}
-        onChange={handleChange}
-        autoComplete="off"
-      />
+      <Search  onSearch={value => { setSearch(value);setCurrentPage(1);}}/>
+      
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (
@@ -105,6 +138,12 @@ export function OrderTable(props) {
           {rowMarkup}
         </IndexTable>
       )}
+        <Paginate
+            total={totalItems}
+            itemsPerPage={ITEMS_PER_PAGE}
+            currentPage={currentPage}
+            onPageChange={page => setCurrentPage(page)}
+        />
     </Card>
   );
 }
