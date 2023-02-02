@@ -6,21 +6,18 @@ import {
   Filters,
   Select,
   TextField,
-  
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
-import { useState, useCallback, useMemo, useEffect} from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
 import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
 
-
-
 export function OrderTable(props) {
   let orders = [];
-  const fetch = useAuthenticatedFetch()
+  const fetch = useAuthenticatedFetch();
   /*
   const { data, status } = useAppQuery({
     url: `/api/orders`,
@@ -38,7 +35,7 @@ export function OrderTable(props) {
   }
   */
   //Pagination stuff
-  
+
   const [rawData, setRawData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [status, setStatus] = useState("");
@@ -49,36 +46,32 @@ export function OrderTable(props) {
   //new way to get the data
   useEffect(() => {
     const getData = () => {
-        
-
-        fetch("/api/orders")
-            .then(response => response.json())
-            .then(json => {
-                
-                setRawData(json);
-                setStatus("success")
-                
-            });
+      fetch("/api/orders")
+        .then((response) => response.json())
+        .then((json) => {
+          setRawData(json);
+          setStatus("success");
+        });
     };
 
     getData();
-}, []);
+  }, []);
   const orderData = useMemo(() => {
-  let computedOrders = rawData;  
-  
-  computedOrders = computedOrders.filter(post => {
-    if (search === '#') {
-      return post;
-    } else if (post.name.toLowerCase().includes(search.toLowerCase())) {
-      return post;
-    }
-  })
-  
-  setTotalItems(computedOrders.length);
-  return computedOrders.slice(
+    let computedOrders = rawData;
+
+    computedOrders = computedOrders.filter((post) => {
+      if (search === "#") {
+        return post;
+      } else if (post.name.toLowerCase().includes(search.toLowerCase())) {
+        return post;
+      }
+    });
+
+    setTotalItems(computedOrders.length);
+    return computedOrders.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
       (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
-  );
+    );
   }, [rawData, currentPage, search]);
 
   const resourceName = {
@@ -101,7 +94,6 @@ export function OrderTable(props) {
     props.setOrderId(id);
     props.setName(name);
   };
-  
 
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
@@ -122,18 +114,21 @@ export function OrderTable(props) {
           </Button>
         </IndexTable.Cell>
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
-           
+
         <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
-        <IndexTable.Cell>{total_price}</IndexTable.Cell>
+        <IndexTable.Cell>${total_price}</IndexTable.Cell>
       </IndexTable.Row>
-      
     )
   );
-  
 
   return (
-    <Card >
-      <FiltersComponent onSearch={value => { setSearch(value);setCurrentPage(1);}}/>
+    <Card>
+      <FiltersComponent
+        onSearch={(value) => {
+          setSearch(value);
+          setCurrentPage(1);
+        }}
+      />
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (
@@ -152,14 +147,13 @@ export function OrderTable(props) {
           {rowMarkup}
         </IndexTable>
       )}
-    
-        <Paginate
-            total={totalItems}
-            itemsPerPage={ITEMS_PER_PAGE}
-            currentPage={currentPage}
-            onPageChange={page => setCurrentPage(page)}
-        />
-     
+
+      <Paginate
+        total={totalItems}
+        itemsPerPage={ITEMS_PER_PAGE}
+        currentPage={currentPage}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </Card>
   );
 }
