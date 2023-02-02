@@ -20,7 +20,8 @@ import FiltersComponent from "./FiltersComponent";
 
 export function OrderTable(props) {
   let orders = [];
-  
+  const fetch = useAuthenticatedFetch()
+  /*
   const { data, status } = useAppQuery({
     url: `/api/orders`,
     reactQueryOptions: {
@@ -35,15 +36,35 @@ export function OrderTable(props) {
     
     
   }
+  */
   //Pagination stuff
   
-  const [once, setOnce] = useState([]);
+  const [rawData, setRawData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [status, setStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("#");
+  //Should be 10
   const ITEMS_PER_PAGE = 10;
+  //new way to get the data
+  useEffect(() => {
+    const getData = () => {
+        
+
+        fetch("/api/orders")
+            .then(response => response.json())
+            .then(json => {
+                
+                setRawData(json);
+                setStatus("success")
+                
+            });
+    };
+
+    getData();
+}, []);
   const orderData = useMemo(() => {
-  let computedOrders = orders;  
+  let computedOrders = rawData;  
   
   computedOrders = computedOrders.filter(post => {
     if (search === '#') {
@@ -58,7 +79,7 @@ export function OrderTable(props) {
       (currentPage - 1) * ITEMS_PER_PAGE,
       (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
   );
-  }, [once, currentPage, search]);
+  }, [rawData, currentPage, search]);
 
   const resourceName = {
     singular: "order",
@@ -81,16 +102,6 @@ export function OrderTable(props) {
     props.setName(name);
   };
   
-  /*
-  orders.filter(post => {
-    if (value === '#') {
-      console.log('vn',post)
-      return post;
-    } else if (post.name.toLowerCase().includes(value.toLowerCase())) {
-      return post;
-    }
-  })
-*/
 
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
@@ -111,7 +122,7 @@ export function OrderTable(props) {
           </Button>
         </IndexTable.Cell>
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
-
+           
         <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
         <IndexTable.Cell>{total_price}</IndexTable.Cell>
       </IndexTable.Row>
