@@ -17,6 +17,7 @@ import { ProductsCard, OrderTable, DatePickerExample } from "../components";
 
 export default function HomePage() {
   const [show, setShow] = useState(false);
+  const [reloadComp, setReloadComp] = useState(false);
   const toggleShow = () => {
     if (!show) {
       setShow(true);
@@ -26,20 +27,26 @@ export default function HomePage() {
   const [orderName, setName] = useState();
 
   return (
-    <Page narrowWidth>
+    <Page fullWidth>
       <TitleBar title="Editify" primaryAction={null} />
       <Layout>
-        <Layout.Section>
+        <Layout.Section oneThird>
+          <br></br>
+          <br />
           <OrderTable
             toggleShow={toggleShow}
             setOrderId={setOrderId}
             setName={setName}
+            reloadComp={reloadComp}
           />
         </Layout.Section>
-        <Layout.Section>
-          {show && (
-            <DatePickerExample orderId={orderId} orderName={orderName} />
-          )}
+        <Layout.Section oneThird>
+          <DatePickerExample
+            orderId={orderId}
+            orderName={orderName}
+            reloadComp={reloadComp}
+            setReloadComp={setReloadComp}
+          />
         </Layout.Section>
       </Layout>
     </Page>

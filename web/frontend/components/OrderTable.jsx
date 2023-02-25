@@ -14,6 +14,7 @@ import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
 import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
+import { Link, Scroll } from "react-scroll";
 
 export function OrderTable(props) {
   let orders = [];
@@ -44,18 +45,18 @@ export function OrderTable(props) {
   //Should be 10
   const ITEMS_PER_PAGE = 10;
   //new way to get the data
-  useEffect(() => {
-    const getData = () => {
-      fetch("/api/orders")
-        .then((response) => response.json())
-        .then((json) => {
-          setRawData(json);
-          setStatus("success");
-        });
-    };
+  const getData = () => {
+    fetch("/api/orders")
+      .then((response) => response.json())
+      .then((json) => {
+        setRawData(json);
+        setStatus("success");
+      });
+  };
 
+  useEffect(() => {
     getData();
-  }, []);
+  }, [props.reloadComp]);
   const orderData = useMemo(() => {
     let computedOrders = rawData;
 
@@ -90,6 +91,7 @@ export function OrderTable(props) {
   };
 
   const orderClicked = (id, name) => {
+    // scroll.scrollToBottom(options);
     props.toggleShow();
     props.setOrderId(id);
     props.setName(name);
@@ -105,6 +107,7 @@ export function OrderTable(props) {
       >
         <IndexTable.Cell>
           <Button
+            primary
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);

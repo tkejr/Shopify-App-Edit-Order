@@ -13,13 +13,16 @@ import {
 import { useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 
-
 export function DatePickerExample(props) {
   const emptyToastProps = { content: null };
   const [active, setActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
 
+  var title = "Please  Click on Order Number";
+  if (props.orderName) {
+    title = "Please Select a Date for " + props.orderName;
+  }
   const toastMarkup = toastProps.content && (
     <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
   );
@@ -32,8 +35,8 @@ export function DatePickerExample(props) {
     year: currentDate.getFullYear(),
   });
   const [selectedDates, setSelectedDates] = useState({
-    start: new Date('January 17, 2023 03:24:00'),
-    end: new Date('January 17, 2023 03:24:00'),
+    start: new Date("January 17, 2023 03:24:00"),
+    end: new Date("January 17, 2023 03:24:00"),
   });
 
   const handleMonthChange = useCallback(
@@ -63,6 +66,7 @@ export function DatePickerExample(props) {
 
     if (response.ok) {
       setToastProps({ content: "Date Updated" });
+      props.setReloadComp(!props.reloadComp);
     } else {
       setIsLoading(false);
       setToastProps({
@@ -76,14 +80,14 @@ export function DatePickerExample(props) {
     <Frame>
       <Page>{toastMarkup}</Page>
       <Card
-        title={`Edit Date for ${props.orderName}`}
+        title={title}
         sectioned
         primaryFooterAction={{
           content: "Submit",
           onAction: submitDate,
         }}
       >
-        <TextContainer spacing="loose">
+        <TextContainer spacing="loose" id="section-1">
           <p>
             You can Backdate an order by selecting a date from the calendar
             below.
