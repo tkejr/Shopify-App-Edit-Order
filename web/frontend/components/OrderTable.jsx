@@ -118,7 +118,7 @@ export function OrderTable(props) {
         </IndexTable.Cell>
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
-        <IndexTable.Cell>{customer.first_name}</IndexTable.Cell>
+        <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
         <IndexTable.Cell>${total_price}</IndexTable.Cell>
       </IndexTable.Row>
     )
