@@ -8,7 +8,8 @@ import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import bodyParser from "body-parser";
-
+//new for billing
+import {billingConfig} from './shopify.js'
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =
@@ -23,6 +24,33 @@ app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
+  //this is for if you want to check if they have paid beforehand, super easy
+  
+  // Request payment if required
+  async (req, res, next) => {
+    const plans = Object.keys(billingConfig);
+    const session = res.locals.shopify.session;
+    const hasPayment = await shopify.api.billing.check({
+      session,
+      plans: plans,
+      isTest: true,
+    });
+
+    if (hasPayment) {
+      next();
+      
+    } else {
+      res.redirect(
+        await shopify.api.billing.request({
+          session,
+          plan: plans[0],
+          isTest: true,
+        })
+      );
+    }
+  },
+  // Load the app otherwise
+  
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -76,7 +104,7 @@ app.get("/api/orders", async (_req, res) => {
 
   */
 
-  res.status(200).json(data);
+  res.status(200).json(data);  
 });
 app.put("/api/orders/:id", async (_req, res) => {
   //const order = new shopify.api.rest.Order({
@@ -162,15 +190,15 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.shipping_address = orderTesting?.shipping_address;
   order2.shipping_lines = orderTesting?.shipping_lines
   order2.source_identifier = orderTesting?.source_identifier;
-  order2.source_name = orderTesting?.source_name; 
-  order2.source_url = orderTesting?.source_url; //
+  //order2.source_name = orderTesting?.source_name; 
+  order2.source_url = orderTesting?.source_url; //  
   order2.subtotal_price = orderTesting?.subtotal_price;
   order2.subtotal_price_set = orderTesting?.subtotal_price_set;
   
   //you cannot have these two attributes for some reason
   //order2.tags = orderTesting?.tags; 
   //order2.tax_lines = orderTesting?.tax_lines;
-
+  
 
   order2.taxes_included = orderTesting?.taxes_included; 
   order2.test = orderTesting?.test; //
@@ -185,7 +213,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_shipping_price_set = orderTesting?.total_shipping_price_set
   order2.total_tax = orderTesting?.total_tax;
   order2.total_tax_set = orderTesting?.total_tax_set;
-  order2.total_tip_received = orderTesting?.total_tip_received;
+  order2.total_tip_received = orderTesting?.total_tip_received; 
   order2.total_weight = orderTesting?.total_weight;
   order2.updated_at = orderTesting?.updated_at;//
   order2.user_id = orderTesting?.user_id;//
