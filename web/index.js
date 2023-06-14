@@ -221,17 +221,16 @@ app.put("/api/orders/:id", async (_req, res) => {
   ////
 
   try {
+    //saving the newly created order here
+    // @ts-ignore
+    await order2.save({
+      update: true,
+    });
     
     //deleting the old order with the old date
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
         id:  _req.params["id"]
-    });
-
-    //saving the newly created order here
-    // @ts-ignore
-    await order2.save({
-      update: true,
     });
   } catch (e) {
     console.log(`Failed to process products/create: ${e.message}`);
