@@ -172,7 +172,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify-dev/";
+  const url = "https://" + shop + "/admin/apps/editify/";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Plan";
