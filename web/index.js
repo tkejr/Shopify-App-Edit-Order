@@ -86,6 +86,109 @@ app.get("/api/products/create", async (_req, res) => {
   }
   res.status(status).send({ success: status === 200, error });
 });
+// Verify the user has a plan
+app.get("/api/check", async (req, res) => {
+  const HAS_PAYMENTS_QUERY = `
+  query appSubscription {  
+    currentAppInstallation {
+      activeSubscriptions {
+            id
+            name
+            lineItems {
+                  id
+                  plan {
+                    pricingDetails {
+                      __typename
+                      ... on AppUsagePricing {
+                        terms
+                        balanceUsed {
+                          amount
+                        }
+                        cappedAmount {
+                          amount
+                        }
+                      }
+                    }
+                  }
+                }
+            }
+          }
+      }
+  `;
+
+  const session = res.locals.shopify.session;
+  console.log("sdsd", session.shop);
+  const client = new shopify.api.clients.Graphql({ session });
+  let subscriptionLineItem = {};
+  let hasPayment = false;
+  //const planName = Object.keys(billingConfig)[0];
+  const planName = "Premium Plan for Resizify";
+  //const planDescription = billingConfig[planName].usageTerms;
+
+  try {
+    const response = await client.query({
+      data: {
+        query: HAS_PAYMENTS_QUERY,
+      },
+    });
+    console.log(
+      response.body.data.currentAppInstallation.activeSubscriptions.lineItems
+    );
+    response.body.data.currentAppInstallation.activeSubscriptions.forEach(
+      (subscription) => {
+        if (subscription.name === planName) {
+          hasPayment = true;
+          /*
+          subscription.lineItems.forEach((lineItem) => {
+            if (lineItem.plan.pricingDetails.terms === planDescription) {
+              subscriptionLineItem = {
+                id: lineItem.id,
+                balanceUsed: parseFloat(
+                  lineItem.plan.pricingDetails.balanceUsed.amount
+                ),
+                cappedAmount: parseFloat(
+                  lineItem.plan.pricingDetails.cappedAmount.amount
+                ),
+              };
+            }
+          });
+          */
+        }
+      }
+    );
+  } catch (error) {
+    if (error instanceof GraphqlQueryError) {
+      throw new Error(
+        `${error.message}\n${JSON.stringify(error.response, null, 2)}`
+      );
+    } else {
+      throw error;
+    }
+  }
+  //return subscriptionLineItem;
+  res.json({ hasPayment });
+});
+app.get("/api/upgradeFirst", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+  ///IMPORTANT, change this to just /editify in prod
+  const url = "https://" + shop + "/admin/apps/editify-dev/";
+  const recurring_application_charge =
+    new shopify.api.rest.RecurringApplicationCharge({ session: session });
+  recurring_application_charge.name = "Premium Plan for Editify";
+  recurring_application_charge.price = 3.99;
+  recurring_application_charge.return_url = url;
+  //recurring_application_charge.billing_account_id = 770125316;
+  recurring_application_charge.trial_days = 5;
+  recurring_application_charge.test = true;
+  await recurring_application_charge.save({
+    update: true,
+  });
+  const confirmationUrl = recurring_application_charge.confirmation_url;
+  //console.log(recurring_application_charge);
+  res.json({ confirmationUrl });
+})
+
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
@@ -129,7 +232,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order.id = _req.params["id"];
   const newDate = _req.body.date;
 
-  ////
+  
+     ////
   // here is all of it lol
   //most important are these two obviously 
   order2.created_at = newDate
@@ -186,14 +290,14 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.processing_method = orderTesting?.processing_method;
   order2.referring_site = orderTesting?.referring_site;  
   order2.refunds = orderTesting?.refunds;
-  order2.session = orderTesting?.session; //
+  //order2.session = orderTesting?.session; //
   order2.shipping_address = orderTesting?.shipping_address;
   order2.shipping_lines = orderTesting?.shipping_lines
   order2.source_identifier = orderTesting?.source_identifier;
   //order2.source_name = orderTesting?.source_name; 
-  order2.source_url = orderTesting?.source_url; //  
+  //order2.source_url = orderTesting?.source_url; //  
   order2.subtotal_price = orderTesting?.subtotal_price;
-  order2.subtotal_price_set = orderTesting?.subtotal_price_set;
+  order2.subtotal_price_set = orderTesting?.subtotal_price_set;  
   
   //you cannot have these two attributes for some reason
   //order2.tags = orderTesting?.tags; 
@@ -201,8 +305,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   
 
   order2.taxes_included = orderTesting?.taxes_included; 
-  order2.test = orderTesting?.test; //
-  order2.token = orderTesting?.token; //
+  //order2.test = orderTesting?.test; //
+  //order2.token = orderTesting?.token; //
   order2.total_discounts = orderTesting?.total_discounts;
   order2.total_discounts_set = orderTesting?.total_discounts_set;
   order2.total_line_items_price = orderTesting?.total_line_items_price;
@@ -220,6 +324,9 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   ////
 
+  
+ 
+
   try {
     //saving the newly created order here
     // @ts-ignore
@@ -233,7 +340,7 @@ app.put("/api/orders/:id", async (_req, res) => {
         id:  _req.params["id"]
     });
   } catch (e) {
-    console.log(`Failed to process products/create: ${e.message}`);
+    console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
     error = e.message;
   }
