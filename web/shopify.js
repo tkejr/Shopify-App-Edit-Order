@@ -13,8 +13,8 @@ export const billingConfig = {
     amount: 3.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
-    trialDays: 7,
-    usageTerms: "7 day free trial, then 3.99 per month",
+    trialDays: 5,
+    usageTerms: "5 day free trial, then 3.99 per month",
     replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
   },
 };

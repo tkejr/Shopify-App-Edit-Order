@@ -1,7 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { NavigationMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
-
+import { Provider } from "react-redux";
+import store from "./store";
 import {
   AppBridgeProvider,
   QueryProvider,
@@ -14,6 +15,7 @@ export default function App() {
   const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
   return (
+  <Provider store={store}>
     <PolarisProvider>
       <BrowserRouter>
         <AppBridgeProvider>
@@ -23,5 +25,6 @@ export default function App() {
         </AppBridgeProvider>
       </BrowserRouter>
     </PolarisProvider>
+  </Provider>
   );
 }
