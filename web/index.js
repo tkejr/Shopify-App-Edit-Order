@@ -33,7 +33,7 @@ app.get(
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: true,
+      isTest: false,
     });
 
     if (hasPayment) {
@@ -44,7 +44,7 @@ app.get(
         await shopify.api.billing.request({
           session,
           plan: plans[0],
-          isTest: true,
+          isTest: false,
         })
       );
     }
