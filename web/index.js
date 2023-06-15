@@ -180,7 +180,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 5;
-  recurring_application_charge.test = true;
+  recurring_application_charge.test = false;
   await recurring_application_charge.save({
     update: true,
   });
