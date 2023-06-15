@@ -33,7 +33,7 @@ app.get(
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: false,
+      isTest: true,
     });
 
     if (hasPayment) {
@@ -44,7 +44,7 @@ app.get(
         await shopify.api.billing.request({
           session,
           plan: plans[0],
-          isTest: false,
+          isTest: true,
         })
       );
     }
@@ -122,7 +122,7 @@ app.get("/api/check", async (req, res) => {
   let subscriptionLineItem = {};
   let hasPayment = false;
   //const planName = Object.keys(billingConfig)[0];
-  const planName = "Premium Plan for Resizify";
+  const planName = "Editify Plan";
   //const planDescription = billingConfig[planName].usageTerms;
 
   try {
@@ -175,7 +175,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   const url = "https://" + shop + "/admin/apps/editify-dev/";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
-  recurring_application_charge.name = "Premium Plan for Editify";
+  recurring_application_charge.name = "Editify Plan";
   recurring_application_charge.price = 3.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
@@ -187,7 +187,33 @@ app.get("/api/upgradeFirst", async (req, res) => {
   const confirmationUrl = recurring_application_charge.confirmation_url;
   //console.log(recurring_application_charge);
   res.json({ confirmationUrl });
-})
+});
+
+app.get("/api/downgrade", async (_req, res) => {
+  const session = res.locals.shopify.session;
+  const planName = "Editify Plan";
+  const allSubscriptions =
+    await shopify.api.rest.RecurringApplicationCharge.all({
+      session: session,
+    });
+  //go through all of them to finf the right one, how would you know it is the right one? active and same name and 32665272321 as api client id
+  try {
+    allSubscriptions.forEach((subscription) => {
+      if (subscription.name === planName && subscription.status === "active") {
+        shopify.api.rest.RecurringApplicationCharge.delete({
+          session: session,
+          id: subscription.id,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  const shop = session.shop;
+  const basicUrl = "https://" + shop + "/admin/apps/editify-dev";
+  res.json({ basicUrl });
+});
 
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
@@ -209,6 +235,9 @@ app.get("/api/orders", async (_req, res) => {
 
   res.status(200).json(data);  
 });
+
+
+
 app.put("/api/orders/:id", async (_req, res) => {
   //const order = new shopify.api.rest.Order({
   //  session: res.locals.shopify.session,

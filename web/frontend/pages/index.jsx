@@ -30,6 +30,7 @@ export default function HomePage() {
   const [orderName, setName] = useState();
   const [loading, setLoading] = useState(false);
   const isPremiumUser = useSelector((state) => state.isPremiumUser);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
@@ -45,6 +46,7 @@ export default function HomePage() {
       .then((response) => response.json())
       .then((data) => {
         dispatch({ type: "SET_IS_PREMIUM_USER", payload: data.hasPayment });
+        
         setUserStateLoading(false);
       });
   };
@@ -59,6 +61,17 @@ export default function HomePage() {
 
       });
   }
+  const downgrade = async () => {
+    setLoading(true);
+
+    const res = await fetch("/api/downgrade")
+      .then((response) => response.json())
+      .then((data) => {
+        navigate(data.basicUrl);
+
+        setLoading(false);
+      });
+  };
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     
@@ -107,13 +120,16 @@ export default function HomePage() {
       content: "Feature Request",
       onAction: () => handlePrimaryAction(),
     }}
+   
+      
+    
     
       fullWidth>
       
       <Layout>
 
         {
-        (isPremiumUser) ? checkPremiumUserContent() :
+        (!isPremiumUser) ? checkPremiumUserContent() :
         
         <>
         <Layout.Section oneThird>
