@@ -14,7 +14,9 @@
   "dependencies": {
     "@shopify/app": "3.38.0",
     "@shopify/cli": "3.38.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "mixpanel": "^0.17.0",
+    "mixpanel-browser": "^2.47.0"
   },
   "author": "tanmay"
 }

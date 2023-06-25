@@ -8,8 +8,10 @@ import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import bodyParser from "body-parser";
+import Mixpanel from "mixpanel";
+
 //new for billing
-import {billingConfig} from './shopify.js'
+import { billingConfig } from "./shopify.js";
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =
@@ -18,6 +20,7 @@ const STATIC_PATH =
     : `${process.cwd()}/frontend/`;
 
 const app = express();
+const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
@@ -25,11 +28,17 @@ app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
   //this is for if you want to check if they have paid beforehand, super easy
-  
   // Request payment if required
   async (req, res, next) => {
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
+    console.log("Install callback", session.shop);
+    //Tracking the install event
+    mixpanel.people.set(session.shop, {
+      $first_name: session.shop,
+      $created: new Date().toISOString(),
+      plan: "premium",
+    });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
@@ -38,7 +47,6 @@ app.get(
 
     if (hasPayment) {
       next();
-      
     } else {
       res.redirect(
         await shopify.api.billing.request({
@@ -50,7 +58,7 @@ app.get(
     }
   },
   // Load the app otherwise
-  
+
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -88,6 +96,7 @@ app.get("/api/products/create", async (_req, res) => {
 });
 // Verify the user has a plan
 app.get("/api/check", async (req, res) => {
+  console.log("in the callback");
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
     currentAppInstallation {
@@ -117,7 +126,7 @@ app.get("/api/check", async (req, res) => {
   `;
 
   const session = res.locals.shopify.session;
-  console.log("sdsd", session.shop);
+  console.log("sdsd", res.locals);
   const client = new shopify.api.clients.Graphql({ session });
   let subscriptionLineItem = {};
   let hasPayment = false;
@@ -172,7 +181,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify/";
+  const url = "https://" + shop + "/admin/apps/editify-dev/";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Plan";
@@ -180,12 +189,16 @@ app.get("/api/upgradeFirst", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 5;
-  recurring_application_charge.test = false;
+  recurring_application_charge.test = true;
   await recurring_application_charge.save({
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
-  //console.log(recurring_application_charge);
+
+  mixpanel.track("Approved Charge", {
+    distinct_id: shop,
+    price: recurring_application_charge.price,
+  });
   res.json({ confirmationUrl });
 });
 
@@ -219,7 +232,7 @@ app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
-    limit: 250,// new to make the limit 250 instead of 50
+    limit: 250, // new to make the limit 250 instead of 50
   });
 
   /*
@@ -233,10 +246,8 @@ app.get("/api/orders", async (_req, res) => {
 
   */
 
-  res.status(200).json(data);  
+  res.status(200).json(data);
 });
-
-
 
 app.put("/api/orders/:id", async (_req, res) => {
   //const order = new shopify.api.rest.Order({
@@ -246,30 +257,26 @@ app.put("/api/orders/:id", async (_req, res) => {
   const orderTesting = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
     id: _req.params["id"],
-    
   });
-
-
-
-  //here is the new order we are creating, appropro named order2 
+  console.log("This is the order Id" + _req.params["id"]);
+  //here is the new order we are creating, appropro named order2
   let order2 = new shopify.api.rest.Order({
-    session: res.locals.shopify.session
-   });
+    session: res.locals.shopify.session,
+  });
   //@ts-ignore
   let status = 200;
   let error = null;
   //order.id = _req.params["id"];
   const newDate = _req.body.date;
 
-  
-     ////
+  ////
   // here is all of it lol
-  //most important are these two obviously 
-  order2.created_at = newDate
-  order2.processed_at = newDate
+  //most important are these two obviously
+  order2.created_at = newDate;
+  order2.processed_at = newDate;
   ///
-  order2.line_items = orderTesting?.line_items
-  order2.transactions = orderTesting?.transactions
+  order2.line_items = orderTesting?.line_items;
+  order2.transactions = orderTesting?.transactions;
   order2.total_tax = orderTesting?.total_tax;
   order2.billing_address = orderTesting?.billing_address;
   order2.app_id = orderTesting?.app_id;
@@ -285,7 +292,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.current_subtotal_price = orderTesting?.current_subtotal_price;
   order2.current_subtotal_price_set = orderTesting?.current_subtotal_price_set;
   order2.current_total_discounts = orderTesting?.current_total_discounts;
-  order2.current_total_discounts_set = orderTesting?.current_total_discounts_set;
+  order2.current_total_discounts_set =
+    orderTesting?.current_total_discounts_set;
   order2.current_total_duties_set = orderTesting?.current_total_duties_set;
   order2.current_total_price = orderTesting?.current_total_price;
   order2.current_total_price_set = orderTesting?.current_total_price_set;
@@ -294,18 +302,18 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.customer = orderTesting?.customer;
   order2.customer_locale = orderTesting?.customer_locale;
   order2.discount_applications = orderTesting?.discount_applications;
-  //order2.discount_codes = orderTesting?.discount_codes;
+  // order2.discount_codes = orderTesting?.discount_codes;
   order2.email = orderTesting?.email;
   order2.estimated_taxes = orderTesting?.estimated_taxes;
   order2.financial_status = orderTesting?.financial_status;
   order2.fulfillment_status = orderTesting?.fulfillment_status;
-  //order2.fulfillments = orderTesting?.fulfillments;
+  // order2.fulfillments = orderTesting?.fulfillments;
   order2.gateway = orderTesting?.gateway;
   order2.landing_site = orderTesting?.landing_site;
   order2.location_id = orderTesting?.location_id;
-  order2.merchant_of_record_app_id = orderTesting?.merchant_of_record_app_id; 
-  order2.name = orderTesting?.name; 
-  order2.note = orderTesting?.note; 
+  order2.merchant_of_record_app_id = orderTesting?.merchant_of_record_app_id;
+  order2.name = orderTesting?.name;
+  order2.note = orderTesting?.note;
   order2.note_attributes = orderTesting?.note_attributes;
   order2.number = orderTesting?.number; //
   order2.order_number = orderTesting?.order_number; //
@@ -314,26 +322,25 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.payment_details = orderTesting?.payment_details;
   order2.payment_gateway_names = orderTesting?.payment_gateway_names;
   order2.payment_terms = orderTesting?.payment_terms;
-  order2.phone = orderTesting?.phone; 
+  order2.phone = orderTesting?.phone;
   order2.presentment_currency = orderTesting?.presentment_currency;
   order2.processing_method = orderTesting?.processing_method;
-  order2.referring_site = orderTesting?.referring_site;  
+  order2.referring_site = orderTesting?.referring_site;
   order2.refunds = orderTesting?.refunds;
   //order2.session = orderTesting?.session; //
   order2.shipping_address = orderTesting?.shipping_address;
-  order2.shipping_lines = orderTesting?.shipping_lines
+  order2.shipping_lines = orderTesting?.shipping_lines;
   order2.source_identifier = orderTesting?.source_identifier;
-  //order2.source_name = orderTesting?.source_name; 
-  //order2.source_url = orderTesting?.source_url; //  
+  //order2.source_name = orderTesting?.source_name;
+  //order2.source_url = orderTesting?.source_url; //
   order2.subtotal_price = orderTesting?.subtotal_price;
-  order2.subtotal_price_set = orderTesting?.subtotal_price_set;  
-  
-  //you cannot have these two attributes for some reason
-  //order2.tags = orderTesting?.tags; 
-  //order2.tax_lines = orderTesting?.tax_lines;
-  
+  order2.subtotal_price_set = orderTesting?.subtotal_price_set;
 
-  order2.taxes_included = orderTesting?.taxes_included; 
+  //you cannot have these two attributes for some reason
+  //order2.tags = orderTesting?.tags;
+  //order2.tax_lines = orderTesting?.tax_lines;
+
+  order2.taxes_included = orderTesting?.taxes_included;
   //order2.test = orderTesting?.test; //
   //order2.token = orderTesting?.token; //
   order2.total_discounts = orderTesting?.total_discounts;
@@ -342,19 +349,16 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_line_items_price_set = orderTesting?.total_line_items_price_set;
   order2.total_outstanding = orderTesting?.total_outstanding;
   order2.total_price = orderTesting?.total_price;
-  order2.total_price_set = orderTesting?.total_price_set
-  order2.total_shipping_price_set = orderTesting?.total_shipping_price_set
+  order2.total_price_set = orderTesting?.total_price_set;
+  order2.total_shipping_price_set = orderTesting?.total_shipping_price_set;
   order2.total_tax = orderTesting?.total_tax;
   order2.total_tax_set = orderTesting?.total_tax_set;
-  order2.total_tip_received = orderTesting?.total_tip_received; 
+  order2.total_tip_received = orderTesting?.total_tip_received;
   order2.total_weight = orderTesting?.total_weight;
-  order2.updated_at = orderTesting?.updated_at;//
-  order2.user_id = orderTesting?.user_id;//
+  order2.updated_at = orderTesting?.updated_at; //
+  order2.user_id = orderTesting?.user_id; //
 
   ////
-
-  
- 
 
   try {
     //saving the newly created order here
@@ -362,17 +366,21 @@ app.put("/api/orders/:id", async (_req, res) => {
     await order2.save({
       update: true,
     });
-    
-    //deleting the old order with the old date
+
+    // deleting the old order with the old date
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
-        id:  _req.params["id"]
+      id: _req.params["id"],
     });
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
     error = e.message;
   }
+  mixpanel.track("Edited Order", {
+    distinct_id: res.locals.shopify.session.shop,
+    order_number: order2.order_number,
+  });
   res.status(status).send({ success: status === 200, error });
 });
 

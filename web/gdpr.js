@@ -30,6 +30,7 @@ export default {
       //     "id": 9999
       //   }
       // }
+      console.log(payload);
     },
   },
 
