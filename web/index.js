@@ -336,8 +336,14 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.subtotal_price = orderTesting?.subtotal_price;
   order2.subtotal_price_set = orderTesting?.subtotal_price_set;
 
+  
+  
+  if(orderTesting.tags){
+    order2.tags = orderTesting?.tags;
+  }
+
+  
   //you cannot have these two attributes for some reason
-  //order2.tags = orderTesting?.tags;
   //order2.tax_lines = orderTesting?.tax_lines;
 
   order2.taxes_included = orderTesting?.taxes_included;
