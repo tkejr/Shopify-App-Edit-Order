@@ -7,10 +7,11 @@ import {
   Stack,
   Link,
   Heading,
-  Button
+  Button,
+  Modal
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
@@ -19,6 +20,25 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
+
+  const [activeResizify, setActiveResizify] = useState(true);
+  const [activeReview, setActiveReview] = useState(true);
+  const handleChangeResizify = useCallback(() => setActiveResizify(!activeResizify), [activeResizify]);
+  const handleChangeReview = useCallback(() => setActiveReview(!activeReview), [activeReview]);
+  const redirectToResizify = () => {
+    window.open(
+      "https://apps.shopify.com/compress-files",
+      "_blank"
+    );
+  };
+  const redirectToEditify = () => {
+    window.open(
+      "https://apps.shopify.com/editify",
+      "_blank"
+    );
+  };
+  //const activator = <Button onClick={handleChange}>Open</Button>;
+
   const [show, setShow] = useState(false);
   const [reloadComp, setReloadComp] = useState(false);
   const toggleShow = () => {
@@ -120,21 +140,71 @@ export default function HomePage() {
       content: "Feature Request",
       onAction: () => handlePrimaryAction(),
     }}
-   
-      
-    
-    
+    secondaryActions={[
+      {
+        content: 'Leave A Review',
+        accessibilityLabel: 'Secondary action label',
+        onAction: () => handleChangeReview(),
+      },
+      {
+        content: 'Check out Resizify',
+        onAction: () => handleChangeResizify(),
+      },
+    ]}
+
       fullWidth>
-      
+     <hr></hr>
+  
+
+      <Modal
+        //activator={activator}
+        open={activeResizify}
+        onClose={handleChangeResizify}
+        title="Check out our other app, Resizify!"
+        primaryAction={{
+          content: 'Check out app',
+          onAction: redirectToResizify,
+        }}
+       
+      >
+        <Modal.Section>
+          <TextContainer>
+            <p>
+              Install this app to compress your store's images and upload from anywhere! You can upload from Instagram, Google Drive, and more!
+            </p>
+          </TextContainer>
+        </Modal.Section>
+      </Modal>
+    
+      <Modal
+        //activator={activator}
+        open={activeReview}
+        onClose={handleChangeReview}
+        title="Leave a Review on this app and get one month free!"
+        primaryAction={{
+          content: 'Leave a Review',
+          onAction: redirectToEditify,
+        }}
+        
+      >
+        <Modal.Section>
+          <TextContainer>
+            <p>
+              Leave us a review on the Shopify app store and get one month free!
+            </p>
+          </TextContainer>
+        </Modal.Section>
+      </Modal>
+    
       <Layout>
 
         {
         (!isPremiumUser) ? checkPremiumUserContent() :
         
         <>
-        <Layout.Section oneThird>
-          <br></br>
-          <br /> 
+        <Layout.Section oneHalf>
+          
+        
           <OrderTable
             toggleShow={toggleShow}
             setOrderId={setOrderId}
@@ -142,7 +212,7 @@ export default function HomePage() {
             reloadComp={reloadComp}
           />
         </Layout.Section>
-        <Layout.Section oneThird>
+        <Layout.Section oneHalf>
           <DatePickerExample
             orderId={orderId}
             orderName={orderName}
