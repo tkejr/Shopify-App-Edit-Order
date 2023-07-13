@@ -42,7 +42,7 @@ app.get(
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: false,
+      isTest: true,
     });
 
     if (hasPayment) {
@@ -52,7 +52,7 @@ app.get(
         await shopify.api.billing.request({
           session,
           plan: plans[0],
-          isTest: false,
+          isTest: true,
         })
       );
     }
@@ -189,7 +189,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 5;
-  recurring_application_charge.test = false;
+  recurring_application_charge.test = true;
   await recurring_application_charge.save({
     update: true,
   });

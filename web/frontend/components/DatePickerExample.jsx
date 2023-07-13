@@ -50,6 +50,10 @@ export function DatePickerExample(props) {
   };
 
   const submitDate = () => {
+    if(!props.orderId){
+      alert("Choose an order first")
+      return
+    }
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
   };
   const updateOrder = async (id, newDate) => {
@@ -76,16 +80,14 @@ export function DatePickerExample(props) {
     }
   };
 
+  
+
   return (
-    <Frame>
-      <Page>{toastMarkup}</Page>
+   <Frame>
       <Card
         title={title}
         sectioned
-        primaryFooterAction={{
-          content: "Submit",
-          onAction: submitDate,
-        }}
+      
       >
         <TextContainer spacing="loose" id="section-1">
           <p>
@@ -102,7 +104,11 @@ export function DatePickerExample(props) {
           disableDatesAfter={new Date()}
           selected={selectedDates}
         />
+        <br></br>
+        <Button pressed={!props.orderId} onClick={() => submitDate()} primary={props.orderId} fullWidth={true}>{props.orderId ? "Submit" : "Pick an Order"}</Button>
+        {toastMarkup}
       </Card>
-    </Frame>
+  </Frame>
+      
   );
 }
