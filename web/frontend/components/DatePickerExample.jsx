@@ -10,18 +10,22 @@ import {
   Page,
   Button,
 } from "@shopify/polaris";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
+import { useSelector, useDispatch } from "react-redux";
 
 export function DatePickerExample(props) {
   const emptyToastProps = { content: null };
   const [active, setActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
-
+  ////new code
+  const orderId = useSelector((state) => state.orderId);
+  const orderName = useSelector((state) => state.orderName);
+  const dispatch = useDispatch();
   var title = "Please  Click on Order Number";
-  if (props.orderName) {
-    title = "Please Select a Date for " + props.orderName;
+  if (orderName) {
+    title = "Please Select a Date for " + orderName;
   }
   const toastMarkup = toastProps.content && (
     <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
@@ -49,12 +53,16 @@ export function DatePickerExample(props) {
     return convertedDate;
   };
 
+
   const submitDate = () => {
-    if(!props.orderId){
+    if(!orderId){
       alert("Choose an order first")
       return
     }
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
+    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+    
   };
   const updateOrder = async (id, newDate) => {
     //make sure you are passing them in correctly, the date needs to be the correct date format as a string
@@ -74,7 +82,7 @@ export function DatePickerExample(props) {
     } else {
       setIsLoading(false);
       setToastProps({
-        content: "There was an error updating the date",
+        content: "There was an error updating the date",  
         error: true,
       });
     }
@@ -105,7 +113,7 @@ export function DatePickerExample(props) {
           selected={selectedDates}
         />
         <br></br>
-        <Button pressed={!props.orderId} onClick={() => submitDate()} primary={props.orderId} fullWidth={true}>{props.orderId ? "Submit" : "Pick an Order"}</Button>
+        <Button pressed={!orderId} onClick={() => submitDate()} primary={orderId} fullWidth={true}>{(orderId) ? "Submit" : "Pick an Order"}</Button>
         {toastMarkup}
       </Card>
   </Frame>
