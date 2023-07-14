@@ -15,6 +15,7 @@ import { Spinner } from "@shopify/polaris";
 import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
 import { Link, Scroll } from "react-scroll";
+import { useSelector, useDispatch } from "react-redux";
 
 export function OrderTable(props) {
   let orders = [];
@@ -89,12 +90,14 @@ export function OrderTable(props) {
     const convertedDate = dateObj.toLocaleDateString("en-US", options);
     return convertedDate;
   };
-
+  const dispatch = useDispatch();
   const orderClicked = (id, name) => {
     // scroll.scrollToBottom(options);
     props.toggleShow();
     props.setOrderId(id);
     props.setName(name);
+    dispatch({ type: "SET_PROPS_ORDER_ID", payload: id });
+    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: name });
   };
 
   const rowMarkup = orderData.map(
