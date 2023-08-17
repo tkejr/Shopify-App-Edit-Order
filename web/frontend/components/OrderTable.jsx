@@ -6,6 +6,8 @@ import {
   Filters,
   Select,
   TextField,
+  Modal,
+  DatePicker
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
@@ -100,6 +102,48 @@ export function OrderTable(props) {
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: name });
   };
 
+  //advanced Search
+  const [active, setActive] = useState(false);
+const [hasDates, setHasDates] = useState(false);
+const handleChange = useCallback(() =>  setActive(!active) , [active]  );
+const getCustomOrderDates = () => {
+    
+
+     setStatus('loading')
+        fetch("/api/orders/" + selectedDates.start + "/" + selectedDates.end)
+          .then((response) => response.json())
+          .then((json) => {
+            setRawData(json);
+            setStatus("success");
+          });
+      handleChange()
+      setHasDates(true)
+      //props.setReload(!props.reload)
+}
+const clearDates = () => {
+  if(hasDates){
+    setStatus('loading')
+    getData()
+    handleChange()
+    //props.setReload(!props.reload)
+  }
+  else{
+    handleChange()
+  }
+  setHasDates(false)
+   
+}
+//dates
+const [{month, year}, setDate] = useState({month: 7, year: 2023});
+const [selectedDates, setSelectedDates] = useState({
+start: new Date('Wed Aug 07 2023 00:00:00 GMT-0500 (EST)'),
+end: new Date('Sat Aug 10 2023 00:00:00 GMT-0500 (EST)'),
+});
+
+const handleMonthChange = useCallback(
+(month, year) => setDate({month, year}),
+[],
+);
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id }, index) => (
       <IndexTable.Row
@@ -135,6 +179,34 @@ export function OrderTable(props) {
           setCurrentPage(1);
         }}
       />
+      <Button  onClick={()=> handleChange()}>  Advanced Search </Button>
+        
+        <Modal
+        //activator={activator}
+        open={active}
+        onClose={handleChange}
+        title="Find Orders by Date"
+        secondaryActions={[{
+          content: "Clear",
+          onAction: () => clearDates(),
+        }]}
+        primaryAction={{
+          content: "Search",
+          onAction: () => getCustomOrderDates(),
+        }}
+      >
+        <Modal.Section>
+        <DatePicker
+            month={month}
+            year={year}
+            onChange={setSelectedDates}
+            onMonthChange={handleMonthChange}
+            selected={selectedDates}
+            allowRange
+        />
+        </Modal.Section>
+      </Modal>
+      <br></br>
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (

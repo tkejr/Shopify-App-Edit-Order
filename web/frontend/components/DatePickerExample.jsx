@@ -9,6 +9,7 @@ import {
   Frame,
   Page,
   Button,
+  Banner
 } from "@shopify/polaris";
 import { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
@@ -55,9 +56,20 @@ export function DatePickerExample(props) {
 
 
   const submitDate = () => {
-    if(!orderId){
-      alert("Choose an order first")
-      return
+    
+    let defaultDate =  new Date("January 17, 2023 03:24:00");
+    if(!orderId ){
+      //alert("Choose an order first")
+      setToastProps({ content: "Choose an order first" });
+      return 
+    }
+    
+    if(selectedDates.start.getFullYear() === defaultDate.getFullYear() &&
+    selectedDates.start.getMonth() === defaultDate.getMonth() &&
+    selectedDates.start.getDate() === defaultDate.getDate()){
+      
+      setToastProps({ content: "Choose an order date first" });
+      return 
     }
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
@@ -113,7 +125,7 @@ export function DatePickerExample(props) {
           selected={selectedDates}
         />
         <br></br>
-        <Button pressed={!orderId} onClick={() => submitDate()} primary={orderId} fullWidth={true}>{(orderId) ? "Submit" : "Pick an Order"}</Button>
+        <Button disabled={!orderId} onClick={() => submitDate()} primary={orderId} fullWidth={true}>{(orderId) ? "Submit" : "Pick an Order"}</Button>
         {toastMarkup}
       </Card>
   </Frame>

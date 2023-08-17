@@ -181,7 +181,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify-dev/";
+  const url = "https://" + shop + "/admin/apps/editify/";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Plan";
@@ -246,6 +246,21 @@ app.get("/api/orders", async (_req, res) => {
 
   */
 
+  res.status(200).json(data);
+});
+//new for advanced search
+app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
+  
+  
+  const data = await shopify.api.rest.Order.all({
+    session: res.locals.shopify.session,
+    status: "any",
+    limit: 250, // new to make the limit 250 instead of 50
+    processed_at_min:  _req.params["startDate"],
+    processed_at_max:  _req.params["endDate"]
+  });
+
+  
   res.status(200).json(data);
 });
 
