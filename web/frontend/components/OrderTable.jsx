@@ -179,7 +179,7 @@ const handleMonthChange = useCallback(
           setCurrentPage(1);
         }}
       />
-      <Button  onClick={()=> handleChange()}>  Advanced Search </Button>
+      <Button fullWidth onClick={()=> handleChange()}>  Advanced Search </Button>
         
         <Modal
         //activator={activator}
