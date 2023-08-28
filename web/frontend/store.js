@@ -4,6 +4,7 @@ const initialState = {
   isPremiumUser: false,
   orderId: false,
   orderName: false, 
+  line_items: []
 };
 
 const reducer = (state = initialState, action) => {
@@ -14,6 +15,8 @@ const reducer = (state = initialState, action) => {
       return { ...state, orderId: action.payload };
     case "SET_PROPS_ORDER_NAME":
         return { ...state, orderName: action.payload };
+    case "SET_PROPS_LINE_ITEMS":
+        return { ...state, line_items: action.payload };
     default:
       return state;
   }

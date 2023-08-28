@@ -263,7 +263,19 @@ app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
   
   res.status(200).json(data);
 });
+//getting unfulfilled orders
+app.get("/api/orders/unfulfilled", async (_req, res) => {
+  const data = await shopify.api.rest.Order.all({
+    session: res.locals.shopify.session,
+    //status: "unfulfilled",
+    fulfillment_status: "unfulfilled",
+    limit: 250, 
+  });
 
+  
+
+  res.status(200).json(data);
+});
 app.put("/api/orders/:id", async (_req, res) => {
   //const order = new shopify.api.rest.Order({
   //  session: res.locals.shopify.session,
@@ -404,7 +416,226 @@ app.put("/api/orders/:id", async (_req, res) => {
   });
   res.status(status).send({ success: status === 200, error });
 });
+//get the line items
+app.get("/api/lineItems/:id", async (_req, res) => {
+  const data = await shopify.api.rest.Order.find({
+    session: res.locals.shopify.session,
+    id: _req.params["id"],
+  });
+  const lineItems = data?.line_items
+  res.status(200).json(lineItems);   
+});
+//edit the order quantity of a product
+app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({ session });
+  //get all the vars
+  const orderId =  req.params["id"];
+  const lineItemId =  req.params["lineItemId"];
+  let status = 200;
+  let error = null;
+  const quantity =  parseInt(req.params["quantity"]);
+try{
+const openOrder = await client.query({
+  data: {
+    query: `mutation orderEditBegin($id: ID!) {
+      orderEditBegin(id: $id) {
+        calculatedOrder {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,  
+     variables: {
+      id :  "gid://shopify/Order/" + orderId,
+    },  
+  },
+});            
+
+  //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+  const calculatedOrderId = openOrder.body.data.orderEditBegin.calculatedOrder.id;
+  //console.log('order id', calculatedOrderId)
+  //console.log("this is the line item if", lineItemId)
+  const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId; 
+  
+
+  const changeAmount = await client.query({
+    data: {   
+      query: `mutation orderEditSetQuantity($id: ID!, $lineItemId: ID!, $quantity: Int!) {
+        orderEditSetQuantity(id: $id, lineItemId: $lineItemId, quantity: $quantity) {
+          calculatedLineItem {
+            id
+          }
+          calculatedOrder {
+            id
+      addedLineItems(first: 5) {
+        edges {
+          node {
+            id
+            quantity
+          }
+        }
+      }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,  
+      variables: {
+            "id": calculatedOrderId,
+            "lineItemId": calculatedLineItem,
+            "quantity": quantity,
+            //"restock": true
+          
+      },
+        
+    },
+  });     
+  
+  
+ // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+const commitChange = await client.query({
+  data: {
+    query: `mutation orderEditCommit($id: ID!) {
+      orderEditCommit(id: $id) {
+        order {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,  
+    variables: {
+          "id": calculatedOrderId,
+          "notifyCustomer": false,
+          "staffNote": "This change is from Editify"
+         
+        
+    },
+      
+  },
+});       
+//console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+
+} catch (e) {
+  console.log(`Failed to edit quantity:  ${e.message}`);
+  status = 500;
+  error = e.message;
+}
+  
+  
+  
+  res.status(status).send({ success: status === 200, error });
+});
+//add a product to an order
+app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
+
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({ session });
+  //get all the vars
+  
+  let status = 200;
+  let error = null;
+  const orderId = req.params["orderId"];
+  const productId = req.params["productId"];
+  
+ const productVariantId = "gid://shopify/ProductVariant/" + productId;
+try{
+const openOrder = await client.query({
+  data: {
+    query: `mutation orderEditBegin($id: ID!) {
+      orderEditBegin(id: $id) {
+        calculatedOrder {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,  
+     variables: {
+      id :  "gid://shopify/Order/" + orderId,
+    },  
+  },
+});            
+
+  //console.log('this is the mutation response 1' , openOrder)//.calculatedOrder
+  const calculatedOrderId = openOrder.body.data.orderEditBegin.calculatedOrder.id;
+  //console.log('order id', calculatedOrderId)
+
+  const addProduct = await client.query({
+    data: {   
+      query: `mutation orderEditAddVariant($id: ID!, $quantity: Int!, $variantId: ID!) {
+        orderEditAddVariant(id: $id, quantity: $quantity, variantId: $variantId) {
+          calculatedLineItem {
+            id
+          }
+          calculatedOrder {
+           id
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,  
+      variables: {
+            "id": calculatedOrderId,
+            "variantId": productVariantId,
+            "quantity": 1,
+            //"restock": true
+          
+      },
+        
+    },
+  });     
+  
+  
+ // console.log('this is the mutation response 2' , addProduct)
+const commitChange = await client.query({
+  data: {
+    query: `mutation orderEditCommit($id: ID!) {
+      orderEditCommit(id: $id) {
+        order {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,  
+    variables: {
+          "id": calculatedOrderId,
+          "notifyCustomer": false,
+          "staffNote": "This change is from Editify"
+         
+        
+    },
+      
+  },
+});       
+//console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+
+} catch (e) {
+  console.log(`Failed to edit order:  ${e.message}`);
+  status = 500;
+  error = e.message;
+}
+  
+  
+  
+  res.status(status).send({ success: status === 200, error });
+});
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
