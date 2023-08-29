@@ -20,46 +20,25 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
-  //new function to compare dates
-  // not the most efficient in the slightest but we move
-  const compareDates = () => {
-    const lastDateStringResizify = localStorage.getItem("timeOfOpenResizify");
-    const lastDateResizify = new Date(lastDateStringResizify);
-    const lastDateMonthResizify = lastDateResizify.getMonth();
-    const lastDateStringReview = localStorage.getItem("timeOfOpenReview");
-    const lastDateReview = new Date(lastDateStringReview);
-    const lastDateMonthReview = lastDateReview.getMonth();
-    const date = new Date ();
-    const dateMonth = date.getMonth();
-   
-    
-      
-      if(lastDateMonthResizify > dateMonth){
-        localStorage.removeItem("timeOfOpenResizify");
-        localStorage.setItem("timeOfOpenResizify", date);
-        return true;
-      }
-      else if(lastDateMonthReview > dateMonth){
-        localStorage.removeItem("timeOfOpenReview");
-        localStorage.setItem("timeOfOpenReview", date);
-        return true; 
-      }
-       else {
-      
-      return false;
-      }
-  }
-  const [activeResizify, setActiveResizify] = useState((compareDates()) ? true : false);
-  const [activeReview, setActiveReview] = useState((compareDates()) ? true : false);
+  
+
+  const fetch = useAuthenticatedFetch();
+  
+
+  
+  //using random
+ 
+  const [activeResizify, setActiveResizify] = useState(((Math.random() <= .1) ? true: false ) ? true : false);
+  const [activeReview, setActiveReview] = useState(((Math.random() <= .1) ? true: false) ? true : false);
   
     
   
   const handleChangeResizify = useCallback(
-    () => {localStorage.setItem("timeOfOpenResizify", date); setActiveResizify(!activeResizify);},
+    () => { setActiveResizify(!activeResizify);},
     [activeResizify]
   );
   const handleChangeReview = useCallback(
-    () => {localStorage.setItem("timeOfOpenReview", date);setActiveReview(!activeReview)},
+    () => {setActiveReview(!activeReview)},
     [activeReview]
   );
   const redirectToResizify = () => {
@@ -84,7 +63,6 @@ export default function HomePage() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fetch = useAuthenticatedFetch();
   const [userStateLoading, setUserStateLoading] = useState(true);
   const handlePrimaryAction = () => {
     window.open(

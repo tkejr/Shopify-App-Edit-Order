@@ -636,6 +636,7 @@ const commitChange = await client.query({
   
   res.status(status).send({ success: status === 200, error });
 });
+
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
