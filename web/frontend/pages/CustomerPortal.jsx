@@ -34,7 +34,7 @@ export default function CustomerPortal() {
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
     {% if customer %}
       {% assign timestamp = 'now' | date: '%s' %} {% assign eo_sig = "t=" | append: timestamp | append: "&oid=" | append: checkout.order_id | append: "&shop=" | append: shop.permanent_domain | hmac_sha256: "ec0617d142ddf3b85e017ae2e3a39744" %}
-      <script id="customer-portal_button" src="https://editify-cportal.kejrtech.com/getScript" data-timestamp="{{timestamp}}" data-token={{eo_sig}} data-baseurl="editify-cportal.kejrtech.com/" defer></script>
+      <script id="customer-portal_button" src="https://editify-cportal.kejrtech.com/getScript" data-timestamp="{{timestamp}}" data-token={{eo_sig}} data-baseurl="editify-cportal.kejrtech.com" defer></script>
     {% endif %}
     <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
