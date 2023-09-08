@@ -9,9 +9,13 @@ import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import bodyParser from "body-parser";
 import Mixpanel from "mixpanel";
-
+import nodemailer from 'nodemailer';
+//const sgMail = require('@sendgrid/mail')
+import sgMail from '@sendgrid/mail'
 //new for billing
 import { billingConfig } from "./shopify.js";
+
+
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =
@@ -21,7 +25,8 @@ const STATIC_PATH =
 
 const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
-
+//for mail
+sgMail.setApiKey("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");
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -33,6 +38,8 @@ app.get(
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
     console.log("Install callback", session.shop);
+    console.log("cklsdds", session)
+    console.log("HOW often does ths trihhr")
     //Tracking the install event
     mixpanel.people.set(session.shop, {
       $first_name: session.shop,
@@ -58,7 +65,7 @@ app.get(
     }
   },
   // Load the app otherwise
-
+  
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -73,12 +80,117 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/api/products/count", async (_req, res) => {
-  const countData = await shopify.api.rest.Product.count({
+app.get("/api/email", async (_req, res) => {
+  const shopDetails = await shopify.api.rest.Shop.all({
     session: res.locals.shopify.session,
   });
+  
+  const shopEmail = "" + shopDetails[0].email
+  try {
+    // Send the email
+    
+    
+    const msg = {
+      to: shopEmail, // Change to your recipient
+      from: 'editifyshopify@gmail.com', // Change to your verified sender
+      subject: 'Editify',
+      text: 'Welcome to Editify',  
+      html: `
+      <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+      <tr>
+        <td align="center" style="padding:0;">
+          <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+            <tr>
+              <td align="center" style="padding:40px 0 30px 0;background:#ffffff;">
+                <img src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png" alt="" width="300" style="height:auto;display:block;" />
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:36px 30px 42px 30px;">
+                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                  <tr>
+                    <td style="padding:0 0 36px 0;color:#153643;">
+                      <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Welcome to Editify</h1>
+                      <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Backdate orders with ease, and have customers edit their orders! </p>
+                      <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="https://apps.shopify.com/editify" style="color:#ee4c50;text-decoration:underline;">Write a Review</a></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0;">
+                      <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                        <tr>
+                          <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+                            <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/left.gif" alt="" width="260" style="height:auto;display:block;" /></p>
+                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Editify is one of the only apps on the Shopify App store to both offer a customer portal for customers to edit their orders and offer merchants a way to backdate their orders. As well as backdating, Editify lets you change just about everything else in an order. If you think there is something we missed, shoot us an email and we will work on implementing it!</p>
+                            <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="http://www.example.com" style="color:#ee4c50;text-decoration:underline;"></a></p>
+                          </td>
+                          <td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
+                          <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+                            <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/right.gif" alt="" width="260" style="height:auto;display:block;" /></p>
+                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Save time trying to backdate an order, with our app it is as simple as a click of a button!</p>
+                            <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="http://www.example.com" style="color:#ee4c50;text-decoration:underline;"></a></p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:30px;background:#880808;">
+                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
+                  <tr>
+                    <td style="padding:0;width:50%;" align="left">
+                      <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;">Unsubscribe</a>
+                      </p>
+                    </td>
+                    <td style="padding:0;width:50%;" align="right">
+                      <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
+                        <tr>
+                          <td style="padding:0 0 0 10px;width:38px;">
+                            <a href="http://www.twitter.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
+                          </td>
+                          <td style="padding:0 0 0 10px;width:38px;">
+                            <a href="http://www.facebook.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/fb_1.png" alt="Facebook" width="38" style="height:auto;display:block;border:0;" /></a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+      `,
+    }
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log('Email sent')
+      })
+      .catch((error) => {
+        console.error(error)
+      })
 
-  res.status(200).send(countData);
+    // Return a success response
+    res.status(200).json({ message: 'Email sent successfully!' })
+  } catch (error) {
+    // Return an error response
+    console.log(error.message)
+    res
+      .status(500)
+      .json({ message: 'Failed to send email.', error: error.message })
+  }
+  
+
+  
+  
+
 });
 
 app.get("/api/products/create", async (_req, res) => {
@@ -202,31 +314,7 @@ app.get("/api/upgradeFirst", async (req, res) => {
   res.json({ confirmationUrl });
 });
 
-app.get("/api/downgrade", async (_req, res) => {
-  const session = res.locals.shopify.session;
-  const planName = "Editify Plan";
-  const allSubscriptions =
-    await shopify.api.rest.RecurringApplicationCharge.all({
-      session: session,
-    });
-  //go through all of them to finf the right one, how would you know it is the right one? active and same name and 32665272321 as api client id
-  try {
-    allSubscriptions.forEach((subscription) => {
-      if (subscription.name === planName && subscription.status === "active") {
-        shopify.api.rest.RecurringApplicationCharge.delete({
-          session: session,
-          id: subscription.id,
-        });
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
 
-  const shop = session.shop;
-  const basicUrl = "https://" + shop + "/admin/apps/editify-dev";
-  res.json({ basicUrl });
-});
 
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
@@ -272,8 +360,6 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
     limit: 250, 
   });
 
-  
-
   res.status(200).json(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
@@ -310,7 +396,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.cancel_reason = orderTesting?.cancel_reason;
   order2.buyer_accepts_marketing = orderTesting?.buyer_accepts_marketing;
   order2.cancelled_at = orderTesting?.cancelled_at;
-  order2.currency = orderTesting?.currency;
+  //order2.currency = orderTesting?.currency;
   order2.cart_token = orderTesting?.cart_token;
   order2.checkout_token = orderTesting?.checkout_token;
   order2.client_details = orderTesting?.client_details;
@@ -350,7 +436,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.payment_gateway_names = orderTesting?.payment_gateway_names;
   order2.payment_terms = orderTesting?.payment_terms;
   order2.phone = orderTesting?.phone;
-  order2.presentment_currency = orderTesting?.presentment_currency;
+  //order2.presentment_currency = orderTesting?.presentment_currency;
   order2.processing_method = orderTesting?.processing_method;
   order2.referring_site = orderTesting?.referring_site;
   order2.refunds = orderTesting?.refunds;
@@ -416,6 +502,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   });
   res.status(status).send({ success: status === 200, error });
 });
+
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
   const data = await shopify.api.rest.Order.find({
@@ -423,8 +510,34 @@ app.get("/api/lineItems/:id", async (_req, res) => {
     id: _req.params["id"],
   });
   const lineItems = data?.line_items
+ //putting the pictures there
+ for(let i = 0; i < lineItems?.length; i++){
+  try{
+    const data1 = await shopify.api.rest.Image.all({
+      session: res.locals.shopify.session,
+      product_id: lineItems[i].product_id,
+    });  
+    
+    if(data1[0].src){
+      lineItems[i].media = data1[0].src;
+    }
+    else{
+      
+      lineItems[i].media = ""
+    }
+    
+    
+  }
+  catch(e){
+    console.log(e.message)
+    lineItems[i].media = "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
+  }
+ }
+  
   res.status(200).json(lineItems);   
 });
+
+
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 
@@ -455,7 +568,7 @@ const openOrder = await client.query({
     },  
   },
 });            
-
+      
   //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
   const calculatedOrderId = openOrder.body.data.orderEditBegin.calculatedOrder.id;
   //console.log('order id', calculatedOrderId)
@@ -598,8 +711,7 @@ const openOrder = await client.query({
         
     },
   });     
-  
-  
+
  // console.log('this is the mutation response 2' , addProduct)
 const commitChange = await client.query({
   data: {
@@ -613,7 +725,7 @@ const commitChange = await client.query({
           message
         }
       }
-    }`,  
+    }`, 
     variables: {
           "id": calculatedOrderId,
           "notifyCustomer": false,
@@ -623,7 +735,7 @@ const commitChange = await client.query({
     },
       
   },
-});       
+});   
 //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
 
 } catch (e) {
@@ -647,3 +759,4 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 });
 
 app.listen(PORT);
+

@@ -39,6 +39,11 @@ const PageExample = () => {
       };
       useEffect(() => {
         fetchRecurringCharges().catch((error) => console.error(error));
+        //new
+        
+        //dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+        //dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+        //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
       }, []);
       const checkPremiumUserContent = () => {
         return (

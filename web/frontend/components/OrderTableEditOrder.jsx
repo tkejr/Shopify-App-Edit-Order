@@ -143,8 +143,9 @@ import {
   );
 
     //for the table
+   
     const rowMarkup = orderData.map(
-      ({ name, processed_at, customer, total_price, id, line_items }, index) => (
+      ({ name, processed_at, customer, total_price, id, line_items, currency }, index) => (
         <IndexTable.Row
           id={id}
           key={id}
@@ -165,7 +166,7 @@ import {
           <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
   
           <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
-          <IndexTable.Cell>${total_price}</IndexTable.Cell>
+          <IndexTable.Cell>{total_price} {currency} </IndexTable.Cell>
         </IndexTable.Row>
       )
     );
@@ -181,9 +182,9 @@ import {
                 }}
             />
         
-            
+        <div style={{padding:"10px"}}>
             <Button  fullWidth onClick={()=> handleChange()}>  Advanced Search </Button>
-            
+            </div>
             
            
         
