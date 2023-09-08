@@ -17,12 +17,13 @@ const orderName = useSelector((state) => state.orderName);
 const [line_items, setLineItems] = useState([])
 const [reload, setReload] = useState(false)
 const [fulfillable, setFulfillable] = useState(0);
-const [status, setStatus] = useState("success")
-
+const [status, setStatus] = useState("success");
+const [source, setSource] = useState("");
 
   useEffect(() => {
     //const line_items = useSelector((state) => state.line_items);
-    if(orderId){
+    
+    if(orderId  && orderName ){
         getLineItems()
     }
   }, [props.orderId, reload]);
@@ -138,12 +139,7 @@ const [showProducts, setShowProducts] = useState(false)
     setProduct([])
     setProductId("")
     setShowProducts(false)
-    const requestOptions = {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        //body: JSON.stringify({ date: newDate }),
-      };
-      const response = await fetch("/api/lineItems/" + orderId, requestOptions);
+   
       
 
       fetch("/api/lineItems/" + orderId)
@@ -154,35 +150,11 @@ const [showProducts, setShowProducts] = useState(false)
         setStatus("success");
       });
       
-      /*
-      line_items.forEach((element) => {
-        element.media = <SkeletonThumbnail />
-      })
-      */
+      
   }
-  const orderData = useMemo(() => {
-    let computedOrders = line_items;
-
-    return computedOrders.forEach((element) => {
-        //element.media = <SkeletonThumbnail />
-        element.media = <Thumbnail
-        source="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
-        alt="placeholder"
-      />
-      })
-    
-  }, [line_items]);
-   
-  const getProduct = async(id) =>{
-   
-    const requestOptions = {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        //body: JSON.stringify({ date: newDate }),
-      };
-      const response = await fetch("/api/product/" + id, requestOptions);
-      //console.log(response)
-  }
+  
+ 
+  
   const [lineItemId, setLineItemId] = useState();
   const handleId = useCallback(
     (value) => setLineItemId(value),
@@ -216,7 +188,13 @@ const [showProducts, setShowProducts] = useState(false)
   const [originalQuantity, setOriginalQuantity] = useState('');
   //const [options, setOptions] = useState(deselectedOptions);
   const [loading, setLoading] = useState(false);
-
+  const testingEmail = () => {
+    fetch("/api/email")
+    .then((response) => response.json())
+    .then((json) => {
+      console.log("flkkk")
+    });
+  }
   
   return (
     <Frame>
@@ -232,6 +210,7 @@ const [showProducts, setShowProducts] = useState(false)
             <Button disabled={!orderId}  onClick={ () => handleChange()}>
             {(orderId) ? "Add Product" : "Pick an Order"}
             </Button>
+            
             </Card.Section>
             {showProducts && <Card.Section title="Product to be Added">
               <ResourceList
@@ -275,22 +254,28 @@ const [showProducts, setShowProducts] = useState(false)
                 resourceName={{singular: 'product', plural: 'products'}}
                 items={line_items}
                 renderItem={(item) => {
-                  const {id, url, name, sku, price, media, fulfillable_quantity, product_id} = item;
-                    
-                     
+                  const {id, url, name, sku, price, media, fulfillable_quantity, product_id, price_set } = item;
+                  
+                  const media2 = <Thumbnail
+                  source={media}
+                  alt="placeholder"
+                />
+                   
+                 
                   return (
                     <ResourceList.Item
                       id={id}
                       url={url}
-                      media={media}
+                      media={media2}
                       accessibilityLabel={`View details for ${name}`}
                     >
                         
                       <div> {name}</div>
-                      <div>Price: ${price}</div>
+                      <div>Price: {price} {price_set.shop_money.currency_code}</div>
                       <div>SKU: {sku}</div>
                       <div>x{fulfillable_quantity} unfulfilled </div>
                       <Button plain onClick={()=> openQuantity(id, fulfillable_quantity)}>Adjust Quantity</Button>
+                      
                       <br></br>
                       
                     </ResourceList.Item>

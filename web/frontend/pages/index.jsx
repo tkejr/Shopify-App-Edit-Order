@@ -28,8 +28,8 @@ export default function HomePage() {
   
   //using random
  
-  const [activeResizify, setActiveResizify] = useState(((Math.random() <= .1) ? true: false ) ? true : false);
-  const [activeReview, setActiveReview] = useState(((Math.random() <= .1) ? true: false) ? true : false);
+  const [activeResizify, setActiveResizify] = useState(((Math.random() <= .05) ? true: false ) ? true : false);
+  const [activeReview, setActiveReview] = useState(((Math.random() <= .05) ? true: false) ? true : false);
   
     
   
@@ -102,6 +102,10 @@ export default function HomePage() {
   };
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
+    //new
+    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+    //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
   }, []);
   const checkPremiumUserContent = () => {
     return (

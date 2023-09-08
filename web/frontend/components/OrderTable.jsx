@@ -145,7 +145,7 @@ const handleMonthChange = useCallback(
 [],
 );
   const rowMarkup = orderData.map(
-    ({ name, processed_at, customer, total_price, id }, index) => (
+    ({ name, processed_at, customer, total_price, id, currency }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
@@ -166,7 +166,7 @@ const handleMonthChange = useCallback(
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
         <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
-        <IndexTable.Cell>${total_price}</IndexTable.Cell>
+        <IndexTable.Cell>{total_price} {currency}</IndexTable.Cell>
       </IndexTable.Row>
     )
   );
@@ -179,8 +179,9 @@ const handleMonthChange = useCallback(
           setCurrentPage(1);
         }}
       />
-      <Button fullWidth onClick={()=> handleChange()}>  Advanced Search </Button>
-        
+      <div style={{padding:"10px"}}>
+      <Button fullWidth  onClick={()=> handleChange()}>  Advanced Search </Button>
+      </div>
         <Modal
         //activator={activator}
         open={active}
