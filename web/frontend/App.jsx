@@ -15,25 +15,28 @@ export default function App() {
   const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
   return (
-  <Provider store={store}>
-    <PolarisProvider>
-      <BrowserRouter>
-        <AppBridgeProvider>
-          <QueryProvider>
-          < NavigationMenu
+    <Provider store={store}>
+      <PolarisProvider>
+        <BrowserRouter>
+          <AppBridgeProvider>
+            <QueryProvider>
+              <NavigationMenu
                 navigationLinks={[
                   {
                     label: "Edit Order",
                     destination: "/EditOrder",
                   },
-                  
+                  {
+                    label: "Customer Portal",
+                    destination: "/CustomerPortal",
+                  },
                 ]}
               />
-            <Routes pages={pages} />
-          </QueryProvider>
-        </AppBridgeProvider>
-      </BrowserRouter>
-    </PolarisProvider>
-  </Provider>
+              <Routes pages={pages} />
+            </QueryProvider>
+          </AppBridgeProvider>
+        </BrowserRouter>
+      </PolarisProvider>
+    </Provider>
   );
 }

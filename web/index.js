@@ -9,12 +9,16 @@ import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import bodyParser from "body-parser";
 import Mixpanel from "mixpanel";
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 //const sgMail = require('@sendgrid/mail')
-import sgMail from '@sendgrid/mail'
+import sgMail from "@sendgrid/mail";
+import { updateUserPreference } from "./db.js";
+
+import { addUser } from "./db.js";
+import preferenceRoutes from "./routes/preferenceRoutes.js";
+
 //new for billing
 import { billingConfig } from "./shopify.js";
-
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -26,7 +30,9 @@ const STATIC_PATH =
 const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 //for mail
-sgMail.setApiKey("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");
+sgMail.setApiKey(
+  "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"
+);
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -38,19 +44,51 @@ app.get(
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
     console.log("Install callback", session.shop);
-    console.log("cklsdds", session)
-    console.log("HOW often does ths trihhr")
+
+    const url = session.shop;
+    const access_token = session.accessToken;
     //Tracking the install event
-    mixpanel.people.set(session.shop, {
-      $first_name: session.shop,
-      $created: new Date().toISOString(),
-      plan: "premium",
+
+    const shopDetails = await shopify.api.rest.Shop.all({
+      session: session,
     });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
       isTest: false,
     });
+
+    if (hasPayment) {
+      mixpanel.people.set(session.shop, {
+        $first_name: shopDetails[0].shop_owner,
+        $created: shopDetails[0].created_at,
+        $email: shopDetails[0].customer_email,
+        $phone: shopDetails[0].phone,
+        $country: shopDetails[0].country_name,
+        $country_code: shopDetails[0].country_code,
+        $city: shopDetails[0].city,
+        $region: shopDetails[0].province,
+        $zip: shopDetails[0].zip,
+        $shopify_plan: shopDetails[0].plan_name,
+        $eligibility: shopDetails[0].eligible_for_payments,
+        plan: "premium",
+      });
+    } else {
+      mixpanel.people.set(session.shop, {
+        $first_name: shopDetails[0].shop_owner,
+        $created: shopDetails[0].created_at,
+        $email: shopDetails[0].customer_email,
+        $phone: shopDetails[0].phone,
+        $country: shopDetails[0].country_name,
+        $country_code: shopDetails[0].country_code,
+        $city: shopDetails[0].city,
+        $region: shopDetails[0].province,
+        $zip: shopDetails[0].zip,
+        $shopify_plan: shopDetails[0].plan_name,
+        $eligibility: shopDetails[0].eligible_for_payments,
+        plan: "free",
+      });
+    }
 
     if (hasPayment) {
       next();
@@ -65,7 +103,7 @@ app.get(
     }
   },
   // Load the app otherwise
-  
+
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -84,17 +122,16 @@ app.get("/api/email", async (_req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: res.locals.shopify.session,
   });
-  
-  const shopEmail = "" + shopDetails[0].email
+
+  const shopEmail = "" + shopDetails[0].email;
   try {
     // Send the email
-    
-    
+
     const msg = {
       to: shopEmail, // Change to your recipient
-      from: 'editifyshopify@gmail.com', // Change to your verified sender
-      subject: 'Editify',
-      text: 'Welcome to Editify',  
+      from: "editifyshopify@gmail.com", // Change to your verified sender
+      subject: "Editify",
+      text: "Welcome to Editify",
       html: `
       <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
       <tr>
@@ -167,30 +204,25 @@ app.get("/api/email", async (_req, res) => {
       </tr>
     </table>
       `,
-    }
+    };
     sgMail
       .send(msg)
       .then(() => {
-        console.log('Email sent')
+        console.log("Email sent");
       })
       .catch((error) => {
-        console.error(error)
-      })
+        console.error(error);
+      });
 
     // Return a success response
-    res.status(200).json({ message: 'Email sent successfully!' })
+    res.status(200).json({ message: "Email sent successfully!" });
   } catch (error) {
     // Return an error response
-    console.log(error.message)
+    console.log(error.message);
     res
       .status(500)
-      .json({ message: 'Failed to send email.', error: error.message })
+      .json({ message: "Failed to send email.", error: error.message });
   }
-  
-
-  
-  
-
 });
 
 app.get("/api/products/create", async (_req, res) => {
@@ -209,6 +241,20 @@ app.get("/api/products/create", async (_req, res) => {
 // Verify the user has a plan
 app.get("/api/check", async (req, res) => {
   console.log("in the callback");
+
+  const sess = res.locals.shopify.session;
+  console.log("Install callback", sess.shop);
+
+  const url = sess.shop;
+  const access_token = sess.accessToken;
+  console.log("========== ADD USER TO DB ==========");
+  try {
+    await addUser(url, access_token);
+    console.log("Added to DB");
+  } catch (error) {
+    console.error("Error in API:", error);
+  }
+
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
     currentAppInstallation {
@@ -314,8 +360,6 @@ app.get("/api/upgradeFirst", async (req, res) => {
   res.json({ confirmationUrl });
 });
 
-
-
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
@@ -338,17 +382,14 @@ app.get("/api/orders", async (_req, res) => {
 });
 //new for advanced search
 app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
-  
-  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
     limit: 250, // new to make the limit 250 instead of 50
-    processed_at_min:  _req.params["startDate"],
-    processed_at_max:  _req.params["endDate"]
+    processed_at_min: _req.params["startDate"],
+    processed_at_max: _req.params["endDate"],
   });
 
-  
   res.status(200).json(data);
 });
 //getting unfulfilled orders
@@ -357,7 +398,7 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
     session: res.locals.shopify.session,
     //status: "unfulfilled",
     fulfillment_status: "unfulfilled",
-    limit: 250, 
+    limit: 250,
   });
 
   res.status(200).json(data);
@@ -386,8 +427,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   // here is all of it lol
   //most important are these two obviously
   order2.created_at = newDate;
-  order2.processed_at = newDate;  
-  ///      
+  order2.processed_at = newDate;
+  ///
   order2.line_items = orderTesting?.line_items;
   order2.transactions = orderTesting?.transactions;
   order2.total_tax = orderTesting?.total_tax;
@@ -449,13 +490,10 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.subtotal_price = orderTesting?.subtotal_price;
   order2.subtotal_price_set = orderTesting?.subtotal_price_set;
 
-  
-  
-  if(orderTesting.tags){
+  if (orderTesting.tags) {
     order2.tags = orderTesting?.tags;
   }
 
-  
   //you cannot have these two attributes for some reason
   //order2.tax_lines = orderTesting?.tax_lines;
 
@@ -505,54 +543,56 @@ app.put("/api/orders/:id", async (_req, res) => {
 
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
+  mixpanel.track("EO Page Opened", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: _req.params["id"],
+  });
   const data = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
     id: _req.params["id"],
   });
-  const lineItems = data?.line_items
- //putting the pictures there
- for(let i = 0; i < lineItems?.length; i++){
-  try{
-    const data1 = await shopify.api.rest.Image.all({
-      session: res.locals.shopify.session,
-      product_id: lineItems[i].product_id,
-    });  
-    
-    if(data1[0].src){
-      lineItems[i].media = data1[0].src;
-    }
-    else{
-      
-      lineItems[i].media = ""
-    }
-    
-    
-  }
-  catch(e){
-    console.log(e.message)
-    lineItems[i].media = "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
-  }
- }
-  
-  res.status(200).json(lineItems);   
-});
+  const lineItems = data?.line_items;
+  //putting the pictures there
+  for (let i = 0; i < lineItems?.length; i++) {
+    try {
+      const data1 = await shopify.api.rest.Image.all({
+        session: res.locals.shopify.session,
+        product_id: lineItems[i].product_id,
+      });
 
+      if (data1[0].src) {
+        lineItems[i].media = data1[0].src;
+      } else {
+        lineItems[i].media = "";
+      }
+    } catch (e) {
+      console.log(e.message);
+      lineItems[i].media =
+        "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081";
+    }
+  }
+
+  res.status(200).json(lineItems);
+});
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
-
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
+  mixpanel.track("EO Amount Change Quantity", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: req.params["id"],
+  });
   //get all the vars
-  const orderId =  req.params["id"];
-  const lineItemId =  req.params["lineItemId"];
+  const orderId = req.params["id"];
+  const lineItemId = req.params["lineItemId"];
   let status = 200;
   let error = null;
-  const quantity =  parseInt(req.params["quantity"]);
-try{
-const openOrder = await client.query({
-  data: {
-    query: `mutation orderEditBegin($id: ID!) {
+  const quantity = parseInt(req.params["quantity"]);
+  try {
+    const openOrder = await client.query({
+      data: {
+        query: `mutation orderEditBegin($id: ID!) {
       orderEditBegin(id: $id) {
         calculatedOrder {
           id
@@ -562,23 +602,23 @@ const openOrder = await client.query({
           message
         }
       }
-    }`,  
-     variables: {
-      id :  "gid://shopify/Order/" + orderId,
-    },  
-  },
-});            
-      
-  //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
-  const calculatedOrderId = openOrder.body.data.orderEditBegin.calculatedOrder.id;
-  //console.log('order id', calculatedOrderId)
-  //console.log("this is the line item if", lineItemId)
-  const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId; 
-  
+    }`,
+        variables: {
+          id: "gid://shopify/Order/" + orderId,
+        },
+      },
+    });
 
-  const changeAmount = await client.query({
-    data: {   
-      query: `mutation orderEditSetQuantity($id: ID!, $lineItemId: ID!, $quantity: Int!) {
+    //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+    const calculatedOrderId =
+      openOrder.body.data.orderEditBegin.calculatedOrder.id;
+    //console.log('order id', calculatedOrderId)
+    //console.log("this is the line item if", lineItemId)
+    const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId;
+
+    const changeAmount = await client.query({
+      data: {
+        query: `mutation orderEditSetQuantity($id: ID!, $lineItemId: ID!, $quantity: Int!) {
         orderEditSetQuantity(id: $id, lineItemId: $lineItemId, quantity: $quantity) {
           calculatedLineItem {
             id
@@ -599,23 +639,20 @@ const openOrder = await client.query({
             message
           }
         }
-      }`,  
-      variables: {
-            "id": calculatedOrderId,
-            "lineItemId": calculatedLineItem,
-            "quantity": quantity,
-            //"restock": true
-          
+      }`,
+        variables: {
+          id: calculatedOrderId,
+          lineItemId: calculatedLineItem,
+          quantity: quantity,
+          //"restock": true
+        },
       },
-        
-    },
-  });     
-  
-  
- // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
-const commitChange = await client.query({
-  data: {
-    query: `mutation orderEditCommit($id: ID!) {
+    });
+
+    // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+    const commitChange = await client.query({
+      data: {
+        query: `mutation orderEditCommit($id: ID!) {
       orderEditCommit(id: $id) {
         order {
           id
@@ -625,46 +662,44 @@ const commitChange = await client.query({
           message
         }
       }
-    }`,  
-    variables: {
-          "id": calculatedOrderId,
-          "notifyCustomer": false,
-          "staffNote": "This change is from Editify"
-         
-        
-    },
-      
-  },
-});       
-//console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+    }`,
+        variables: {
+          id: calculatedOrderId,
+          notifyCustomer: false,
+          staffNote: "This change is from Editify",
+        },
+      },
+    });
+    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+  } catch (e) {
+    console.log(`Failed to edit quantity:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
 
-} catch (e) {
-  console.log(`Failed to edit quantity:  ${e.message}`);
-  status = 500;
-  error = e.message;
-}
-  
-  
-  
   res.status(status).send({ success: status === 200, error });
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
-
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
-  
+  mixpanel.track("EO Add Product to Order", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: req.params["orderId"],
+    productId: req.params["productId"],
+  });
+
   let status = 200;
   let error = null;
   const orderId = req.params["orderId"];
   const productId = req.params["productId"];
-  
- const productVariantId = "gid://shopify/ProductVariant/" + productId;
-try{
-const openOrder = await client.query({
-  data: {
-    query: `mutation orderEditBegin($id: ID!) {
+
+  const productVariantId = "gid://shopify/ProductVariant/" + productId;
+  try {
+    const openOrder = await client.query({
+      data: {
+        query: `mutation orderEditBegin($id: ID!) {
       orderEditBegin(id: $id) {
         calculatedOrder {
           id
@@ -674,20 +709,21 @@ const openOrder = await client.query({
           message
         }
       }
-    }`,  
-     variables: {
-      id :  "gid://shopify/Order/" + orderId,
-    },  
-  },
-});            
+    }`,
+        variables: {
+          id: "gid://shopify/Order/" + orderId,
+        },
+      },
+    });
 
-  //console.log('this is the mutation response 1' , openOrder)//.calculatedOrder
-  const calculatedOrderId = openOrder.body.data.orderEditBegin.calculatedOrder.id;
-  //console.log('order id', calculatedOrderId)
+    //console.log('this is the mutation response 1' , openOrder)//.calculatedOrder
+    const calculatedOrderId =
+      openOrder.body.data.orderEditBegin.calculatedOrder.id;
+    //console.log('order id', calculatedOrderId)
 
-  const addProduct = await client.query({
-    data: {   
-      query: `mutation orderEditAddVariant($id: ID!, $quantity: Int!, $variantId: ID!) {
+    const addProduct = await client.query({
+      data: {
+        query: `mutation orderEditAddVariant($id: ID!, $quantity: Int!, $variantId: ID!) {
         orderEditAddVariant(id: $id, quantity: $quantity, variantId: $variantId) {
           calculatedLineItem {
             id
@@ -700,22 +736,20 @@ const openOrder = await client.query({
             message
           }
         }
-      }`,  
-      variables: {
-            "id": calculatedOrderId,
-            "variantId": productVariantId,
-            "quantity": 1,
-            //"restock": true
-          
+      }`,
+        variables: {
+          id: calculatedOrderId,
+          variantId: productVariantId,
+          quantity: 1,
+          //"restock": true
+        },
       },
-        
-    },
-  });     
+    });
 
- // console.log('this is the mutation response 2' , addProduct)
-const commitChange = await client.query({
-  data: {
-    query: `mutation orderEditCommit($id: ID!) {
+    // console.log('this is the mutation response 2' , addProduct)
+    const commitChange = await client.query({
+      data: {
+        query: `mutation orderEditCommit($id: ID!) {
       orderEditCommit(id: $id) {
         order {
           id
@@ -725,28 +759,101 @@ const commitChange = await client.query({
           message
         }
       }
-    }`, 
-    variables: {
-          "id": calculatedOrderId,
-          "notifyCustomer": false,
-          "staffNote": "This change is from Editify"
-         
-        
-    },
-      
-  },
-});   
-//console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+    }`,
+        variables: {
+          id: calculatedOrderId,
+          notifyCustomer: false,
+          staffNote: "This change is from Editify",
+        },
+      },
+    });
+    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+  } catch (e) {
+    console.log(`Failed to edit order:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
 
-} catch (e) {
-  console.log(`Failed to edit order:  ${e.message}`);
-  status = 500;
-  error = e.message;
-}
-  
-  
-  
   res.status(status).send({ success: status === 200, error });
+});
+
+//customer portal
+app.use("/api/preferences", preferenceRoutes);
+
+//create test order
+app.post("/api/testOrder", async (req, res) => {
+  mixpanel.track("CP Test Order Created", {
+    distinct_id: res.locals.shopify.session.shop,
+  });
+  try {
+    const session = res.locals.shopify.session;
+    const order = new shopify.api.rest.Order({ session: session });
+    order.customer = {
+      first_name: "Paul",
+      last_name: "Norman",
+      email: "paul.norman@example.com",
+    };
+
+    order.billing_address = {
+      first_name: "John",
+      last_name: "Smith",
+      address1: "123 Fake Street",
+      phone: "555-555-5555",
+      city: "Fakecity",
+      province: "Ontario",
+      country: "Canada",
+      zip: "K2P 1L4",
+    };
+    order.shipping_address = {
+      first_name: "Jane",
+      last_name: "Smith",
+      address1: "123 Fake Street",
+      phone: "777-777-7777",
+      city: "Fakecity",
+      province: "Ontario",
+      country: "Canada",
+      zip: "K2P 1L4",
+    };
+    order.email = "jane@example.com";
+    order.financial_status = "partially_paid";
+
+    order.line_items = [
+      {
+        title: "Big Brown Bear Boots",
+        price: 74.99,
+        grams: "1300",
+        quantity: 3,
+        tax_lines: [
+          {
+            price: 13.5,
+            rate: 0.06,
+            title: "State tax",
+          },
+        ],
+      },
+    ];
+    order.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: 238.47,
+      },
+    ];
+    order.total_tax = 13.5;
+    order.currency = "EUR";
+    await order.save({
+      update: true,
+    });
+
+    // Return a success response if everything went well
+    res.status(200).json({ message: "Order successfully created." });
+  } catch (error) {
+    // Handle errors
+    console.error("Error creating order:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the order." });
+  }
 });
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
@@ -759,4 +866,3 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 });
 
 app.listen(PORT);
-
