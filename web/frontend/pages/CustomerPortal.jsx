@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   EmptyState,
@@ -14,8 +14,11 @@ import {
 import { cust1 } from "../assets";
 import { cust2 } from "../assets";
 import { cust3 } from "../assets";
+import { useAuthenticatedFetch } from "../hooks";
+import { isError } from "react-query";
 
 export default function CustomerPortal() {
+  const fetch = useAuthenticatedFetch();
   const [active, setActive] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const handleToggle = useCallback(() => setEnabled((enabled) => !enabled), []);
@@ -23,6 +26,9 @@ export default function CustomerPortal() {
   const badgeContent = enabled ? "On" : "Off";
   const contentStatus = enabled ? "Turn off" : "Turn on";
   const [selected, setSelected] = useState("15min");
+  const [preferences, setPreferences] = useState([]);
+  const [toastContent, setToastContent] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
@@ -49,6 +55,33 @@ export default function CustomerPortal() {
 
   const handleSelectChange = useCallback((value) => setSelected(value), []);
 
+  function timeStringToSeconds(timeString) {
+    const regex = /^(\d+)\s*([a-zA-Z]+)$/;
+    const match = timeString.match(regex);
+
+    if (!match) {
+      throw new Error("Invalid time string format");
+    }
+
+    const value = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+
+    switch (unit) {
+      case "min":
+      case "minute":
+        return value * 60;
+
+      case "hr":
+      case "hour":
+        return value * 3600;
+
+      case "day":
+        return value * 86400;
+
+      default:
+        throw new Error("Invalid time unit");
+    }
+  }
   const options = [
     { label: "15 Minutes", value: "15min" },
     { label: "30 Minutes", value: "30min" },
@@ -62,12 +95,74 @@ export default function CustomerPortal() {
     { label: "30 Days", value: "30day" },
   ];
 
+  //api functions
+  const updatePreference = async (requestBody) => {
+    handleToggle();
+
+    try {
+      const response = await fetch("/api/preferences", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsError(false);
+        setToastContent("Updated Successfully");
+        toggleActive();
+      } else {
+        setIsError(true);
+        setToastContent("Some Error Occurred");
+        toggleActive();
+      }
+    } catch (error) {
+      console.error("Error updating preference:", error);
+      setIsError(true);
+      setToastContent("Some Error Occurred" + response);
+      toggleActive();
+    }
+  };
+
+  const createOrder = async () => {
+    try {
+      const response = await fetch("/api/testOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // You can include any request body data here if needed
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsError(false);
+        setToastContent(data.message);
+        toggleActive();
+      } else {
+        setIsError(true);
+        setToastContent("Some Error Occurred");
+        toggleActive(); // Update state with error message
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      setIsError(true);
+      setToastContent("Some Error Occurred" + response);
+      toggleActive(); // Update state with error message
+    }
+  };
+
   const toastMarkup = active ? (
-    <Toast content="Copied Successfully" onDismiss={toggleActive} />
+    <Toast content={toastContent} error={isError} onDismiss={toggleActive} />
   ) : null;
   const handleCopyClick = () => {
     // Copy the content to the clipboard
+    setIsError(false);
+    setToastContent("Copied Successfully");
     toggleActive();
+
     navigator.clipboard.writeText(copiedContent);
   };
 
@@ -80,13 +175,45 @@ export default function CustomerPortal() {
     </Badge>
   );
 
+  useEffect(() => {
+    const getPreferences = async () => {
+      try {
+        const response = await fetch("/api/preferences", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPreferences(data);
+          setEnabled(data.enable);
+        } else {
+          // Handle non-successful response (e.g., show an error message)
+        }
+      } catch (error) {
+        console.error("Error updating preference:", error);
+      }
+    };
+
+    getPreferences();
+  }, [enabled]);
+
   return (
     <Frame>
       <Page
         backAction={{ content: "Products", url: "#" }}
         title="Customer Portal"
         titleMetadata={settingStatusMarkup}
-        primaryAction={{ content: contentStatus, onAction: handleToggle }}
+        primaryAction={{
+          content: contentStatus,
+          onAction: () => {
+            updatePreference({
+              enable: !enabled,
+            });
+          },
+        }}
       >
         <Card title="About">
           <Card.Section>
@@ -156,7 +283,7 @@ export default function CustomerPortal() {
             />{" "}
             <br></br>
             <br></br>
-            <Button>Create Test Order</Button>
+            <Button onClick={createOrder}>Create Test Order</Button>
           </Card.Section>
         </Card>
         <Card
@@ -164,7 +291,11 @@ export default function CustomerPortal() {
           primaryFooterAction={{
             content: "Save",
             onAction: () => {
-              toggleActive();
+              // setToastContent(selected);
+              // toggleActive();
+              updatePreference({
+                time_to_edit: timeStringToSeconds(selected),
+              });
             },
           }}
         >
