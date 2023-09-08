@@ -4,10 +4,14 @@ import {
   getUserIdByUrl,
   getUserPreferences,
 } from "../db.js";
+import Mixpanel from "mixpanel";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+  mixpanel.track("CP Page Opened", {
+    distinct_id: res.locals.shopify.session.shop,
+  });
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
   try {
@@ -31,6 +35,9 @@ router.get("/", async (req, res) => {
 });
 
 router.put("/", async (req, res) => {
+  mixpanel.track("CP Preferences Updated", {
+    distinct_id: res.locals.shopify.session.shop,
+  });
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
 

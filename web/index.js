@@ -41,17 +41,47 @@ app.get(
     const url = session.shop;
     const access_token = session.accessToken;
     //Tracking the install event
-    mixpanel.people.set(url, {
-      $first_name: url,
-      $created: new Date().toISOString(),
-      plan: "premium",
-    });
 
+    const shopDetails = await shopify.api.rest.Shop.all({
+      session: session,
+    });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
       isTest: true,
     });
+
+    if (hasPayment) {
+      mixpanel.people.set(session.shop, {
+        $first_name: shopDetails[0].shop_owner,
+        $created: shopDetails[0].created_at,
+        $email: shopDetails[0].customer_email,
+        $phone: shopDetails[0].phone,
+        $country: shopDetails[0].country_name,
+        $country_code: shopDetails[0].country_code,
+        $city: shopDetails[0].city,
+        $region: shopDetails[0].province,
+        $zip: shopDetails[0].zip,
+        $shopify_plan: shopDetails[0].plan_name,
+        $eligibility: shopDetails[0].eligible_for_payments,
+        plan: "premium",
+      });
+    } else {
+      mixpanel.people.set(session.shop, {
+        $first_name: shopDetails[0].shop_owner,
+        $created: shopDetails[0].created_at,
+        $email: shopDetails[0].customer_email,
+        $phone: shopDetails[0].phone,
+        $country: shopDetails[0].country_name,
+        $country_code: shopDetails[0].country_code,
+        $city: shopDetails[0].city,
+        $region: shopDetails[0].province,
+        $zip: shopDetails[0].zip,
+        $shopify_plan: shopDetails[0].plan_name,
+        $eligibility: shopDetails[0].eligible_for_payments,
+        plan: "free",
+      });
+    }
 
     if (hasPayment) {
       next();
@@ -432,6 +462,10 @@ app.put("/api/orders/:id", async (_req, res) => {
 });
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
+  mixpanel.track("EO Page Opened", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: _req.params["id"],
+  });
   const data = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
     id: _req.params["id"],
@@ -441,6 +475,10 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 });
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
+  mixpanel.track("EO Amount Change Quantity", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: req.params["id"],
+  });
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
@@ -541,6 +579,11 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
+  mixpanel.track("EO Add Product to Order", {
+    distinct_id: res.locals.shopify.session.shop,
+    orderId: req.params["orderId"],
+    productId: req.params["productId"],
+  });
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
@@ -632,21 +675,14 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
   res.status(status).send({ success: status === 200, error });
 });
 
-// app.post("/api/preferences", async (req, res) => {
-//   const session = res.locals.shopify.session;
-//   const shopUrl = session.shop;
-//   const status = 200;
-//   const error = "No error";
-//   console.log("Inside preferences");
-
-//   res.status(status).send({ success: status === 200, error });
-// });
-
 //customer portal
 app.use("/api/preferences", preferenceRoutes);
 
 //create test order
 app.post("/api/testOrder", async (req, res) => {
+  mixpanel.track("CP Test Order Created", {
+    distinct_id: res.locals.shopify.session.shop,
+  });
   try {
     const session = res.locals.shopify.session;
     const order = new shopify.api.rest.Order({ session: session });
