@@ -106,7 +106,7 @@ const addUser = async (url, accessToken) => {
     }
     const userId = result.rows[0].id;
 
-    await addUserPreference(userId, 30, false);
+    await addUserPreference(userId, 900, false);
 
     return result.rows[0].id;
   } catch (error) {

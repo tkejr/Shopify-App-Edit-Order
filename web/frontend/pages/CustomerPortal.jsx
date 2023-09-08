@@ -82,6 +82,24 @@ export default function CustomerPortal() {
         throw new Error("Invalid time unit");
     }
   }
+  function secondsToTimeString(seconds) {
+    if (seconds < 0) {
+      throw new Error("Seconds must be non-negative");
+    }
+
+    if (seconds < 3600) {
+      // less than 1 hour
+      const minutes = Math.round(seconds / 60);
+      return `${minutes}min`;
+    } else if (seconds < 86400) {
+      // less than 1 day
+      const hours = Math.round(seconds / 3600);
+      return `${hours}hr`;
+    } else {
+      const days = Math.round(seconds / 86400);
+      return `${days}day`;
+    }
+  }
   const options = [
     { label: "15 Minutes", value: "15min" },
     { label: "30 Minutes", value: "30min" },
@@ -187,6 +205,7 @@ export default function CustomerPortal() {
 
         if (response.ok) {
           const data = await response.json();
+          setSelected(secondsToTimeString(data.time_to_edit));
           setPreferences(data);
           setEnabled(data.enable);
         } else {
