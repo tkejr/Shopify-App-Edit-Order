@@ -1,4 +1,8 @@
-import { BillingInterval, LATEST_API_VERSION, BillingReplacementBehavior } from "@shopify/shopify-api";
+import {
+  BillingInterval,
+  LATEST_API_VERSION,
+  BillingReplacementBehavior,
+} from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
 import { restResources } from "@shopify/shopify-api/rest/admin/2023-01";
@@ -9,8 +13,8 @@ const DB_PATH = `${process.cwd()}/database.sqlite`;
 // See the ensureBilling helper to learn more about billing in this template.
 export const billingConfig = {
   "Editify Plan": {
-    // 
-    amount: 3.99,
+    //
+    amount: 4.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
     trialDays: 5,
