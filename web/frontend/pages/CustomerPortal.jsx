@@ -153,7 +153,7 @@ export default function CustomerPortal() {
         setIsError(false);
         setToastContent("Order Fetched Successfully");
         setStatusUrl(data.data[0].order_status_url);
-        window.open(statusUrl, "_blank");
+        window.open(data.data[0].order_status_url, "_blank");
         toggleActive();
       } else {
         setIsError(true);
@@ -164,6 +164,38 @@ export default function CustomerPortal() {
       console.error("Error creating order:", error);
       setIsError(true);
       setToastContent("Some Error Occurred" + response);
+      toggleActive(); // Update state with error message
+    }
+  };
+
+  const createScriptTag = async () => {
+    try {
+      const response = await fetch("/api/scriptTag", {
+        method: "POST", // Use the appropriate HTTP method (e.g., POST) if needed
+        headers: {
+          "Content-Type": "application/json",
+          // You can include any other headers if required
+        },
+        // You can include any request body data here if needed
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsError(false);
+        setToastContent("Script Tag Created Successfully");
+
+        // Do something with the response data if necessary
+
+        toggleActive();
+      } else {
+        setIsError(true);
+        setToastContent("Some Error Occurred");
+        toggleActive(); // Update state with error message
+      }
+    } catch (error) {
+      console.error("Error creating script tag:", error);
+      setIsError(true);
+      setToastContent("Some Error Occurred");
       toggleActive(); // Update state with error message
     }
   };
@@ -252,6 +284,7 @@ export default function CustomerPortal() {
         </Card>
         <Card title="Install Customer Portal">
           <Card.Section>
+            {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
             <p>
               Add the Customer Portal snippet to the additional scripts in your
               order status page. This snippet contains your unique account token

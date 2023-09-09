@@ -16,6 +16,7 @@ import { updateUserPreference } from "./db.js";
 
 import { addUser } from "./db.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
+import cPortalRoutes from "./routes/cPortalRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -777,32 +778,11 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
   res.status(status).send({ success: status === 200, error });
 });
 
-//customer portal
+//customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
 
-//create test order
-app.get("/api/viewLast", async (req, res) => {
-  mixpanel.track("CP View Order Status", {
-    distinct_id: res.locals.shopify.session.shop,
-  });
-  try {
-    const data = await shopify.api.rest.Order.all({
-      session: res.locals.shopify.session,
-      status: "any",
-      limit: 1, // new to make the limit 250 instead of 50
-    });
-
-    res.status(200).json({
-      data,
-    });
-  } catch (error) {
-    // Handle errors
-    console.error("Error fetching most recent order:", error);
-    res.status(500).json({
-      error: "An error occurred while fetching the most recent order.",
-    });
-  }
-});
+//misc cportal routes
+app.use("/api", cPortalRoutes);
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
