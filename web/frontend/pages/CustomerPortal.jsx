@@ -39,19 +39,8 @@ export default function CustomerPortal() {
     <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
-  const currentURL = window.location.href;
-  const urlSearchParams = new URLSearchParams(currentURL);
-  const shopParam = urlSearchParams.get("shop");
 
-  var subdomain;
-  if (shopParam) {
-    subdomain = shopParam.split(".")[0];
-    console.log(subdomain); // Output: testinglatest (for example)
-  } else {
-    console.log("Subdomain not found");
-  }
-
-  const dynamicLink = `https://admin.shopify.com/store/${subdomain}/settings/checkout`;
+  var dynamicLink = ``;
 
   const handleSelectChange = useCallback((value) => setSelected(value), []);
 
@@ -206,6 +195,10 @@ export default function CustomerPortal() {
         if (response.ok) {
           const data = await response.json();
           setSelected(secondsToTimeString(data.time_to_edit));
+          var shopParam = data.shop;
+          var subdomain = shopParam.split(".")[0];
+          dynamicLink = `https://admin.shopify.com/store/${subdomain}/settings/checkout#orderstatus`;
+          console.log(dynamicLink);
           setPreferences(data);
           setEnabled(data.enable);
         } else {

@@ -14,7 +14,7 @@ const DB_PATH = `${process.cwd()}/database.sqlite`;
 export const billingConfig = {
   "Editify Plan": {
     //
-    amount: 4.99,
+    amount: 3.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
     trialDays: 5,
