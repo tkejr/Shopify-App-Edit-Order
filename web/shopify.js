@@ -14,11 +14,11 @@ const DB_PATH = `${process.cwd()}/database.sqlite`;
 export const billingConfig = {
   "Editify Plan": {
     //
-    amount: 3.99,
+    amount: 4.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
     trialDays: 5,
-    usageTerms: "5 day free trial, then 3.99 per month",
+    usageTerms: "5 day free trial, then 4.99 per month",
     replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
   },
 };
