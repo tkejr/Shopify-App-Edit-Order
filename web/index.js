@@ -781,81 +781,26 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
 app.use("/api/preferences", preferenceRoutes);
 
 //create test order
-app.post("/api/testOrder", async (req, res) => {
-  mixpanel.track("CP Test Order Created", {
+app.get("/api/viewLast", async (req, res) => {
+  mixpanel.track("CP View Order Status", {
     distinct_id: res.locals.shopify.session.shop,
   });
   try {
-    const session = res.locals.shopify.session;
-    const order = new shopify.api.rest.Order({ session: session });
-    order.customer = {
-      first_name: "Paul",
-      last_name: "Norman",
-      email: "paul.norman@example.com",
-    };
-
-    order.billing_address = {
-      first_name: "John",
-      last_name: "Smith",
-      address1: "123 Fake Street",
-      phone: "555-555-5555",
-      city: "Fakecity",
-      province: "Ontario",
-      country: "Canada",
-      zip: "K2P 1L4",
-    };
-    order.shipping_address = {
-      first_name: "Jane",
-      last_name: "Smith",
-      address1: "123 Fake Street",
-      phone: "777-777-7777",
-      city: "Fakecity",
-      province: "Ontario",
-      country: "Canada",
-      zip: "K2P 1L4",
-    };
-    order.email = "jane@example.com";
-    order.financial_status = "paid";
-
-    order.line_items = [
-      {
-        title: "Big Brown Bear Boots",
-        price: 74.99,
-        grams: "1300",
-        quantity: 3,
-        tax_lines: [
-          {
-            price: 13.5,
-            rate: 0.06,
-            title: "State tax",
-          },
-        ],
-      },
-    ];
-    order.transactions = [
-      {
-        kind: "sale",
-        status: "success",
-        amount: 238.47,
-      },
-    ];
-    order.total_tax = 13.5;
-    order.currency = "EUR";
-    await order.save({
-      update: true,
+    const data = await shopify.api.rest.Order.all({
+      session: res.locals.shopify.session,
+      status: "any",
+      limit: 1, // new to make the limit 250 instead of 50
     });
 
-    // Return a success response if everything went well
     res.status(200).json({
-      message: "Order successfully created.",
-      order_url: order.order_status_url,
+      data,
     });
   } catch (error) {
     // Handle errors
-    console.error("Error creating order:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the order." });
+    console.error("Error fetching most recent order:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching the most recent order.",
+    });
   }
 });
 

@@ -133,10 +133,15 @@ export default function CustomerPortal() {
     }
   };
 
-  const createOrder = async () => {
+  const getOrder = async () => {
+    //if already saved no need to make a backend request again
+    if (statusUrl) {
+      window.open(statusUrl, "_blank");
+      return;
+    }
     try {
-      const response = await fetch("/api/testOrder", {
-        method: "POST",
+      const response = await fetch("/api/viewLast", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
@@ -146,8 +151,8 @@ export default function CustomerPortal() {
       if (response.ok) {
         const data = await response.json();
         setIsError(false);
-        setToastContent(data.message);
-        setStatusUrl(data.order_url);
+        setToastContent("Order Fetched Successfully");
+        setStatusUrl(data.data[0].order_status_url);
         window.open(statusUrl, "_blank");
         toggleActive();
       } else {
@@ -286,11 +291,10 @@ export default function CustomerPortal() {
               alt="Customer Image"
             />{" "}
           </Card.Section>
-          <Card.Section title="Step 3: Create Test Order">
+          <Card.Section title="Step 3: View Order">
             <h1>
-              This will create a test order and send the order confirmation
-              email to you. When you receive the order confirmation, click on
-              View your order, then click on Edit order.
+              Click on View Order to see the checkout page and see the customer
+              portal box embedded onto that page like showed in the photo below
             </h1>
             <br></br>
             <img
@@ -300,7 +304,7 @@ export default function CustomerPortal() {
             />{" "}
             <br></br>
             <br></br>
-            <Button onClick={createOrder}>Create Test Order</Button>
+            <Button onClick={getOrder}>View Order Status</Button>
           </Card.Section>
         </Card>
         <Card
