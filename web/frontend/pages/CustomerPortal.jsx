@@ -29,6 +29,8 @@ export default function CustomerPortal() {
   const [preferences, setPreferences] = useState([]);
   const [toastContent, setToastContent] = useState("");
   const [isError, setIsError] = useState(false);
+  const [statusUrl, setStatusUrl] = useState("");
+  const [dynamicLink, setDynamicLink] = useState("");
 
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
@@ -39,8 +41,6 @@ export default function CustomerPortal() {
     <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
-
-  var dynamicLink = ``;
 
   const handleSelectChange = useCallback((value) => setSelected(value), []);
 
@@ -147,6 +147,8 @@ export default function CustomerPortal() {
         const data = await response.json();
         setIsError(false);
         setToastContent(data.message);
+        setStatusUrl(data.order_url);
+        window.open(statusUrl, "_blank");
         toggleActive();
       } else {
         setIsError(true);
@@ -197,7 +199,9 @@ export default function CustomerPortal() {
           setSelected(secondsToTimeString(data.time_to_edit));
           var shopParam = data.shop;
           var subdomain = shopParam.split(".")[0];
-          dynamicLink = `https://admin.shopify.com/store/${subdomain}/settings/checkout#orderstatus`;
+          setDynamicLink(
+            `https://admin.shopify.com/store/${subdomain}/settings/checkout#orderstatus`
+          );
           console.log(dynamicLink);
           setPreferences(data);
           setEnabled(data.enable);
@@ -246,7 +250,8 @@ export default function CustomerPortal() {
             <p>
               Add the Customer Portal snippet to the additional scripts in your
               order status page. This snippet contains your unique account token
-              that should be kept secret.
+              that should be kept secret. Make sure you have customer accounts
+              enabled
             </p>
             <br></br>
           </Card.Section>

@@ -815,7 +815,7 @@ app.post("/api/testOrder", async (req, res) => {
       zip: "K2P 1L4",
     };
     order.email = "jane@example.com";
-    order.financial_status = "partially_paid";
+    order.financial_status = "paid";
 
     order.line_items = [
       {
@@ -846,7 +846,10 @@ app.post("/api/testOrder", async (req, res) => {
     });
 
     // Return a success response if everything went well
-    res.status(200).json({ message: "Order successfully created." });
+    res.status(200).json({
+      message: "Order successfully created.",
+      order_url: order.order_status_url,
+    });
   } catch (error) {
     // Handle errors
     console.error("Error creating order:", error);
