@@ -23,12 +23,20 @@ export default function App() {
               <NavigationMenu
                 navigationLinks={[
                   {
+                    label: "Backdate Order",
+                    destination: "/",
+                  },
+                  {
                     label: "Edit Order",
                     destination: "/EditOrder",
                   },
                   {
                     label: "Customer Portal",
                     destination: "/CustomerPortal",
+                  },
+                  {
+                    label: "Analytics",
+                    destination: "/Analytics",
                   },
                 ]}
               />
