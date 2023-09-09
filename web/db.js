@@ -135,10 +135,98 @@ const addUserPreference = async (userId, timeToEdit, enable) => {
   }
 };
 
+const getUser = async (userUrl) => {
+  try {
+    const query = {
+      text: "SELECT * FROM users WHERE url = $1",
+      values: [userUrl],
+    };
+
+    const result = await pool.query(query);
+
+    if (result.rows.length === 0) {
+      return null; // User with given URL not found
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting user ID by URL:", error);
+    throw error;
+  }
+};
+
+const updateUserDetails = async (
+  userId,
+  emailSentIncrement,
+  backOrdersIncrement,
+  editOrdersIncrement,
+  custEditOrdersIncrement
+) => {
+  try {
+    let updateQuery = "";
+    let queryParams = [];
+    let returningColumns = "*";
+
+    if (emailSentIncrement !== undefined) {
+      if (typeof emailSentIncrement !== "boolean") {
+        throw new Error("emailSentIncrement must be of type boolean");
+      }
+      updateQuery += "email_sent = $1";
+      queryParams.push(emailSentIncrement);
+    }
+
+    if (backOrdersIncrement !== undefined) {
+      if (queryParams.length > 0) updateQuery += ", ";
+      updateQuery +=
+        "no_back_orders = no_back_orders + $" + (queryParams.length + 1);
+      queryParams.push(backOrdersIncrement);
+    }
+
+    if (editOrdersIncrement !== undefined) {
+      if (queryParams.length > 0) updateQuery += ", ";
+      updateQuery +=
+        "no_edit_orders = no_edit_orders + $" + (queryParams.length + 1);
+      queryParams.push(editOrdersIncrement);
+    }
+
+    if (custEditOrdersIncrement !== undefined) {
+      if (queryParams.length > 0) updateQuery += ", ";
+      updateQuery +=
+        "no_cust_edit_orders = no_cust_edit_orders + $" +
+        (queryParams.length + 1);
+      queryParams.push(custEditOrdersIncrement);
+    }
+
+    if (queryParams.length === 0) {
+      return null; // No valid update data provided
+    }
+
+    const query = {
+      text: `UPDATE users SET ${updateQuery} WHERE id = $${
+        queryParams.length + 1
+      } RETURNING ${returningColumns}`,
+      values: [...queryParams, userId],
+    };
+
+    const result = await pool.query(query);
+
+    if (result.rows.length === 0) {
+      return null; // User ID not found
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    throw error;
+  }
+};
+
 export {
   updateUserPreference,
   getUserIdByUrl,
   addUser,
   addUserPreference,
   getUserPreferences,
+  getUser,
+  updateUserDetails,
 };

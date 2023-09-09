@@ -12,11 +12,16 @@ import Mixpanel from "mixpanel";
 import nodemailer from "nodemailer";
 //const sgMail = require('@sendgrid/mail')
 import sgMail from "@sendgrid/mail";
-import { updateUserPreference } from "./db.js";
+import {
+  updateUserPreference,
+  updateUserDetails,
+  getUserIdByUrl,
+} from "./db.js";
 
 import { addUser } from "./db.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -42,6 +47,8 @@ app.get(
   //this is for if you want to check if they have paid beforehand, super easy
   // Request payment if required
   async (req, res, next) => {
+    //sending email on install
+
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
     console.log("Install callback", session.shop);
@@ -58,36 +65,24 @@ app.get(
       plans: plans,
       isTest: false,
     });
+    mixpanel.people.set(session.shop, {
+      $first_name: shopDetails[0].shop_owner,
+      $created: shopDetails[0].created_at,
+      $email: shopDetails[0].customer_email,
+      $phone: shopDetails[0].phone,
+      $country: shopDetails[0].country_name,
+      $country_code: shopDetails[0].country_code,
+      $city: shopDetails[0].city,
+      $region: shopDetails[0].province,
+      $zip: shopDetails[0].zip,
+      $shopify_plan: shopDetails[0].plan_name,
+      $eligibility: shopDetails[0].eligible_for_payments,
+      plan: "free",
+    });
 
     if (hasPayment) {
       mixpanel.people.set(session.shop, {
-        $first_name: shopDetails[0].shop_owner,
-        $created: shopDetails[0].created_at,
-        $email: shopDetails[0].customer_email,
-        $phone: shopDetails[0].phone,
-        $country: shopDetails[0].country_name,
-        $country_code: shopDetails[0].country_code,
-        $city: shopDetails[0].city,
-        $region: shopDetails[0].province,
-        $zip: shopDetails[0].zip,
-        $shopify_plan: shopDetails[0].plan_name,
-        $eligibility: shopDetails[0].eligible_for_payments,
         plan: "premium",
-      });
-    } else {
-      mixpanel.people.set(session.shop, {
-        $first_name: shopDetails[0].shop_owner,
-        $created: shopDetails[0].created_at,
-        $email: shopDetails[0].customer_email,
-        $phone: shopDetails[0].phone,
-        $country: shopDetails[0].country_name,
-        $country_code: shopDetails[0].country_code,
-        $city: shopDetails[0].city,
-        $region: shopDetails[0].province,
-        $zip: shopDetails[0].zip,
-        $shopify_plan: shopDetails[0].plan_name,
-        $eligibility: shopDetails[0].eligible_for_payments,
-        plan: "free",
       });
     }
 
@@ -104,7 +99,6 @@ app.get(
     }
   },
   // Load the app otherwise
-
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -241,17 +235,11 @@ app.get("/api/products/create", async (_req, res) => {
 });
 // Verify the user has a plan
 app.get("/api/check", async (req, res) => {
-  console.log("in the callback");
-
   const sess = res.locals.shopify.session;
-  console.log("Install callback", sess.shop);
-
   const url = sess.shop;
   const access_token = sess.accessToken;
-  console.log("========== ADD USER TO DB ==========");
   try {
     await addUser(url, access_token);
-    console.log("Added to DB");
   } catch (error) {
     console.error("Error in API:", error);
   }
@@ -285,7 +273,6 @@ app.get("/api/check", async (req, res) => {
   `;
 
   const session = res.locals.shopify.session;
-  console.log("sdsd", res.locals);
   const client = new shopify.api.clients.Graphql({ session });
   let subscriptionLineItem = {};
   let hasPayment = false;
@@ -334,6 +321,30 @@ app.get("/api/check", async (req, res) => {
     }
   }
   //return subscriptionLineItem;
+  const shopDetails = await shopify.api.rest.Shop.all({
+    session: session,
+  });
+  console.log(shopDetails);
+  mixpanel.people.set(session.shop, {
+    $first_name: shopDetails[0].shop_owner,
+    $created: shopDetails[0].created_at,
+    $email: shopDetails[0].customer_email,
+    $phone: shopDetails[0].phone,
+    $country: shopDetails[0].country_name,
+    $country_code: shopDetails[0].country_code,
+    $city: shopDetails[0].city,
+    $region: shopDetails[0].province,
+    $zip: shopDetails[0].zip,
+    $shopify_plan: shopDetails[0].plan_name,
+    $eligibility: shopDetails[0].eligible_for_payments,
+    plan: "free",
+  });
+
+  if (hasPayment) {
+    mixpanel.people.set(session.shop, {
+      plan: "premium",
+    });
+  }
   res.json({ hasPayment });
 });
 app.get("/api/upgradeFirst", async (req, res) => {
@@ -405,6 +416,9 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
   res.status(200).json(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
+
   //const order = new shopify.api.rest.Order({
   //  session: res.locals.shopify.session,
   //});
@@ -413,7 +427,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     session: res.locals.shopify.session,
     id: _req.params["id"],
   });
-  console.log("This is the order Id" + _req.params["id"]);
+
   //here is the new order we are creating, appropro named order2
   let order2 = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
@@ -578,6 +592,13 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(
+    uid,
+    undefined,
+    undefined,
+    1
+  );
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   mixpanel.track("EO Amount Change Quantity", {
@@ -682,6 +703,13 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(
+    uid,
+    undefined,
+    undefined,
+    1
+  );
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
@@ -783,6 +811,9 @@ app.use("/api/preferences", preferenceRoutes);
 
 //misc cportal routes
 app.use("/api", cPortalRoutes);
+
+//anyltcis routes
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
