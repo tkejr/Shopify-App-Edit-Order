@@ -29,6 +29,8 @@ export default function CustomerPortal() {
   const [preferences, setPreferences] = useState([]);
   const [toastContent, setToastContent] = useState("");
   const [isError, setIsError] = useState(false);
+  const [statusUrl, setStatusUrl] = useState("");
+  const [dynamicLink, setDynamicLink] = useState("");
 
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
@@ -39,19 +41,6 @@ export default function CustomerPortal() {
     <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
-  const currentURL = window.location.href;
-  const urlSearchParams = new URLSearchParams(currentURL);
-  const shopParam = urlSearchParams.get("shop");
-
-  var subdomain;
-  if (shopParam) {
-    subdomain = shopParam.split(".")[0];
-    console.log(subdomain); // Output: testinglatest (for example)
-  } else {
-    console.log("Subdomain not found");
-  }
-
-  const dynamicLink = `https://admin.shopify.com/store/${subdomain}/settings/checkout`;
 
   const handleSelectChange = useCallback((value) => setSelected(value), []);
 
@@ -144,10 +133,15 @@ export default function CustomerPortal() {
     }
   };
 
-  const createOrder = async () => {
+  const getOrder = async () => {
+    //if already saved no need to make a backend request again
+    if (statusUrl) {
+      window.open(statusUrl, "_blank");
+      return;
+    }
     try {
-      const response = await fetch("/api/testOrder", {
-        method: "POST",
+      const response = await fetch("/api/viewLast", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
@@ -157,7 +151,9 @@ export default function CustomerPortal() {
       if (response.ok) {
         const data = await response.json();
         setIsError(false);
-        setToastContent(data.message);
+        setToastContent("Order Fetched Successfully");
+        setStatusUrl(data.data[0].order_status_url);
+        window.open(data.data[0].order_status_url, "_blank");
         toggleActive();
       } else {
         setIsError(true);
@@ -168,6 +164,38 @@ export default function CustomerPortal() {
       console.error("Error creating order:", error);
       setIsError(true);
       setToastContent("Some Error Occurred" + response);
+      toggleActive(); // Update state with error message
+    }
+  };
+
+  const createScriptTag = async () => {
+    try {
+      const response = await fetch("/api/scriptTag", {
+        method: "POST", // Use the appropriate HTTP method (e.g., POST) if needed
+        headers: {
+          "Content-Type": "application/json",
+          // You can include any other headers if required
+        },
+        // You can include any request body data here if needed
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsError(false);
+        setToastContent("Script Tag Created Successfully");
+
+        // Do something with the response data if necessary
+
+        toggleActive();
+      } else {
+        setIsError(true);
+        setToastContent("Some Error Occurred");
+        toggleActive(); // Update state with error message
+      }
+    } catch (error) {
+      console.error("Error creating script tag:", error);
+      setIsError(true);
+      setToastContent("Some Error Occurred");
       toggleActive(); // Update state with error message
     }
   };
@@ -206,6 +234,12 @@ export default function CustomerPortal() {
         if (response.ok) {
           const data = await response.json();
           setSelected(secondsToTimeString(data.time_to_edit));
+          var shopParam = data.shop;
+          var subdomain = shopParam.split(".")[0];
+          setDynamicLink(
+            `https://admin.shopify.com/store/${subdomain}/settings/checkout#orderstatus`
+          );
+          console.log(dynamicLink);
           setPreferences(data);
           setEnabled(data.enable);
         } else {
@@ -250,10 +284,12 @@ export default function CustomerPortal() {
         </Card>
         <Card title="Install Customer Portal">
           <Card.Section>
+            {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
             <p>
               Add the Customer Portal snippet to the additional scripts in your
               order status page. This snippet contains your unique account token
-              that should be kept secret.
+              that should be kept secret. Make sure you have customer accounts
+              enabled
             </p>
             <br></br>
           </Card.Section>
@@ -288,11 +324,10 @@ export default function CustomerPortal() {
               alt="Customer Image"
             />{" "}
           </Card.Section>
-          <Card.Section title="Step 3: Create Test Order">
+          <Card.Section title="Step 3: View Order">
             <h1>
-              This will create a test order and send the order confirmation
-              email to you. When you receive the order confirmation, click on
-              View your order, then click on Edit order.
+              Click on View Order to see the checkout page and see the customer
+              portal box embedded onto that page like showed in the photo below
             </h1>
             <br></br>
             <img
@@ -302,7 +337,7 @@ export default function CustomerPortal() {
             />{" "}
             <br></br>
             <br></br>
-            <Button onClick={createOrder}>Create Test Order</Button>
+            <Button onClick={getOrder}>View Order Status</Button>
           </Card.Section>
         </Card>
         <Card

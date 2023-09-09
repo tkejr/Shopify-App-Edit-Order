@@ -16,6 +16,7 @@ import { updateUserPreference } from "./db.js";
 
 import { addUser } from "./db.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
+import cPortalRoutes from "./routes/cPortalRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -777,84 +778,11 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
   res.status(status).send({ success: status === 200, error });
 });
 
-//customer portal
+//customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
 
-//create test order
-app.post("/api/testOrder", async (req, res) => {
-  mixpanel.track("CP Test Order Created", {
-    distinct_id: res.locals.shopify.session.shop,
-  });
-  try {
-    const session = res.locals.shopify.session;
-    const order = new shopify.api.rest.Order({ session: session });
-    order.customer = {
-      first_name: "Paul",
-      last_name: "Norman",
-      email: "paul.norman@example.com",
-    };
-
-    order.billing_address = {
-      first_name: "John",
-      last_name: "Smith",
-      address1: "123 Fake Street",
-      phone: "555-555-5555",
-      city: "Fakecity",
-      province: "Ontario",
-      country: "Canada",
-      zip: "K2P 1L4",
-    };
-    order.shipping_address = {
-      first_name: "Jane",
-      last_name: "Smith",
-      address1: "123 Fake Street",
-      phone: "777-777-7777",
-      city: "Fakecity",
-      province: "Ontario",
-      country: "Canada",
-      zip: "K2P 1L4",
-    };
-    order.email = "jane@example.com";
-    order.financial_status = "partially_paid";
-
-    order.line_items = [
-      {
-        title: "Big Brown Bear Boots",
-        price: 74.99,
-        grams: "1300",
-        quantity: 3,
-        tax_lines: [
-          {
-            price: 13.5,
-            rate: 0.06,
-            title: "State tax",
-          },
-        ],
-      },
-    ];
-    order.transactions = [
-      {
-        kind: "sale",
-        status: "success",
-        amount: 238.47,
-      },
-    ];
-    order.total_tax = 13.5;
-    order.currency = "EUR";
-    await order.save({
-      update: true,
-    });
-
-    // Return a success response if everything went well
-    res.status(200).json({ message: "Order successfully created." });
-  } catch (error) {
-    // Handle errors
-    console.error("Error creating order:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the order." });
-  }
-});
+//misc cportal routes
+app.use("/api", cPortalRoutes);
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 

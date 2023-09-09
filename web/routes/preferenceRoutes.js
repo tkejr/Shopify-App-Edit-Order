@@ -27,6 +27,7 @@ router.get("/", async (req, res) => {
     if (userPreference === null) {
       return res.status(400).send("Invalid Id");
     }
+    userPreference.shop = shopUrl;
 
     res.json(userPreference);
   } catch (error) {
