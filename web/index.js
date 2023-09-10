@@ -58,11 +58,11 @@ app.get(
     const access_token = session.accessToken;
     //Tracking the install event
 
-    //email
-    /*
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
+    //email
+    /*
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
     sgMail
