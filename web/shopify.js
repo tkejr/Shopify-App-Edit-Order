@@ -12,13 +12,22 @@ const DB_PATH = `${process.cwd()}/database.sqlite`;
 // The transactions with Shopify will always be marked as test transactions, unless NODE_ENV is production.
 // See the ensureBilling helper to learn more about billing in this template.
 export const billingConfig = {
-  "Editify Plan": {
+  "Editify Starter Plan": {
     //
     amount: 3.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
-    trialDays: 5,
-    usageTerms: "5 day free trial, then 4.99 per month",
+    trialDays: 3,
+    usageTerms: "3 day free trial, then 4.99 per month",
+    replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
+  },
+  "Editify Pro Plan": {
+    //
+    amount: 9.99,
+    currencyCode: "USD",
+    interval: BillingInterval.Every30Days,
+    trialDays: 3,
+    usageTerms: "3 day free trail, then 9.99 per month",
     replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
   },
 };
