@@ -10,12 +10,14 @@ import {
   Toast,
   Frame,
   Select,
+  MediaCard
 } from "@shopify/polaris";
 import { cust1 } from "../assets";
 import { cust2 } from "../assets";
 import { cust3 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
 import { isError } from "react-query";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -253,9 +255,71 @@ export default function CustomerPortal() {
     getPreferences();
   }, [enabled]);
 
+//payment stuff
+const dispatch = useDispatch();
+const isPremiumUser = useSelector((state) => state.isPremiumUser);
+  
+const planName = useSelector((state) => state.planName);
+  
+const fetchRecurringCharges = async () => {
+  const res = await fetch("/api/check")
+    .then((response) => response.json())
+    .then((data) => {
+      if(data.hasPayment === "pro"){
+        
+        dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+        dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+     
+      }
+      else if(data.hasPayment === "starter"){
+        
+        dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+        dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+      }
+      else{
+        dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
+      }
+      
+
+      setUserStateLoading(false);
+    });
+};
+
+useEffect(() => {
+  fetchRecurringCharges().catch((error) => console.error(error));
+  //new
+  dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+  dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+  //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+}, []);
+const checkPremiumUserContent = () => {
   return (
     <Frame>
-      <Page
+    
+    <MediaCard
+    title="Discover how the Customer Portal can help you"
+    description="Go to the Plans page and select the Pro plan" 
+    >
+    <img
+      alt=""
+      width="100%"
+      height="100%"
+      style={{
+        objectFit: 'cover',
+        objectPosition: 'center',
+      }}
+      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+    />
+  </MediaCard>
+    </Frame>
+  );
+};
+
+
+  return (
+    <Frame>
+      {((planName==="pro" )  && isPremiumUser) ?
+      (<Page
         backAction={{ content: "Products", url: "#" }}
         title="Customer Portal"
         titleMetadata={settingStatusMarkup}
@@ -365,7 +429,8 @@ export default function CustomerPortal() {
             />
           </Card.Section>
         </Card>
-      </Page>
+      </Page>) : checkPremiumUserContent()
+}
     </Frame>
   );
 }

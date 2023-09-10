@@ -22,6 +22,7 @@ export default function App() {
             <QueryProvider>
               <NavigationMenu
                 navigationLinks={[
+                  
                   {
                     label: "Edit Order",
                     destination: "/EditOrder",
@@ -29,6 +30,10 @@ export default function App() {
                   {
                     label: "Customer Portal",
                     destination: "/CustomerPortal",
+                  },
+                  {
+                    label: "Plans",
+                    destination: "/Plans",
                   },
                 ]}
               />

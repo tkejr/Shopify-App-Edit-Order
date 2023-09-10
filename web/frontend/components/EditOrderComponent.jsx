@@ -209,6 +209,7 @@ export function EditOrderComponent(props) {
               <Button disabled={!orderId} onClick={() => handleChange()}>
                 {orderId ? "Add Product" : "Pick an Order"}
               </Button>
+              
             </Card.Section>
             {showProducts && (
               <Card.Section title="Product to be Added">

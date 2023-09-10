@@ -1,9 +1,9 @@
-import {Page, Badge,Banner,  Card, PageActions, Layout, Button, Modal, TextContainer,  IndexTable, useIndexResourceState} from '@shopify/polaris';
+import {Page, Badge,Banner,  MediaCard, Frame, Layout, Button, Modal, TextContainer,  IndexTable, useIndexResourceState} from '@shopify/polaris';
 import React from 'react';
 import {Autocomplete, Icon} from '@shopify/polaris';
 import {SearchMinor} from '@shopify/polaris-icons';
 import {useState, useCallback, useMemo, useEffect} from 'react';
-import {MediaCard} from '@shopify/polaris';
+
 import { useAuthenticatedFetch } from "../hooks";
 import { TitleBar, ResourcePicker } from '@shopify/app-bridge-react';
 import { ProductsCard, OrderTable, DatePickerExample, EditOrderComponent, OrderTableEditOrder } from "../components";
@@ -19,6 +19,17 @@ const PageExample = () => {
       setShow(true);
     }
   };
+  const fetch = useAuthenticatedFetch();
+  const upgrade = async () => {
+    setLoading(true);
+    const res = await fetch("/api/upgradePortal")
+      .then((response) => response.json())
+      .then((data) => {
+        navigate(data.confirmationUrl);
+
+        setLoading(false);
+      });
+  };
   const [orderId, setOrderId] = useState(0);
   const [orderName, setName] = useState();
   const [lineItems, setLineItems] = useState();
@@ -26,17 +37,31 @@ const PageExample = () => {
     //charges 
     //const [loading, setLoading] = useState(false);
     const isPremiumUser = useSelector((state) => state.isPremiumUser);
+    const planName = useSelector((state) => state.planName);
     const dispatch = useDispatch();
     //const navigate = useNavigate();
     const fetchRecurringCharges = async () => {
-        const res = await fetch("/api/check")
-          .then((response) => response.json())
-          .then((data) => {
-            dispatch({ type: "SET_IS_PREMIUM_USER", payload: data.hasPayment });
-    
-            //setUserStateLoading(false);
-          });
-      };
+      const res = await fetch("/api/check")
+        .then((response) => response.json())
+        .then((data) => {
+          if(data.hasPayment === "pro"){
+            
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true }); 
+          }
+          else if(data.hasPayment === "starter"){
+            
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+          }
+          else{
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
+          }
+          
+  
+          setUserStateLoading(false);
+        });
+    };
       useEffect(() => {
         fetchRecurringCharges().catch((error) => console.error(error));
         //new
@@ -47,33 +72,29 @@ const PageExample = () => {
       }, []);
       const checkPremiumUserContent = () => {
         return (
-          <Card
-            sectioned
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Card.Section>
-              <TextContainer spacing="loose">
-                <h2>Upgrade to keep using Editify</h2>
-              </TextContainer>
-              <br></br>
-            </Card.Section>
-            <Card.Section>
-              {
-                <Button primary="true" onClick={() => upgrade()}>
-                  {loading ? "Loading..." : "Upgrade"}
-                </Button>
-              }
-            </Card.Section>
-          </Card>
+          <Frame>
+      
+            <MediaCard
+              title="Discover how Editify can help you"
+              description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select your plan"
+      
+            >
+              <img
+                alt=""
+                width="100%"
+                height="100%"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+                src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+              />
+            </MediaCard>
+        </Frame>
         );
       };
 
-const fetch = useAuthenticatedFetch();
+
     
   //open modal
   const date = new Date();
@@ -115,11 +136,10 @@ const fetch = useAuthenticatedFetch();
 
      
       <Layout>
-        {!isPremiumUser ? (
-          checkPremiumUserContent()
-        ) : (
+        {((planName==="pro")  && isPremiumUser) ?  (
           <>
             <Layout.Section oneHalf>
+              {
               <OrderTableEditOrder
                 toggleShow={toggleShow}
                 setOrderId={setOrderId}
@@ -127,6 +147,7 @@ const fetch = useAuthenticatedFetch();
                 reloadComp={reloadComp}
                 setLineItems={setLineItems}
               />
+        }
             </Layout.Section>
             <Layout.Section oneHalf>
               <EditOrderComponent
@@ -138,7 +159,9 @@ const fetch = useAuthenticatedFetch();
                />
             </Layout.Section>
           </>
-        )}
+        ): (
+          checkPremiumUserContent()
+        ) }
       </Layout>
     </Page>
   );

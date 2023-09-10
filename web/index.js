@@ -10,8 +10,9 @@ import GDPRWebhookHandlers from "./gdpr.js";
 import bodyParser from "body-parser";
 import Mixpanel from "mixpanel";
 import nodemailer from "nodemailer";
-//const sgMail = require('@sendgrid/mail')
+
 import sgMail from "@sendgrid/mail";
+import {emailHelper} from "./email-helper.js";
 import { updateUserPreference } from "./db.js";
 
 import { addUser } from "./db.js";
@@ -50,13 +51,26 @@ app.get(
     const access_token = session.accessToken;
     //Tracking the install event
 
+    //email
+    /*
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
+    const shopEmail = "" + shopDetails[0].email;
+    const msg = await emailHelper(shopEmail);
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+      */
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: false,
+      isTest: true,
     });
 
     if (hasPayment) {
@@ -97,8 +111,8 @@ app.get(
       res.redirect(
         await shopify.api.billing.request({
           session,
-          plan: plans[0],
-          isTest: false,
+          plan: plans[1],
+          isTest: true,
         })
       );
     }
@@ -123,7 +137,10 @@ app.get("/api/email", async (_req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: res.locals.shopify.session,
   });
-
+console.log('======here')
+sgMail.setApiKey(
+  "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"
+);
   const shopEmail = "" + shopDetails[0].email;
   try {
     // Send the email
@@ -149,7 +166,7 @@ app.get("/api/email", async (_req, res) => {
                   <tr>
                     <td style="padding:0 0 36px 0;color:#153643;">
                       <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Welcome to Editify</h1>
-                      <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Backdate orders with ease, and have customers edit their orders! </p>
+                      <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Editify is one of the only apps on the Shopify App store to both offer a customer portal for customers to edit their orders and offer merchants a way to backdate their orders. As well as backdating, Editify lets you change just about everything else in an order. If you think there is something we missed, shoot us an email and we will work on implementing it! </p>
                       <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="https://apps.shopify.com/editify" style="color:#ee4c50;text-decoration:underline;">Write a Review</a></p>
                     </td>
                   </tr>
@@ -159,7 +176,7 @@ app.get("/api/email", async (_req, res) => {
                         <tr>
                           <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
                             <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/left.gif" alt="" width="260" style="height:auto;display:block;" /></p>
-                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Editify is one of the only apps on the Shopify App store to both offer a customer portal for customers to edit their orders and offer merchants a way to backdate their orders. As well as backdating, Editify lets you change just about everything else in an order. If you think there is something we missed, shoot us an email and we will work on implementing it!</p>
+                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"> Save on returns! Have customers directly edit their order!</p>
                             <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="http://www.example.com" style="color:#ee4c50;text-decoration:underline;"></a></p>
                           </td>
                           <td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
@@ -176,23 +193,21 @@ app.get("/api/email", async (_req, res) => {
               </td>
             </tr>
             <tr>
-              <td style="padding:30px;background:#880808;">
+              <td style="padding:30px;background:#ee4c50;">
                 <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
                   <tr>
                     <td style="padding:0;width:50%;" align="left">
                       <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;">Unsubscribe</a>
+                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
                       </p>
                     </td>
                     <td style="padding:0;width:50%;" align="right">
                       <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
                         <tr>
                           <td style="padding:0 0 0 10px;width:38px;">
-                            <a href="http://www.twitter.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
+                            <a href="https://twitter.com/1_Day_Apps" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
                           </td>
-                          <td style="padding:0 0 0 10px;width:38px;">
-                            <a href="http://www.facebook.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/fb_1.png" alt="Facebook" width="38" style="height:auto;display:block;border:0;" /></a>
-                          </td>
+                          
                         </tr>
                       </table>
                     </td>
@@ -248,7 +263,8 @@ app.get("/api/check", async (req, res) => {
 
   const url = sess.shop;
   const access_token = sess.accessToken;
-  console.log("========== ADD USER TO DB ==========");
+  console.log("========== ADD USER TO DB =========="); 
+  
   try {
     await addUser(url, access_token);
     console.log("Added to DB");
@@ -285,12 +301,12 @@ app.get("/api/check", async (req, res) => {
   `;
 
   const session = res.locals.shopify.session;
-  console.log("sdsd", res.locals);
+  
   const client = new shopify.api.clients.Graphql({ session });
   let subscriptionLineItem = {};
-  let hasPayment = false;
+  let hasPayment;
   //const planName = Object.keys(billingConfig)[0];
-  const planName = "Editify Plan";
+  
   //const planDescription = billingConfig[planName].usageTerms;
 
   try {
@@ -304,8 +320,8 @@ app.get("/api/check", async (req, res) => {
     );
     response.body.data.currentAppInstallation.activeSubscriptions.forEach(
       (subscription) => {
-        if (subscription.name === planName) {
-          hasPayment = true;
+        if ((subscription.name === "Editify Pro Plan" )) {
+          hasPayment = "pro";
           /*
           subscription.lineItems.forEach((lineItem) => {
             if (lineItem.plan.pricingDetails.terms === planDescription) {
@@ -322,6 +338,9 @@ app.get("/api/check", async (req, res) => {
           });
           */
         }
+        else if((subscription.name === "Editify Starter Plan" )){
+          hasPayment = "starter";
+        }
       }
     );
   } catch (error) {
@@ -336,19 +355,19 @@ app.get("/api/check", async (req, res) => {
   //return subscriptionLineItem;
   res.json({ hasPayment });
 });
-app.get("/api/upgradeFirst", async (req, res) => {
+app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
   const url = "https://" + shop + "/admin/apps/editify/";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
-  recurring_application_charge.name = "Editify Plan";
-  recurring_application_charge.price = 3.99;
+  recurring_application_charge.name = "Editify Pro Plan";
+  recurring_application_charge.price = 9.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
-  recurring_application_charge.trial_days = 5;
-  recurring_application_charge.test = false;
+  recurring_application_charge.trial_days = 3;
+  recurring_application_charge.test = true;
   await recurring_application_charge.save({
     update: true,
   });
@@ -360,7 +379,30 @@ app.get("/api/upgradeFirst", async (req, res) => {
   });
   res.json({ confirmationUrl });
 });
+app.get("/api/upgradeStarter", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+  ///IMPORTANT, change this to just /editify in prod
+  const url = "https://" + shop + "/admin/apps/editify/";
+  const recurring_application_charge =
+    new shopify.api.rest.RecurringApplicationCharge({ session: session });
+  recurring_application_charge.name = "Editify Starter Plan";
+  recurring_application_charge.price = 4.99;
+  recurring_application_charge.return_url = url;
+  //recurring_application_charge.billing_account_id = 770125316;
+  recurring_application_charge.trial_days = 3;
+  recurring_application_charge.test = true;
+  await recurring_application_charge.save({
+    update: true,
+  });
+  const confirmationUrl = recurring_application_charge.confirmation_url;
 
+  mixpanel.track("Approved Charge", {
+    distinct_id: shop,
+    price: recurring_application_charge.price,
+  });
+  res.json({ confirmationUrl });
+});
 app.get("/api/orders", async (_req, res) => {
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
@@ -368,16 +410,8 @@ app.get("/api/orders", async (_req, res) => {
     limit: 250, // new to make the limit 250 instead of 50
   });
 
-  /*
-  ////count total number of orders
-
-  const count = await shopify.api.rest.Order.count({
-    session: res.locals.shopify.session,
-    status: "any",
-    
-  });
-
-  */
+  
+  
 
   res.status(200).json(data);
 });
