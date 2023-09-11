@@ -10,7 +10,7 @@ import {
   Button,
   Modal,
   Frame,
-  MediaCard
+  MediaCard,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
@@ -22,27 +22,23 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
-  
-
   const fetch = useAuthenticatedFetch();
-  
 
-  
   //using random
- 
-  const [activeResizify, setActiveResizify] = useState(((Math.random() <= .05) ? true: false ) ? true : false);
-  const [activeReview, setActiveReview] = useState(((Math.random() <= .05) ? true: false) ? true : false);
-  
-    
-  
-  const handleChangeResizify = useCallback(
-    () => { setActiveResizify(!activeResizify);},
-    [activeResizify]
+
+  const [activeResizify, setActiveResizify] = useState(
+    (Math.random() <= 0.05 ? true : false) ? true : false
   );
-  const handleChangeReview = useCallback(
-    () => {setActiveReview(!activeReview)},
-    [activeReview]
+  const [activeReview, setActiveReview] = useState(
+    (Math.random() <= 0.05 ? true : false) ? true : false
   );
+
+  const handleChangeResizify = useCallback(() => {
+    setActiveResizify(!activeResizify);
+  }, [activeResizify]);
+  const handleChangeReview = useCallback(() => {
+    setActiveReview(!activeReview);
+  }, [activeReview]);
   const redirectToResizify = () => {
     window.open("https://apps.shopify.com/compress-files", "_blank");
   };
@@ -62,9 +58,9 @@ export default function HomePage() {
   const [orderName, setName] = useState();
   const [loading, setLoading] = useState(false);
   const isPremiumUser = useSelector((state) => state.isPremiumUser);
-  
+
   const planName = useSelector((state) => state.planName);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userStateLoading, setUserStateLoading] = useState(true);
@@ -78,28 +74,20 @@ export default function HomePage() {
     const res = await fetch("/api/check")
       .then((response) => response.json())
       .then((data) => {
-        if(data.hasPayment === "pro"){
-          
+        if (data.hasPayment === "pro") {
           dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
-          
-
-          
-        }
-        else if(data.hasPayment === "starter"){
-          
+        } else if (data.hasPayment === "starter") {
           dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
-        }
-        else{
+        } else {
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
         }
-        
 
         setUserStateLoading(false);
       });
   };
-  
+
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     //new
@@ -110,26 +98,27 @@ export default function HomePage() {
   const checkPremiumUserContent = () => {
     return (
       <Frame>
-      
-      <MediaCard
-      title="Discover how Editify can help you"
-      description="Go to the Plans page and select your plan" 
-      primaryAction={{
-        content: 'Go to Plans',
-        onAction: () => {navigate("/Plans")},
-      }}
-      >
-      <img
-        alt=""
-        width="100%"
-        height="100%"
-        style={{
-          objectFit: 'cover',
-          objectPosition: 'center',
-        }}
-        src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
-      />
-    </MediaCard>
+        <MediaCard
+          title="Discover how Editify can help you"
+          description="Upgrade to Any Plan to Backdate Orders"
+          primaryAction={{
+            content: "Go to Plans",
+            onAction: () => {
+              navigate("/Plans");
+            },
+          }}
+        >
+          <img
+            alt=""
+            width="100%"
+            height="100%"
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+            src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+          />
+        </MediaCard>
       </Frame>
     );
   };
@@ -192,17 +181,17 @@ export default function HomePage() {
       </Modal>
 
       <Layout>
-        {((planName==="pro" || planName === "starter")  && isPremiumUser) ?  (
+        {(planName === "pro" || planName === "starter") && isPremiumUser ? (
           <>
             <Layout.Section oneHalf>
               {
-              <OrderTable
-                toggleShow={toggleShow}
-                setOrderId={setOrderId}
-                setName={setName}
-                reloadComp={reloadComp}
-              />
-        }
+                <OrderTable
+                  toggleShow={toggleShow}
+                  setOrderId={setOrderId}
+                  setName={setName}
+                  reloadComp={reloadComp}
+                />
+              }
             </Layout.Section>
             <Layout.Section oneHalf>
               <DatePickerExample
@@ -213,9 +202,9 @@ export default function HomePage() {
               />
             </Layout.Section>
           </>
-        ):(
+        ) : (
           checkPremiumUserContent()
-        ) }
+        )}
       </Layout>
     </Page>
   );
