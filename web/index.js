@@ -75,7 +75,7 @@ app.get(
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: true,
+      isTest: false,
     });
     mixpanel.people.set(session.shop, {
       $first_name: shopDetails[0].shop_owner,
@@ -105,7 +105,7 @@ app.get(
         await shopify.api.billing.request({
           session,
           plan: plans[1],
-          isTest: true,
+          isTest: false,
         })
       );
     }
@@ -376,7 +376,7 @@ app.get("/api/upgradePro", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 3;
-  recurring_application_charge.test = true;
+  recurring_application_charge.test = false;
   await recurring_application_charge.save({
     update: true,
   });
@@ -400,7 +400,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 3;
-  recurring_application_charge.test = true;
+  recurring_application_charge.test = false;
   await recurring_application_charge.save({
     update: true,
   });
