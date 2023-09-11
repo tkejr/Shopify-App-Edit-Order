@@ -37,11 +37,10 @@ const STATIC_PATH =
 
 const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
-//for mail
-//sgMail.setApiKey(
-//  "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"
-//);
-// Set up Shopify authentication and webhook handling
+const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
+
+sgMail.setApiKey(SEND_GRID_API_KEY);
+
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
   shopify.config.auth.callbackPath,
@@ -63,7 +62,6 @@ app.get(
       session: session,
     });
     //email
-    /*
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
     sgMail
@@ -74,7 +72,6 @@ app.get(
       .catch((error) => {
         console.error(error);
       });
-      */
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
@@ -132,8 +129,8 @@ app.get("/api/email", async (_req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: res.locals.shopify.session,
   });
-  
-  sgMail.setApiKey(  
+
+  sgMail.setApiKey(
     "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"
   );
   const shopEmail = "" + shopDetails[0].email;
@@ -254,7 +251,7 @@ app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
-  
+
   try {
     await addUser(url, access_token);
   } catch (error) {
