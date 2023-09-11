@@ -114,6 +114,10 @@ export default function HomePage() {
       <MediaCard
       title="Discover how Editify can help you"
       description="Go to the Plans page and select your plan" 
+      primaryAction={{
+        content: 'Go to Plans',
+        onAction: () => {navigate("/Plans")},
+      }}
       >
       <img
         alt=""

@@ -53,7 +53,9 @@ import {
     
     const [loading, setLoading] = useState(false);
     const isPremiumUser = useSelector((state) => state.isPremiumUser);
+    
     const planName = useSelector((state) => state.planName);
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [userStateLoading, setUserStateLoading] = useState(true);
@@ -190,7 +192,7 @@ import {
                     
                 
                 <Card.Section>
-                   {(planName==="starter") &&  <Button onClick={()=> upgradePro()}> {loading ? "Loading..." : "Upgrade"}</Button>}
+                   {(!isPremiumUser  || planName==="starter") &&  <Button onClick={()=> upgradePro()}> {loading ? "Loading..." : "Get Pro Plan"}</Button>}
                    {(planName==="pro") && <Badge progress="complete" status="success">Active</Badge> }
                 </Card.Section>
               </MediaCard>
@@ -216,7 +218,7 @@ import {
                     
                 
                 <Card.Section>
-                    { (planName === "pro") && <Button onClick={()=> upgradeStarter()}> {loading ? "Loading..." : "Downgrade"}</Button>}
+                    { (!isPremiumUser || planName === "pro") && <Button onClick={()=> upgradeStarter()}> {loading ? "Loading..." : "Get Starter Plan"}</Button>}
                     {(planName === "starter") && <Badge progress="complete" status="success">Active</Badge> }
                 </Card.Section>
               </MediaCard>

@@ -18,6 +18,7 @@ import { cust3 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
 import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "@shopify/app-bridge-react";
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -257,6 +258,7 @@ export default function CustomerPortal() {
 
 //payment stuff
 const dispatch = useDispatch();
+const navigate = useNavigate();
 const isPremiumUser = useSelector((state) => state.isPremiumUser);
   
 const planName = useSelector((state) => state.planName);
@@ -281,7 +283,7 @@ const fetchRecurringCharges = async () => {
       }
       
 
-      setUserStateLoading(false);
+      //setUserStateLoading(false);
     });
 };
 
@@ -299,6 +301,10 @@ const checkPremiumUserContent = () => {
     <MediaCard
     title="Discover how the Customer Portal can help you"
     description="Go to the Plans page and select the Pro plan" 
+    primaryAction={{
+      content: 'Go to Plans',
+      onAction: () => {navigate("/Plans")},
+    }}
     >
     <img
       alt=""
@@ -308,7 +314,7 @@ const checkPremiumUserContent = () => {
         objectFit: 'cover',
         objectPosition: 'center',
       }}
-      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
     />
   </MediaCard>
     </Frame>

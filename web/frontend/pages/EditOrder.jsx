@@ -5,7 +5,7 @@ import {SearchMinor} from '@shopify/polaris-icons';
 import {useState, useCallback, useMemo, useEffect} from 'react';
 
 import { useAuthenticatedFetch } from "../hooks";
-import { TitleBar, ResourcePicker } from '@shopify/app-bridge-react';
+import { TitleBar, ResourcePicker, useNavigate } from '@shopify/app-bridge-react';
 import { ProductsCard, OrderTable, DatePickerExample, EditOrderComponent, OrderTableEditOrder } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -20,6 +20,7 @@ const PageExample = () => {
     }
   };
   const fetch = useAuthenticatedFetch();
+  const navigate = useNavigate()
   const upgrade = async () => {
     setLoading(true);
     const res = await fetch("/api/upgradePortal")
@@ -59,7 +60,7 @@ const PageExample = () => {
           }
           
   
-          setUserStateLoading(false);
+          //setUserStateLoading(false);
         });
     };
       useEffect(() => {
@@ -76,8 +77,11 @@ const PageExample = () => {
       
             <MediaCard
               title="Discover how Editify can help you"
-              description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select your plan"
-      
+              description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select your plan."
+              primaryAction={{
+                content: 'Go to Plans',
+                onAction: () => {navigate("/Plans")},
+              }}
             >
               <img
                 alt=""

@@ -13,6 +13,7 @@ import nodemailer from "nodemailer";
 
 import sgMail from "@sendgrid/mail";
 import { emailHelper } from "./email-helper.js";
+
 import {
   updateUserPreference,
   updateUserDetails,
@@ -37,9 +38,9 @@ const STATIC_PATH =
 const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 //for mail
-sgMail.setApiKey(
-  "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"
-);
+//sgMail.setApiKey(
+//  "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"
+//);
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -131,8 +132,8 @@ app.get("/api/email", async (_req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: res.locals.shopify.session,
   });
-  console.log("======here");
-  sgMail.setApiKey(
+  
+  sgMail.setApiKey(  
     "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"
   );
   const shopEmail = "" + shopDetails[0].email;
@@ -253,6 +254,7 @@ app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
+  
   try {
     await addUser(url, access_token);
   } catch (error) {
