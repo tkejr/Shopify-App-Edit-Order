@@ -35,10 +35,6 @@ export default function App() {
                     destination: "/CustomerPortal",
                   },
                   {
-                    label: "Analytics",
-                    destination: "/Analytics",
-                  },
-                  {
                     label: "Plans",
                     destination: "/Plans",
                   },
