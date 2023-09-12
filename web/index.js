@@ -30,6 +30,16 @@ import { billingConfig } from "./shopify.js";
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
+//ENV Logic
+// Just add to your .env FILE
+//  ENVIRONMENT = "dev"
+// to make billing as test charge
+const ENV = process.env.ENVIRONMENT || "prod";
+var prod = true;
+if (ENV != "prod") {
+  prod = false;
+}
+
 const STATIC_PATH =
   process.env.NODE_ENV === "production"
     ? `${process.cwd()}/frontend/dist`
@@ -64,6 +74,12 @@ app.get(
     //email
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
+    const Installmsg = {
+      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+      from: "editifyshopify@gmail.com", // Change to your verified sender
+      subject: "LFG Ka-ching-$$ Editify",
+      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
+    };
     sgMail
       .send(msg)
       .then(() => {
@@ -72,10 +88,19 @@ app.get(
       .catch((error) => {
         console.error(error);
       });
+
+    sgMail
+      .send(Installmsg)
+      .then(() => {
+        console.log("Email sent to owners");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
-      isTest: false,
+      isTest: !prod,
     });
     mixpanel.people.set(session.shop, {
       $first_name: shopDetails[0].shop_owner,
@@ -105,7 +130,7 @@ app.get(
         await shopify.api.billing.request({
           session,
           plan: plans[1],
-          isTest: false,
+          isTest: !prod,
         })
       );
     }
@@ -376,7 +401,7 @@ app.get("/api/upgradePro", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 3;
-  recurring_application_charge.test = false;
+  recurring_application_charge.test = !prod;
   await recurring_application_charge.save({
     update: true,
   });
@@ -400,7 +425,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = 3;
-  recurring_application_charge.test = false;
+  recurring_application_charge.test = !prod;
   await recurring_application_charge.save({
     update: true,
   });
@@ -542,7 +567,6 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.tax_lines = orderTesting?.tax_lines;
 
   order2.taxes_included = orderTesting?.taxes_included;
-  //order2.test = orderTesting?.test; //
   //order2.token = orderTesting?.token; //
   order2.total_discounts = orderTesting?.total_discounts;
   order2.total_discounts_set = orderTesting?.total_discounts_set;

@@ -24,7 +24,7 @@ export default function App() {
                 navigationLinks={[
                   {
                     label: "Backdate Order",
-                    destination: "/",
+                    destination: "/Backdate",
                   },
                   {
                     label: "Edit Order",
@@ -33,10 +33,6 @@ export default function App() {
                   {
                     label: "Customer Portal",
                     destination: "/CustomerPortal",
-                  },
-                  {
-                    label: "Analytics",
-                    destination: "/Analytics",
                   },
                   {
                     label: "Plans",

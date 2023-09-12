@@ -11,6 +11,10 @@ import {
   Frame,
   Select,
   MediaCard,
+  Banner,
+  Link,
+  Modal,
+  TextContainer,
 } from "@shopify/polaris";
 import { cust1 } from "../assets";
 import { cust2 } from "../assets";
@@ -34,6 +38,20 @@ export default function CustomerPortal() {
   const [isError, setIsError] = useState(false);
   const [statusUrl, setStatusUrl] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
+  const [error, setError] = useState(false);
+
+  const clearError = useCallback(() => {
+    setError(false);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setError(!error);
+
+    // If we're setting the error to true, clear it after 10 seconds
+    if (!error) {
+      setTimeout(clearError, 10000); // 10000 ms = 10 seconds
+    }
+  }, [error, clearError]);
 
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
@@ -122,17 +140,16 @@ export default function CustomerPortal() {
         const data = await response.json();
         setIsError(false);
         setToastContent("Updated Successfully");
+
         toggleActive();
       } else {
-        setIsError(true);
         setToastContent("Some Error Occurred");
-        toggleActive();
+        handleError();
       }
     } catch (error) {
       console.error("Error updating preference:", error);
-      setIsError(true);
       setToastContent("Some Error Occurred" + response);
-      toggleActive();
+      handleError();
     }
   };
 
@@ -159,47 +176,13 @@ export default function CustomerPortal() {
         window.open(data.data[0].order_status_url, "_blank");
         toggleActive();
       } else {
-        setIsError(true);
         setToastContent("Some Error Occurred");
-        toggleActive(); // Update state with error message
+        handleError();
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      setIsError(true);
       setToastContent("Some Error Occurred" + response);
-      toggleActive(); // Update state with error message
-    }
-  };
-
-  const createScriptTag = async () => {
-    try {
-      const response = await fetch("/api/scriptTag", {
-        method: "POST", // Use the appropriate HTTP method (e.g., POST) if needed
-        headers: {
-          "Content-Type": "application/json",
-          // You can include any other headers if required
-        },
-        // You can include any request body data here if needed
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setIsError(false);
-        setToastContent("Script Tag Created Successfully");
-
-        // Do something with the response data if necessary
-
-        toggleActive();
-      } else {
-        setIsError(true);
-        setToastContent("Some Error Occurred");
-        toggleActive(); // Update state with error message
-      }
-    } catch (error) {
-      console.error("Error creating script tag:", error);
-      setIsError(true);
-      setToastContent("Some Error Occurred");
-      toggleActive(); // Update state with error message
+      handleError();
     }
   };
 
@@ -208,10 +191,8 @@ export default function CustomerPortal() {
   ) : null;
   const handleCopyClick = () => {
     // Copy the content to the clipboard
-    setIsError(false);
     setToastContent("Copied Successfully");
-    toggleActive();
-
+    handleError();
     navigator.clipboard.writeText(copiedContent);
   };
 
@@ -247,9 +228,13 @@ export default function CustomerPortal() {
           setEnabled(data.enable);
         } else {
           // Handle non-successful response (e.g., show an error message)
+          setToastContent("Some Error Occurred");
+          handleError();
         }
       } catch (error) {
         console.error("Error updating preference:", error);
+        setToastContent("Some Error Occurred" + response);
+        handleError();
       }
     };
 
@@ -282,7 +267,11 @@ export default function CustomerPortal() {
   };
 
   useEffect(() => {
-    fetchRecurringCharges().catch((error) => console.error(error));
+    fetchRecurringCharges().catch((error) => {
+      setToastContent("Some Error Occurred" + response);
+      handleError();
+      console.error(error);
+    });
     //new
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
@@ -340,7 +329,10 @@ export default function CustomerPortal() {
                 Portal, you must have customer accounts enabled for your store.
               </p>
               <img
-                style={{ width: "500px" }} // Set the width using inline styles
+                style={{
+                  width: "80vw", // This makes the image take up to 80% of the viewport width
+                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
+                }}
                 src={cust1} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
               />{" "}
@@ -383,7 +375,10 @@ export default function CustomerPortal() {
               </h1>
               <br></br>
               <img
-                style={{ width: "800px" }} // Set the width using inline styles
+                style={{
+                  width: "80vw", // This makes the image take up to 80% of the viewport width
+                  maxWidth: "80%", // This ensures the image never exceeds the size of its container
+                }}
                 src={cust2} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
               />{" "}
@@ -396,7 +391,10 @@ export default function CustomerPortal() {
               </h1>
               <br></br>
               <img
-                style={{ width: "400px" }} // Set the width using inline styles
+                style={{
+                  width: "80vw", // This makes the image take up to 80% of the viewport width
+                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
+                }} // Set the width using inline styles
                 src={cust3} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
               />{" "}
@@ -430,6 +428,16 @@ export default function CustomerPortal() {
               />
             </Card.Section>
           </Card>
+
+          <Modal open={error} onClose={handleError} title="Connection with API">
+            <Modal.Section>
+              <TextContainer>
+                <Banner status="critical">
+                  <p>{toastContent}</p>
+                </Banner>
+              </TextContainer>
+            </Modal.Section>
+          </Modal>
         </Page>
       ) : (
         checkPremiumUserContent()
