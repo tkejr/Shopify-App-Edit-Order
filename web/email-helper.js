@@ -1,59 +1,14 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 console.log("process.env.DATABASE_URL", process.env.DATABASE_URL);
 
-
-
-const getUserPreferences = async (userId) => {
-  try {
-    const query = {
-      text: `SELECT * FROM custom_preferences WHERE user_id = $1`,
-      values: [userId],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User ID not found
-    }
-
-    return result.rows[0];
-  } catch (error) {
-    console.error("Error fetching user preferences:", error);
-    throw error;
-  }
-};
-
-
-
-const getUserIdByUrl = async (userUrl) => {
-  try {
-    const query = {
-      text: "SELECT id FROM users WHERE url = $1",
-      values: [userUrl],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User with given URL not found
-    }
-
-    return result.rows[0].id;
-  } catch (error) {
-    console.error("Error getting user ID by URL:", error);
-    throw error;
-  }
-};
-
 const emailHelper = async (shopEmail) => {
-    const msg = {
-        to: shopEmail, // Change to your recipient
-        from: "editifyshopify@gmail.com", // Change to your verified sender
-        subject: "Editify",
-        text: "Welcome to Editify",
-        html: `
+  const msg = {
+    to: shopEmail, // Change to your recipient
+    from: "editifyshopify@gmail.com", // Change to your verified sender
+    subject: "Editify",
+    text: "Welcome to Editify",
+    html: `
         <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
         <tr>
           <td align="center" style="padding:0;">
@@ -123,12 +78,8 @@ const emailHelper = async (shopEmail) => {
         </tr>
       </table>
         `,
-      };
-      return msg;
+  };
+  return msg;
 };
 
-
-
-export {
-  emailHelper
-};
+export { emailHelper };
