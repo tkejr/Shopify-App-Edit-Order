@@ -72,16 +72,15 @@ app.get(
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
-    //push Mobile Notifcation
-    pushNotify(
-      "$9.99 Ka-ching",
-      `Editify Installed by ${shopDetails[0].name}`,
-      "💰"
-    );
-
     //email
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
+    const Installmsg = {
+      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+      from: "editifyshopify@gmail.com", // Change to your verified sender
+      subject: "LFG Ka-ching-$$ Editify",
+      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
+    };
     sgMail
       .send(msg)
       .then(() => {
@@ -91,6 +90,14 @@ app.get(
         console.error(error);
       });
 
+    sgMail
+      .send(Installmsg)
+      .then(() => {
+        console.log("Email sent to owners");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
