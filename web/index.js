@@ -22,6 +22,7 @@ import {
 } from "./db.js";
 
 import { addUser } from "./db.js";
+
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
@@ -37,7 +38,7 @@ const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 // to make billing as test charge
 const ENV = process.env.ENVIRONMENT || "prod";
 var prod = true;
-if (ENV != "prod") {
+if (ENV !== "prod") {
   prod = false;
 }
 
@@ -81,6 +82,7 @@ app.get(
       subject: "LFG Ka-ching-$$ Editify",
       text: `An Installation was made by ${shopDetails[0].shop_owner}`,
     };
+    
     sgMail
       .send(msg)
       .then(() => {
@@ -98,6 +100,8 @@ app.get(
       .catch((error) => {
         console.error(error);
       });
+      
+     
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
@@ -331,6 +335,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   res.json({ confirmationUrl });
 });
 app.get("/api/orders", async (_req, res) => {
+  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
@@ -353,12 +358,14 @@ app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
 });
 //getting unfulfilled orders
 app.get("/api/orders/unfulfilled", async (_req, res) => {
+  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     //status: "unfulfilled",
     fulfillment_status: "unfulfilled",
     limit: 250,
   });
+  
 
   res.status(200).json(data);
 });

@@ -90,8 +90,8 @@ const PageExample = () => {
     return (
       <Frame>
         <MediaCard
-          title="Discover how Editify can help you"
-          description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select your plan."
+          title="Edit any order"
+          description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select the Pro plan."
           primaryAction={{
             content: "Go to Plans",
             onAction: () => {
@@ -124,16 +124,16 @@ const PageExample = () => {
   return (
     <Page
       title="Edit Order"
-      secondaryActions={[
-        {
-          content: "What is this page for? ",
-          accessibilityLabel: "Secondary action label",
-          onAction: () => handleChange(),
-        },
-      ]}
-      fullWidth
+      //secondaryActions={[
+      //  {
+       //   content: "What is this page for? ",
+       //   accessibilityLabel: "Secondary action label",
+      //    onAction: () => handleChange(),
+      //  },
+      //]}
+      defaultWidth
     >
-      <hr></hr>
+      
       <Modal
         //activator={activator}
         open={active}

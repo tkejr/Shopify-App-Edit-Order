@@ -154,7 +154,7 @@ const handleMonthChange = useCallback(
       >
         <IndexTable.Cell>
           <Button
-            primary
+            
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);

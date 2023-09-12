@@ -199,11 +199,7 @@ export function EditOrderComponent(props) {
                 ? `Order Details for Order ${orderName}`
                 : "Pick an Order"
             }
-            primaryFooterAction={{
-              content: "Save",
-              onAction: () => addProductVariant(),
-              disabled: !productId,
-            }}
+           
           >
             <Card.Section>
               <Button disabled={!orderId} onClick={() => handleChange()}>
@@ -246,6 +242,7 @@ export function EditOrderComponent(props) {
                     );
                   }}
                 />
+                
               </Card.Section>
             )}
             <Card.Section title="Items">
@@ -299,6 +296,11 @@ export function EditOrderComponent(props) {
                 />
               )}
             </Card.Section>
+            {productId && (
+                  <Card.Section>
+                    <Button primary onClick={()=>addProductVariant()}>Add product</Button>
+                  </Card.Section>)
+            }
           </Card>
         </Layout.Section>
 

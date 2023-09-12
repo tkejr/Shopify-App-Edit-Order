@@ -44,6 +44,7 @@ export default function HomePage() {
   };
 
   const [loading, setLoading] = useState(false);
+  const [loadingStarter, setLoadingStarter] = useState(false);
   const isPremiumUser = useSelector((state) => state.isPremiumUser);
 
   const planName = useSelector((state) => state.planName);
@@ -62,13 +63,13 @@ export default function HomePage() {
       });
   };
   const upgradeStarter = async () => {
-    setLoading(true);
+    setLoadingStarter(true);
     const res = await fetch("/api/upgradeStarter")
       .then((response) => response.json())
       .then((data) => {
         navigate(data.confirmationUrl);
 
-        setLoading(false);
+        setLoadingStarter(false);
       });
   };
   const upgradePro = async () => {
@@ -103,20 +104,20 @@ export default function HomePage() {
   return (
     <Page
       title="Plans"
-      secondaryActions={[
-        {
-          content: "Leave A Review",
-          accessibilityLabel: "Secondary action label",
-          onAction: () => handleChangeReview(),
-        },
-        {
-          content: "Check out Resizify",
-          onAction: () => handleChangeResizify(),
-        },
-      ]}
-      fullWidth
+      //secondaryActions={[
+      //  {
+      //    content: "Leave A Review",
+      //    accessibilityLabel: "Secondary action label",
+      //    onAction: () => handleChangeReview(),
+      //  },
+      //  {
+      //    content: "Check out Resizify",
+      //    onAction: () => handleChangeResizify(),
+      //  },
+      //]}
+      defaultWidth
     >
-      <hr></hr>
+      
 
       <Modal
         //activator={activator}
@@ -214,7 +215,7 @@ export default function HomePage() {
                 {(!isPremiumUser || planName === "pro") && (
                   <Button onClick={() => upgradeStarter()}>
                     {" "}
-                    {loading ? "Loading..." : "Get Starter Plan"}
+                    {loadingStarter ? "Loading..." : "Get Starter Plan"}
                   </Button>
                 )}
                 {planName === "starter" && (

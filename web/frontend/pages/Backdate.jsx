@@ -100,7 +100,7 @@ export default function Backdate() {
       <Frame>
         <MediaCard
           title="Discover how Editify can help you"
-          description="Upgrade to Any Plan to Backdate Orders"
+          description="Upgrade to any plan to Backdate/Postdate any order"
           primaryAction={{
             content: "Go to Plans",
             onAction: () => {
@@ -126,20 +126,19 @@ export default function Backdate() {
   return (
     <Page
       title="Backdate Order"
-      secondaryActions={[
-        {
-          content: "Leave A Review",
-          accessibilityLabel: "Secondary action label",
-          onAction: () => handleChangeReview(),
-        },
-        {
-          content: "Check out Resizify",
-          onAction: () => handleChangeResizify(),
-        },
-      ]}
-      fullWidth
+      //secondaryActions={[
+      //  {
+       //   content: "Leave A Review",
+      //    onAction: () => handleChangeReview(),
+       // },
+      //  {
+      //    content: "Check out Resizify",
+       //   onAction: () => handleChangeResizify(),
+       // },
+      //]}
+      defaultWidth
     >
-      <hr></hr>
+      
 
       <Modal
         //activator={activator}

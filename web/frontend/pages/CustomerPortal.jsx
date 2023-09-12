@@ -279,7 +279,11 @@ export default function CustomerPortal() {
   }, []);
   const checkPremiumUserContent = () => {
     return (
-      <Frame>
+      <Page
+        title="Customer Portal"
+        defaultWidth
+      >
+        
         <MediaCard
           title="Discover how the Customer Portal can help you"
           description="Upgrade to Pro to let customers be able to edit orders and reduce returns"
@@ -301,7 +305,7 @@ export default function CustomerPortal() {
             src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
           />
         </MediaCard>
-      </Frame>
+      </Page>
     );
   };
 
