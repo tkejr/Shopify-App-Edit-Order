@@ -13,6 +13,7 @@ import nodemailer from "nodemailer";
 
 import sgMail from "@sendgrid/mail";
 import { emailHelper } from "./email-helper.js";
+import { pushNotify } from "./push-notification.js";
 
 import {
   updateUserPreference,
@@ -71,15 +72,16 @@ app.get(
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
+    //push Mobile Notifcation
+    pushNotify(
+      "$9.99 Ka-ching",
+      `Editify Installed by ${shopDetails[0].name}`,
+      "💰"
+    );
+
     //email
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
-    const Installmsg = {
-      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-      from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: "LFG Ka-ching-$$ Editify",
-      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
-    };
     sgMail
       .send(msg)
       .then(() => {
@@ -89,14 +91,6 @@ app.get(
         console.error(error);
       });
 
-    sgMail
-      .send(Installmsg)
-      .then(() => {
-        console.log("Email sent to owners");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
@@ -149,114 +143,6 @@ app.use("/api/*", shopify.validateAuthenticatedSession());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get("/api/email", async (_req, res) => {
-  const shopDetails = await shopify.api.rest.Shop.all({
-    session: res.locals.shopify.session,
-  });
-
-  sgMail.setApiKey(
-    "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"
-  );
-  const shopEmail = "" + shopDetails[0].email;
-  try {
-    // Send the email
-
-    const msg = {
-      to: shopEmail, // Change to your recipient
-      from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: "Editify",
-      text: "Welcome to Editify",
-      html: `
-      <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
-      <tr>
-        <td align="center" style="padding:0;">
-          <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
-            <tr>
-              <td align="center" style="padding:40px 0 30px 0;background:#ffffff;">
-                <img src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png" alt="" width="300" style="height:auto;display:block;" />
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:36px 30px 42px 30px;">
-                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
-                  <tr>
-                    <td style="padding:0 0 36px 0;color:#153643;">
-                      <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Welcome to Editify</h1>
-                      <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Editify is one of the only apps on the Shopify App store to both offer a customer portal for customers to edit their orders and offer merchants a way to backdate their orders. As well as backdating, Editify lets you change just about everything else in an order. If you think there is something we missed, shoot us an email and we will work on implementing it! </p>
-                      <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="https://apps.shopify.com/editify" style="color:#ee4c50;text-decoration:underline;">Write a Review</a></p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding:0;">
-                      <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
-                        <tr>
-                          <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
-                            <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/left.gif" alt="" width="260" style="height:auto;display:block;" /></p>
-                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"> Save on returns! Have customers directly edit their order!</p>
-                            <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="http://www.example.com" style="color:#ee4c50;text-decoration:underline;"></a></p>
-                          </td>
-                          <td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
-                          <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
-                            <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/right.gif" alt="" width="260" style="height:auto;display:block;" /></p>
-                            <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Save time trying to backdate an order, with our app it is as simple as a click of a button!</p>
-                            <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><a href="http://www.example.com" style="color:#ee4c50;text-decoration:underline;"></a></p>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:30px;background:#ee4c50;">
-                <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
-                  <tr>
-                    <td style="padding:0;width:50%;" align="left">
-                      <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
-                      </p>
-                    </td>
-                    <td style="padding:0;width:50%;" align="right">
-                      <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
-                        <tr>
-                          <td style="padding:0 0 0 10px;width:38px;">
-                            <a href="https://twitter.com/1_Day_Apps" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
-                          </td>
-                          
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-      `,
-    };
-    sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    // Return a success response
-    res.status(200).json({ message: "Email sent successfully!" });
-  } catch (error) {
-    // Return an error response
-    console.log(error.message);
-    res
-      .status(500)
-      .json({ message: "Failed to send email.", error: error.message });
-  }
-});
 
 app.get("/api/products/create", async (_req, res) => {
   let status = 200;
