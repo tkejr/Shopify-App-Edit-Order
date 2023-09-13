@@ -23,6 +23,8 @@ import { useAuthenticatedFetch } from "../hooks";
 import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
+import ErrorBanner from "../components/ErrorBanner";
+import CustomSkeletonPage from '../components/SkeletonPage';
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -39,20 +41,7 @@ export default function CustomerPortal() {
   const [statusUrl, setStatusUrl] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
   const [error, setError] = useState(false);
-
-  const clearError = useCallback(() => {
-    setError(false);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setError(!error);
-
-    // If we're setting the error to true, clear it after 10 seconds
-    if (!error) {
-      setTimeout(clearError, 10000); // 10000 ms = 10 seconds
-    }
-  }, [error, clearError]);
-
+  const [userStateLoading, setUserStateLoading] = useState(true);
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
     {% if customer %}
@@ -64,6 +53,10 @@ export default function CustomerPortal() {
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
   const handleSelectChange = useCallback((value) => setSelected(value), []);
+
+  const handleError = () => {
+    setError(!error);
+  };
 
   function timeStringToSeconds(timeString) {
     const regex = /^(\d+)\s*([a-zA-Z]+)$/;
@@ -143,12 +136,12 @@ export default function CustomerPortal() {
 
         toggleActive();
       } else {
-        setToastContent("Some Error Occurred");
+        setToastContent("Some Problem Occurred With API");
         handleError();
       }
     } catch (error) {
       console.error("Error updating preference:", error);
-      setToastContent("Some Error Occurred" + response);
+      setToastContent("Some Problem Occurred With API" + response);
       handleError();
     }
   };
@@ -176,12 +169,12 @@ export default function CustomerPortal() {
         window.open(data.data[0].order_status_url, "_blank");
         toggleActive();
       } else {
-        setToastContent("Some Error Occurred");
+        setToastContent("Some Problem Occurred With API");
         handleError();
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      setToastContent("Some Error Occurred" + response);
+      setToastContent("Some Problem Occurred With API" + response);
       handleError();
     }
   };
@@ -228,12 +221,12 @@ export default function CustomerPortal() {
           setEnabled(data.enable);
         } else {
           // Handle non-successful response (e.g., show an error message)
-          setToastContent("Some Error Occurred");
+          setToastContent("Some Problem Occurred With API");
           handleError();
         }
       } catch (error) {
         console.error("Error updating preference:", error);
-        setToastContent("Some Error Occurred" + response);
+        setToastContent("Some Problem Occurred With API" + response);
         handleError();
       }
     };
@@ -262,13 +255,13 @@ export default function CustomerPortal() {
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
         }
 
-        //setUserStateLoading(false);
+        setUserStateLoading(false);
       });
   };
 
   useEffect(() => {
     fetchRecurringCharges().catch((error) => {
-      setToastContent("Some Error Occurred" + response);
+      setToastContent("Some Problem Occurred With API" + response);
       handleError();
       console.error(error);
     });
@@ -279,7 +272,7 @@ export default function CustomerPortal() {
   }, []);
   const checkPremiumUserContent = () => {
     return (
-      <Frame>
+      <Page title="Customer Portal" defaultWidth>
         <MediaCard
           title="Discover how the Customer Portal can help you"
           description="Upgrade to Pro to let customers be able to edit orders and reduce returns"
@@ -301,14 +294,14 @@ export default function CustomerPortal() {
             src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
           />
         </MediaCard>
-      </Frame>
+      </Page>
     );
   };
 
   return (
     <Frame>
       {planName === "pro" && isPremiumUser ? (
-        <Page
+        userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Page
           backAction={{ content: "Products", url: "#" }}
           title="Customer Portal"
           titleMetadata={settingStatusMarkup}
@@ -428,17 +421,13 @@ export default function CustomerPortal() {
               />
             </Card.Section>
           </Card>
+          <ErrorBanner
+            open={error}
+            onClose={handleError}
+            content={toastContent}
+          />
+        </Page>)
 
-          <Modal open={error} onClose={handleError} title="Connection with API">
-            <Modal.Section>
-              <TextContainer>
-                <Banner status="critical">
-                  <p>{toastContent}</p>
-                </Banner>
-              </TextContainer>
-            </Modal.Section>
-          </Modal>
-        </Page>
       ) : (
         checkPremiumUserContent()
       )}

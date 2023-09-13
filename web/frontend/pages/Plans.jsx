@@ -14,10 +14,14 @@ import {
   MediaCard,
   Frame,
   VideoThumbnail,
+  SkeletonPage,
+  
+  SkeletonDisplayText,
+  SkeletonBodyText
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-
+import CustomSkeletonPage from '../components/SkeletonPage'
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -44,6 +48,7 @@ export default function HomePage() {
   };
 
   const [loading, setLoading] = useState(false);
+  const [loadingStarter, setLoadingStarter] = useState(false);
   const isPremiumUser = useSelector((state) => state.isPremiumUser);
 
   const planName = useSelector((state) => state.planName);
@@ -62,13 +67,13 @@ export default function HomePage() {
       });
   };
   const upgradeStarter = async () => {
-    setLoading(true);
+    setLoadingStarter(true);
     const res = await fetch("/api/upgradeStarter")
       .then((response) => response.json())
       .then((data) => {
         navigate(data.confirmationUrl);
 
-        setLoading(false);
+        setLoadingStarter(false);
       });
   };
   const upgradePro = async () => {
@@ -103,20 +108,9 @@ export default function HomePage() {
   return (
     <Page
       title="Plans"
-      secondaryActions={[
-        {
-          content: "Leave A Review",
-          accessibilityLabel: "Secondary action label",
-          onAction: () => handleChangeReview(),
-        },
-        {
-          content: "Check out Resizify",
-          onAction: () => handleChangeResizify(),
-        },
-      ]}
-      fullWidth
+      defaultWidth
     >
-      <hr></hr>
+      
 
       <Modal
         //activator={activator}
@@ -157,8 +151,16 @@ export default function HomePage() {
         </Modal.Section>
       </Modal>
 
-      <Layout>
-        <>
+      
+        { userStateLoading ? (
+          
+         <CustomSkeletonPage></CustomSkeletonPage>
+        
+        ) : 
+        (
+        <Layout>
+          <>
+        
           <Layout.Section oneHalf>
             <MediaCard
               portrait
@@ -214,7 +216,7 @@ export default function HomePage() {
                 {(!isPremiumUser || planName === "pro") && (
                   <Button onClick={() => upgradeStarter()}>
                     {" "}
-                    {loading ? "Loading..." : "Get Starter Plan"}
+                    {loadingStarter ? "Loading..." : "Get Starter Plan"}
                   </Button>
                 )}
                 {planName === "starter" && (
@@ -225,8 +227,12 @@ export default function HomePage() {
               </Card.Section>
             </MediaCard>
           </Layout.Section>
+
         </>
-      </Layout>
+        </Layout>
+        )
+}    
+      
     </Page>
   );
 }

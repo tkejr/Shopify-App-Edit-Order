@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-
+import CustomSkeletonPage from '../components/SkeletonPage';
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -100,7 +100,7 @@ export default function Backdate() {
       <Frame>
         <MediaCard
           title="Discover how Editify can help you"
-          description="Upgrade to Any Plan to Backdate Orders"
+          description="Upgrade to any plan to Backdate/Postdate any order"
           primaryAction={{
             content: "Go to Plans",
             onAction: () => {
@@ -126,21 +126,8 @@ export default function Backdate() {
   return (
     <Page
       title="Backdate Order"
-      secondaryActions={[
-        {
-          content: "Leave A Review",
-          accessibilityLabel: "Secondary action label",
-          onAction: () => handleChangeReview(),
-        },
-        {
-          content: "Check out Resizify",
-          onAction: () => handleChangeResizify(),
-        },
-      ]}
-      fullWidth
+      defaultWidth
     >
-      <hr></hr>
-
       <Modal
         //activator={activator}
         open={activeResizify}
@@ -180,7 +167,7 @@ export default function Backdate() {
         </Modal.Section>
       </Modal>
 
-      <Layout>
+      {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {(planName === "pro" || planName === "starter") && isPremiumUser ? (
           <>
             <Layout.Section oneHalf>
@@ -205,7 +192,8 @@ export default function Backdate() {
         ) : (
           checkPremiumUserContent()
         )}
-      </Layout>
+      </Layout>)
+}
     </Page>
   );
 }

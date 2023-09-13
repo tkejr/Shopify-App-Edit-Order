@@ -154,7 +154,7 @@ import {
         >
           <IndexTable.Cell>
             <Button
-              primary
+              plain
               dataPrimaryLink
               onClick={() => {
                 orderClicked(id, name, line_items);
