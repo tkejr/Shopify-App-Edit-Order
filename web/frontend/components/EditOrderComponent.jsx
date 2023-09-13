@@ -12,8 +12,6 @@ import {
   IndexTable,
   useIndexResourceState,
   SkeletonThumbnail,
-  
-
 } from "@shopify/polaris";
 import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
@@ -185,167 +183,154 @@ export function EditOrderComponent(props) {
         console.log("flkkk");
       });
   };
-  const removeProduct = () =>{
+  const removeProduct = () => {
     setProduct([]);
     setProductId("");
     setShowProducts(false);
-
-  }
+  };
 
   return (
     <Frame>
-      
-          <Card
-            title={
-              orderName
-                ? `Order Details for Order ${orderName}`
-                : "Pick an Order"
-            }
-          >
-            <Card.Section>
-              <Button disabled={orderId} onClick={() => handleChange()}>
-                {orderId ? "Add Product" : "Pick an Order"}
-              </Button>
-            </Card.Section>
+      <Card
+        title={
+          orderName ? `Order Details for Order ${orderName}` : "Pick an Order"
+        }
+      >
+        <Card.Section>
+          <Button disabled={!orderId} onClick={() => handleChange()}>
+            {orderId ? "Add Product" : "Pick an Order"}
+          </Button>
+        </Card.Section>
 
-            <Card.Section title="Items">
-              {status !== "success" ? (
-                <Spinner accessibilityLabel="Spinner example" size="large" />
-              ) : (
-                <ResourceList
-                  resourceName={{ singular: "product", plural: "products" }}
-                  items={line_items}
-                  renderItem={(item) => {
-                    const {
-                      id,
-                      url,
-                      name,
-                      sku,
-                      price,
-                      media,
-                      fulfillable_quantity,
-                      product_id,
-                      price_set,
-                    } = item;
+        <Card.Section title="Items">
+          {status !== "success" ? (
+            <Spinner accessibilityLabel="Spinner example" size="large" />
+          ) : (
+            <ResourceList
+              resourceName={{ singular: "product", plural: "products" }}
+              items={line_items}
+              renderItem={(item) => {
+                const {
+                  id,
+                  url,
+                  name,
+                  sku,
+                  price,
+                  media,
+                  fulfillable_quantity,
+                  product_id,
+                  price_set,
+                } = item;
 
-                    const media2 = (
-                      <Thumbnail source={media} alt="placeholder" />
-                    );
+                const media2 = <Thumbnail source={media} alt="placeholder" />;
 
-                    return (
-                      <ResourceList.Item
-                        id={id}
-                        url={url}
-                        media={media2}
-                        accessibilityLabel={`View details for ${name}`}
-                      >
-                        <div> {name}</div>
-                        <div>
-                          Price: {price} {price_set.shop_money.currency_code}
-                        </div>
-                        <div>SKU: {sku}</div>
-                        <div>x{fulfillable_quantity} unfulfilled </div>
-                        <Button
-                          plain
-                          onClick={() => openQuantity(id, fulfillable_quantity)}
-                        >
-                          Adjust Quantity
-                        </Button>
+                return (
+                  <ResourceList.Item
+                    id={id}
+                    url={url}
+                    media={media2}
+                    accessibilityLabel={`View details for ${name}`}
+                  >
+                    <div> {name}</div>
+                    <div>
+                      Price: {price} {price_set.shop_money.currency_code}
+                    </div>
+                    <div>SKU: {sku}</div>
+                    <div>x{fulfillable_quantity} unfulfilled </div>
+                    <Button
+                      plain
+                      onClick={() => openQuantity(id, fulfillable_quantity)}
+                    >
+                      Adjust Quantity
+                    </Button>
 
-                        <br></br>
-                      </ResourceList.Item>
-                    );
-                  }}
-                />
-              )}
-            </Card.Section>
-            {showProducts && (
-              <Card.Section title="Product to be Added">
-                <ResourceList
-                  resourceName={{ singular: "product", plural: "products" }}
-                  items={product}
-                  renderItem={(item) => {
-                    const { id, title, url, images } = item;
-
-                    let image;
-                    let hasPicture = true;
-                    if (images[0]) {
-                      image = images[0].originalSrc;
-                    } else {
-                      hasPicture = false;
-                    }
-                    return (
-                      <ResourceList.Item
-                        id={id}
-                        url={url}
-                        media={
-                          hasPicture ? (
-                            <Thumbnail
-                              source={image}
-                              alt="picture of product"
-                            />
-                          ) : (
-                            <SkeletonThumbnail />
-                          )
-                        }
-                      >
-                        <div> {title}</div>
-                        <div style={{alignItems:'right', float:'right'}}>
-                        <Button plain destructive onClick={()=>removeProduct()}>Remove</Button>
-                        </div>
-                       
-                        
-                       
-                      </ResourceList.Item>
-                      
-                    );
-                  }}
-                />
-              </Card.Section>
-            )}
-            {productId && (
-              <Card.Section>
-                <Button primary onClick={() => addProductVariant()}>
-                  Add product
-                </Button>
-              </Card.Section>
-            )}
-          </Card>
-        
-
-       
-          <ResourcePicker
-            resourceType="Product"
-            actionVerb="select"
-            showVariants={false}
-            selectMultiple={false}
-            open={active}
-            onSelection={(resources) => handleSelection(resources)}
-            onCancel={() => console.log("cancelled")}
-          />
-        
-        <Modal
-          //activator={activator}
-          open={activeQuantity}
-          onClose={handleChangeQuantity}
-          title="Adjust Quantity"
-          primaryAction={{
-            content: "Save",
-            onAction: () => changeAmount(),
-          }}
-        >
-          <Modal.Section>
-            <TextField
-              label="Quantity"
-              type="number"
-              value={quantity}
-              onChange={(number) => handleQuantityChange(number)}
-              error={quantity < 0}
-              autoComplete="off"
+                    <br></br>
+                  </ResourceList.Item>
+                );
+              }}
             />
-          </Modal.Section>
-        </Modal>
-     
+          )}
+        </Card.Section>
+        {showProducts && (
+          <Card.Section title="Product to be Added">
+            <ResourceList
+              resourceName={{ singular: "product", plural: "products" }}
+              items={product}
+              renderItem={(item) => {
+                const { id, title, url, images } = item;
+
+                let image;
+                let hasPicture = true;
+                if (images[0]) {
+                  image = images[0].originalSrc;
+                } else {
+                  hasPicture = false;
+                }
+                return (
+                  <ResourceList.Item
+                    id={id}
+                    url={url}
+                    media={
+                      hasPicture ? (
+                        <Thumbnail source={image} alt="picture of product" />
+                      ) : (
+                        <SkeletonThumbnail />
+                      )
+                    }
+                  >
+                    <div> {title}</div>
+                    <div style={{ alignItems: "right", float: "right" }}>
+                      <Button plain destructive onClick={() => removeProduct()}>
+                        Remove
+                      </Button>
+                    </div>
+                  </ResourceList.Item>
+                );
+              }}
+            />
+          </Card.Section>
+        )}
+        {productId && (
+          <Card.Section>
+            <Button primary onClick={() => addProductVariant()}>
+              Add product
+            </Button>
+          </Card.Section>
+        )}
+      </Card>
+
+      <ResourcePicker
+        resourceType="Product"
+        actionVerb="select"
+        showVariants={false}
+        selectMultiple={false}
+        open={active}
+        onSelection={(resources) => handleSelection(resources)}
+        onCancel={() => console.log("cancelled")}
+      />
+
+      <Modal
+        //activator={activator}
+        open={activeQuantity}
+        onClose={handleChangeQuantity}
+        title="Adjust Quantity"
+        primaryAction={{
+          content: "Save",
+          onAction: () => changeAmount(),
+        }}
+      >
+        <Modal.Section>
+          <TextField
+            label="Quantity"
+            type="number"
+            value={quantity}
+            onChange={(number) => handleQuantityChange(number)}
+            error={quantity < 0}
+            autoComplete="off"
+          />
+        </Modal.Section>
+      </Modal>
+
       {toastMarkup}
       <ErrorBanner open={error} onClose={handleError} content={errorContent} />
     </Frame>
