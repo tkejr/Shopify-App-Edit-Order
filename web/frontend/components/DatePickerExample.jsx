@@ -9,21 +9,29 @@ import {
   Frame,
   Page,
   Button,
-  Banner
+  Banner,
 } from "@shopify/polaris";
 import { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
+import ErrorBanner from "../components/ErrorBanner";
 
 export function DatePickerExample(props) {
   const emptyToastProps = { content: null };
   const [active, setActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
+
+  const [errorContent, setErrorContent] = useState("");
+  const [error, setError] = useState(false);
   ////new code
   const orderId = useSelector((state) => state.orderId);
   const orderName = useSelector((state) => state.orderName);
   const dispatch = useDispatch();
+
+  const handleError = () => {
+    setError(!error);
+  };
   var title = "Please  Click on Order Number";
   if (orderName) {
     title = "Please Select a Date for " + orderName;
@@ -54,27 +62,27 @@ export function DatePickerExample(props) {
     return convertedDate;
   };
 
-
   const submitDate = () => {
-    
-    let defaultDate =  new Date("January 17, 2023 03:24:00");
-    if(!orderId ){
+    let defaultDate = new Date("January 17, 2023 03:24:00");
+    if (!orderId) {
       //alert("Choose an order first")
-      setToastProps({ content: "Choose an order first" });
-      return 
+      setErrorContent("Choose an order first");
+      handleError();
+      return;
     }
-    
-    if(selectedDates.start.getFullYear() === defaultDate.getFullYear() &&
-    selectedDates.start.getMonth() === defaultDate.getMonth() &&
-    selectedDates.start.getDate() === defaultDate.getDate()){
-      
-      setToastProps({ content: "Choose an order date first" });
-      return 
+
+    if (
+      selectedDates.start.getFullYear() === defaultDate.getFullYear() &&
+      selectedDates.start.getMonth() === defaultDate.getMonth() &&
+      selectedDates.start.getDate() === defaultDate.getDate()
+    ) {
+      setErrorContent("Choose an order date as well");
+      handleError();
+      return;
     }
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
-    
   };
   const updateOrder = async (id, newDate) => {
     //make sure you are passing them in correctly, the date needs to be the correct date format as a string
@@ -93,22 +101,14 @@ export function DatePickerExample(props) {
       props.setReloadComp(!props.reloadComp);
     } else {
       setIsLoading(false);
-      setToastProps({
-        content: "There was an error updating the date",  
-        error: true,
-      });
+      setErrorContent("There was an error updating the date");
+      handleError();
     }
   };
 
-  
-
   return (
-   <Frame>
-      <Card
-        title={title}
-        sectioned
-      
-      >
+    <Frame>
+      <Card title={title} sectioned>
         <TextContainer spacing="loose" id="section-1">
           <p>
             You can Backdate an order by selecting a date from the calendar
@@ -125,10 +125,17 @@ export function DatePickerExample(props) {
           selected={selectedDates}
         />
         <br></br>
-        <Button disabled={!orderId} onClick={() => submitDate()} primary={orderId} fullWidth={true}>{(orderId) ? "Submit" : "Pick an Order"}</Button>
+        <Button
+          disabled={!orderId}
+          onClick={() => submitDate()}
+          primary={orderId}
+          fullWidth={true}
+        >
+          {orderId ? "Submit" : "Pick an Order"}
+        </Button>
         {toastMarkup}
       </Card>
-  </Frame>
-      
+      <ErrorBanner open={error} onClose={handleError} content={errorContent} />
+    </Frame>
   );
 }

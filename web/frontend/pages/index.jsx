@@ -31,7 +31,7 @@ export default function HomePage() {
     getAnalytics();
   }, []);
   return (
-    <Page title="Analytics" titleMetadata="Tracking Since 09/10/23">
+    <Page title="Editify" titleMetadata="Tracking Since 09/10/23">
       <Layout>
         <Layout.Section oneThird>
           <Card title="Backdated Orders">
