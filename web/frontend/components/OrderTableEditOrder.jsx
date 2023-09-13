@@ -47,7 +47,8 @@ import {
     const [status, setStatus] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("#");
-   
+   //new
+    const [expanded, setExpanded] = useState(false);
     //Should be 10
     const ITEMS_PER_PAGE = 10;
     //new way to get the data
@@ -109,32 +110,49 @@ import {
       dispatch({ type: "SET_PROPS_ORDER_NAME", payload: name });
       dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: line_items });
     };
-  
-
-
     //advanced search
     
     const [active, setActive] = useState(false);
+    const [hasDates, setHasDates] = useState(false);
     const handleChange = useCallback(() =>  setActive(!active) , [active]  );
     const getCustomOrderDates = () => {
         
 
          setStatus('loading')
-            fetch("/api/orders/" + selectedDates.start + "/" + selectedDates.end)
+            fetch("/api/orders/unfulfilled/" + selectedDates.start + "/" + selectedDates.end)
               .then((response) => response.json())
               .then((json) => {
                 setRawData(json);
                 setStatus("success");
               });
           handleChange()
-          props.setReload(!props.reload)
+          setHasDates(true)
+          //props.setReload(!props.reload)
     }
-
+    const clearDates = () => {
+  
+      if(hasDates){
+        setStatus('loading')
+        getData()
+        handleChange()
+        setSelectedDates({
+          start: new Date(),
+          end: new Date(),
+          })
+        //setDate({month: 8, year: 2023})
+        //props.setReload(!props.reload)
+      }
+      else{
+        //handleChange()
+      }
+      setHasDates(false)
+       
+    }
     //dates
-    const [{month, year}, setDate] = useState({month: 6, year: 2023});
+    const [{month, year}, setDate] = useState({month: 8, year: 2023});
     const [selectedDates, setSelectedDates] = useState({
-    start: new Date('Wed Jul 07 2023 00:00:00 GMT-0500 (EST)'),
-    end: new Date('Sat Jul 10 2023 00:00:00 GMT-0500 (EST)'),
+    start: new Date(),
+    end: new Date(),
   });
 
   const handleMonthChange = useCallback(
@@ -183,25 +201,24 @@ import {
             />
         
         <div style={{padding:"10px"}}>
-            <Button  fullWidth onClick={()=> handleChange()}>  Advanced Search </Button>
-            </div>
+      
+      <Button
+      plain
+      disclosure={expanded ? 'up' : 'down'}
+      onClick={() => {
+        setExpanded(!expanded);
+      }}
+    >
+      {expanded ? 'Show less' : 'Show more'}
+    </Button>
+      </div>
             
            
+      {expanded &&
+        <Card sectioned
         
-        
-        
-        
-        <Modal
-        //activator={activator}
-        open={active}
-        onClose={handleChange}
-        title="Find Orders by Date"
-        primaryAction={{
-          content: "Search",
-          onAction: () => getCustomOrderDates(),
-        }}
       >
-        <Modal.Section>
+        <Card.Section>
         <DatePicker
             month={month}
             year={year}
@@ -210,8 +227,35 @@ import {
             selected={selectedDates}
             allowRange
         />
-        </Modal.Section>
-      </Modal>
+        <br></br>
+        <Button
+          disabled={!hasDates}
+          onClick={() => clearDates()}
+          destructive
+        >
+          
+          { "Clear" }
+          {" "}
+        </Button>
+        
+        <Button
+          //disabled={!hasDates}
+          onClick={() => getCustomOrderDates()}
+          primary={true}
+          
+        >
+          {" "}
+          { "Search" }
+        </Button>
+        </Card.Section>
+        
+        
+      </Card>
+}
+        
+    
+
+
         <br></br>
         {status !== "success" ? (
           <Spinner accessibilityLabel="Spinner example" size="large" />

@@ -31,22 +31,6 @@ import { useAuthenticatedFetch } from "../hooks";
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
 
-  const [activeResizify, setActiveResizify] = useState(false);
-  const [activeReview, setActiveReview] = useState(false);
-
-  const handleChangeResizify = useCallback(() => {
-    setActiveResizify(!activeResizify);
-  }, [activeResizify]);
-  const handleChangeReview = useCallback(() => {
-    setActiveReview(!activeReview);
-  }, [activeReview]);
-  const redirectToResizify = () => {
-    window.open("https://apps.shopify.com/compress-files", "_blank");
-  };
-  const redirectToEditify = () => {
-    window.open("https://apps.shopify.com/editify", "_blank");
-  };
-
   const [loading, setLoading] = useState(false);
   const [loadingStarter, setLoadingStarter] = useState(false);
   const isPremiumUser = useSelector((state) => state.isPremiumUser);
@@ -61,7 +45,15 @@ export default function HomePage() {
     const res = await fetch("/api/check")
       .then((response) => response.json())
       .then((data) => {
-        dispatch({ type: "SET_IS_PREMIUM_USER", payload: data.hasPayment });
+        if (data.hasPayment === "pro") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        } else if (data.hasPayment === "starter") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        } else {
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
+        }
 
         setUserStateLoading(false);
       });
@@ -86,17 +78,7 @@ export default function HomePage() {
         setLoading(false);
       });
   };
-  const downgrade = async () => {
-    setLoading(true);
-
-    const res = await fetch("/api/downgrade")
-      .then((response) => response.json())
-      .then((data) => {
-        navigate(data.basicUrl);
-
-        setLoading(false);
-      });
-  };
+  
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     //new
@@ -110,48 +92,7 @@ export default function HomePage() {
       title="Plans"
       defaultWidth
     >
-      
-
-      <Modal
-        //activator={activator}
-        open={activeResizify}
-        onClose={handleChangeResizify}
-        title="Check out our other app, Resizify!"
-        primaryAction={{
-          content: "Check out app",
-          onAction: redirectToResizify,
-        }}
-      >
-        <Modal.Section>
-          <TextContainer>
-            <p>
-              Install this app to compress your store's images and upload from
-              anywhere! You can upload from Instagram, Google Drive, and more!
-            </p>
-          </TextContainer>
-        </Modal.Section>
-      </Modal>
-
-      <Modal
-        //activator={activator}
-        open={activeReview}
-        onClose={handleChangeReview}
-        title="Leave a Review on this app and get one month free!"
-        primaryAction={{
-          content: "Leave a Review",
-          onAction: redirectToEditify,
-        }}
-      >
-        <Modal.Section>
-          <TextContainer>
-            <p>
-              Leave us a review on the Shopify app store and get one month free!
-            </p>
-          </TextContainer>
-        </Modal.Section>
-      </Modal>
-
-      
+       
         { userStateLoading ? (
           
          <CustomSkeletonPage></CustomSkeletonPage>
@@ -187,10 +128,16 @@ export default function HomePage() {
                   </Button>
                 )}
                 {planName === "pro" && (
+                  <div style={{padding:'8px'}}>
                   <Badge progress="complete" status="success">
+                    {" "}
                     Active
                   </Badge>
+                  
+                 
+                  </div>
                 )}
+                {"    "}
               </Card.Section>
             </MediaCard>
           </Layout.Section>
@@ -220,9 +167,12 @@ export default function HomePage() {
                   </Button>
                 )}
                 {planName === "starter" && (
+                  <div style={{padding:'8px'}}>
                   <Badge progress="complete" status="success">
+                    {" "}
                     Active
                   </Badge>
+                  </div>
                 )}
               </Card.Section>
             </MediaCard>

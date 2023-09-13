@@ -51,7 +51,7 @@ const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
 
-sgMail.setApiKey(SEND_GRID_API_KEY);
+//sgMail.setApiKey(SEND_GRID_API_KEY);
 
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -74,6 +74,7 @@ app.get(
       session: session,
     });
     //email
+    
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
     const Installmsg = {
@@ -122,6 +123,8 @@ app.get(
       plan: "free",
     });
 
+
+    //need to get rid of this
     if (hasPayment) {
       mixpanel.people.set(session.shop, {
         plan: "premium",
@@ -348,6 +351,8 @@ app.get("/api/orders", async (_req, res) => {
 });
 //new for advanced search
 app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
+  
+  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
@@ -355,18 +360,37 @@ app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
     processed_at_min: _req.params["startDate"],
     processed_at_max: _req.params["endDate"],
   });
+  
+ 
 
   res.status(200).json(data);
-});
+}); 
+app.get("/api/orders/unfulfilled/:startDate/:endDate", async (_req, res) => {
+  
+  
+  const data = await shopify.api.rest.Order.all({
+    session: res.locals.shopify.session,
+    status: "any",
+    limit: 250, // new to make the limit 250 instead of 50
+    processed_at_min: _req.params["startDate"],
+    processed_at_max: _req.params["endDate"],
+    fulfillment_status: "unfulfilled",
+  });
+  
+ 
+
+  res.status(200).json(data);
+}); 
 //getting unfulfilled orders
 app.get("/api/orders/unfulfilled", async (_req, res) => {
-   
+  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     //status: "unfulfilled",
     fulfillment_status: "unfulfilled",
     limit: 250,
   });
+  
   
   
 

@@ -7,7 +7,8 @@ import {
   Select,
   TextField,
   Modal,
-  DatePicker
+  DatePicker,
+  Page
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
@@ -45,6 +46,9 @@ export function OrderTable(props) {
   const [status, setStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("#");
+  //new
+  const [expanded, setExpanded] = useState(false);
+
   //Should be 10
   const ITEMS_PER_PAGE = 10;
   //new way to get the data
@@ -121,23 +125,31 @@ const getCustomOrderDates = () => {
       //props.setReload(!props.reload)
 }
 const clearDates = () => {
+  
   if(hasDates){
     setStatus('loading')
     getData()
     handleChange()
+    setSelectedDates({
+      start: new Date(),
+      end: new Date(),
+      })
+    //setDate({month: 8, year: 2023})
     //props.setReload(!props.reload)
   }
   else{
-    handleChange()
+    //handleChange()
   }
   setHasDates(false)
    
 }
 //dates
-const [{month, year}, setDate] = useState({month: 7, year: 2023});
+const [{month, year}, setDate] = useState({month: 8, year: 2023});
 const [selectedDates, setSelectedDates] = useState({
-start: new Date('Wed Aug 07 2023 00:00:00 GMT-0500 (EST)'),
-end: new Date('Sat Aug 10 2023 00:00:00 GMT-0500 (EST)'),
+//start: new Date('Sat Sep 09 2023 00:00:00 GMT-0500 (EST)'),
+//end: new Date('Sat Sep 16 2023 00:00:00 GMT-0500 (EST)'),
+start: new Date(),
+end: new Date(),
 });
 
 const handleMonthChange = useCallback(
@@ -173,6 +185,7 @@ const handleMonthChange = useCallback(
 
   return (
     <Card>
+      
       <FiltersComponent
         onSearch={(value) => {
           setSearch(value);
@@ -180,23 +193,21 @@ const handleMonthChange = useCallback(
         }}
       />
       <div style={{padding:"10px"}}>
-      <Button fullWidth  onClick={()=> handleChange()}>  Advanced Search </Button>
+    
+      <Button
+      plain
+      disclosure={expanded ? 'up' : 'down'}
+      onClick={() => {
+        setExpanded(!expanded);
+      }}
+    >
+      {expanded ? 'Show less' : 'Show more'}
+    </Button>
       </div>
-        <Modal
-        //activator={activator}
-        open={active}
-        onClose={handleChange}
-        title="Find Orders by Date"
-        secondaryActions={[{
-          content: "Clear",
-          onAction: () => clearDates(),
-        }]}
-        primaryAction={{
-          content: "Search",
-          onAction: () => getCustomOrderDates(),
-        }}
+      {expanded &&
+        <Card sectioned
       >
-        <Modal.Section>
+        <Card.Section>
         <DatePicker
             month={month}
             year={year}
@@ -205,8 +216,31 @@ const handleMonthChange = useCallback(
             selected={selectedDates}
             allowRange
         />
-        </Modal.Section>
-      </Modal>
+        <br></br>
+        <Button
+          disabled={!hasDates}
+          onClick={() => clearDates()}
+          destructive
+        >
+          
+          { "Clear"}
+          {" "}
+        </Button>
+        
+        <Button
+          //disabled={!hasDates}
+          onClick={() => getCustomOrderDates()}
+          primary={true}
+          
+        >
+          {" "}
+          { "Search"}
+        </Button>
+        </Card.Section>
+        
+        
+      </Card>
+}
       <br></br>
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
