@@ -24,6 +24,7 @@ import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
+import CustomSkeletonPage from '../components/SkeletonPage';
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -40,7 +41,7 @@ export default function CustomerPortal() {
   const [statusUrl, setStatusUrl] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
   const [error, setError] = useState(false);
-
+  const [userStateLoading, setUserStateLoading] = useState(true);
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
     {% if customer %}
@@ -254,7 +255,7 @@ export default function CustomerPortal() {
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
         }
 
-        //setUserStateLoading(false);
+        setUserStateLoading(false);
       });
   };
 
@@ -300,7 +301,7 @@ export default function CustomerPortal() {
   return (
     <Frame>
       {planName === "pro" && isPremiumUser ? (
-        <Page
+        userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Page
           backAction={{ content: "Products", url: "#" }}
           title="Customer Portal"
           titleMetadata={settingStatusMarkup}
@@ -425,7 +426,8 @@ export default function CustomerPortal() {
             onClose={handleError}
             content={toastContent}
           />
-        </Page>
+        </Page>)
+
       ) : (
         checkPremiumUserContent()
       )}

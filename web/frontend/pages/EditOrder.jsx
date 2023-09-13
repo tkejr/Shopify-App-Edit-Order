@@ -15,7 +15,7 @@ import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
 import { SearchMinor } from "@shopify/polaris-icons";
 import { useState, useCallback, useMemo, useEffect } from "react";
-
+import CustomSkeletonPage from '../components/SkeletonPage';
 import { useAuthenticatedFetch } from "../hooks";
 import {
   TitleBar,
@@ -34,6 +34,7 @@ import { useSelector, useDispatch } from "react-redux";
 const PageExample = () => {
   const [show, setShow] = useState(false);
   const [reloadComp, setReloadComp] = useState(false);
+  const [userStateLoading, setUserStateLoading] = useState(true);
   const toggleShow = () => {
     if (!show) {
       setShow(true);
@@ -75,7 +76,7 @@ const PageExample = () => {
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
         }
 
-        //setUserStateLoading(false);
+        setUserStateLoading(false);
       });
   };
   useEffect(() => {
@@ -124,13 +125,6 @@ const PageExample = () => {
   return (
     <Page
       title="Edit Order"
-      //secondaryActions={[
-      //  {
-       //   content: "What is this page for? ",
-       //   accessibilityLabel: "Secondary action label",
-      //    onAction: () => handleChange(),
-      //  },
-      //]}
       defaultWidth
     >
       
@@ -151,7 +145,7 @@ const PageExample = () => {
         </Modal.Section>
       </Modal>
 
-      <Layout>
+      {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {planName === "pro" && isPremiumUser ? (
           <>
             <Layout.Section oneHalf>
@@ -178,7 +172,8 @@ const PageExample = () => {
         ) : (
           checkPremiumUserContent()
         )}
-      </Layout>
+      </Layout>)
+}
     </Page>
   );
 };

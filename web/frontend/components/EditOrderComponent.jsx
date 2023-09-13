@@ -12,6 +12,8 @@ import {
   IndexTable,
   useIndexResourceState,
   SkeletonThumbnail,
+  
+
 } from "@shopify/polaris";
 import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
@@ -183,11 +185,16 @@ export function EditOrderComponent(props) {
         console.log("flkkk");
       });
   };
+  const removeProduct = () =>{
+    setProduct([]);
+    setProductId("");
+    setShowProducts(false);
+
+  }
 
   return (
     <Frame>
-      <Layout>
-        <Layout.Section>
+      
           <Card
             title={
               orderName
@@ -196,7 +203,7 @@ export function EditOrderComponent(props) {
             }
           >
             <Card.Section>
-              <Button disabled={!orderId} onClick={() => handleChange()}>
+              <Button disabled={orderId} onClick={() => handleChange()}>
                 {orderId ? "Add Product" : "Pick an Order"}
               </Button>
             </Card.Section>
@@ -283,7 +290,14 @@ export function EditOrderComponent(props) {
                         }
                       >
                         <div> {title}</div>
+                        <div style={{alignItems:'right', float:'right'}}>
+                        <Button plain destructive onClick={()=>removeProduct()}>Remove</Button>
+                        </div>
+                       
+                        
+                       
                       </ResourceList.Item>
+                      
                     );
                   }}
                 />
@@ -297,9 +311,9 @@ export function EditOrderComponent(props) {
               </Card.Section>
             )}
           </Card>
-        </Layout.Section>
+        
 
-        <Layout.Section secondary>
+       
           <ResourcePicker
             resourceType="Product"
             actionVerb="select"
@@ -309,7 +323,7 @@ export function EditOrderComponent(props) {
             onSelection={(resources) => handleSelection(resources)}
             onCancel={() => console.log("cancelled")}
           />
-        </Layout.Section>
+        
         <Modal
           //activator={activator}
           open={activeQuantity}
@@ -331,7 +345,7 @@ export function EditOrderComponent(props) {
             />
           </Modal.Section>
         </Modal>
-      </Layout>
+     
       {toastMarkup}
       <ErrorBanner open={error} onClose={handleError} content={errorContent} />
     </Frame>
