@@ -341,6 +341,8 @@ app.get("/api/orders", async (_req, res) => {
     status: "any",
     limit: 250, // new to make the limit 250 instead of 50
   });
+  
+ 
 
   res.status(200).json(data);
 });
@@ -358,13 +360,14 @@ app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
 });
 //getting unfulfilled orders
 app.get("/api/orders/unfulfilled", async (_req, res) => {
-  
+   
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     //status: "unfulfilled",
     fulfillment_status: "unfulfilled",
     limit: 250,
   });
+  
   
 
   res.status(200).json(data);

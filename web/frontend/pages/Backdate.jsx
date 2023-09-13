@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-
+import CustomSkeletonPage from '../components/SkeletonPage';
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -126,16 +126,6 @@ export default function Backdate() {
   return (
     <Page
       title="Backdate Order"
-      //secondaryActions={[
-      //  {
-      //   content: "Leave A Review",
-      //    onAction: () => handleChangeReview(),
-      // },
-      //  {
-      //    content: "Check out Resizify",
-      //   onAction: () => handleChangeResizify(),
-      // },
-      //]}
       defaultWidth
     >
       <Modal
@@ -177,7 +167,7 @@ export default function Backdate() {
         </Modal.Section>
       </Modal>
 
-      <Layout>
+      {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {(planName === "pro" || planName === "starter") && isPremiumUser ? (
           <>
             <Layout.Section oneHalf>
@@ -202,7 +192,8 @@ export default function Backdate() {
         ) : (
           checkPremiumUserContent()
         )}
-      </Layout>
+      </Layout>)
+}
     </Page>
   );
 }
