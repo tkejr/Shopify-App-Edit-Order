@@ -103,7 +103,7 @@ export default function HomePage() {
           <Page
             title="Editify"
             titleMetadata="Tracking Since 09/10/23"
-            fullWidth
+            defaultWidth
           >
             <CalloutCard
               title="Seamlessly Edit Your Orders"
