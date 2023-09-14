@@ -15,13 +15,12 @@ import {
   Frame,
   VideoThumbnail,
   SkeletonPage,
-  
   SkeletonDisplayText,
-  SkeletonBodyText
+  SkeletonBodyText,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-import CustomSkeletonPage from '../components/SkeletonPage'
+import CustomSkeletonPage from "../components/SkeletonPage";
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -30,22 +29,6 @@ import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
-
-  const [activeResizify, setActiveResizify] = useState(false);
-  const [activeReview, setActiveReview] = useState(false);
-
-  const handleChangeResizify = useCallback(() => {
-    setActiveResizify(!activeResizify);
-  }, [activeResizify]);
-  const handleChangeReview = useCallback(() => {
-    setActiveReview(!activeReview);
-  }, [activeReview]);
-  const redirectToResizify = () => {
-    window.open("https://apps.shopify.com/compress-files", "_blank");
-  };
-  const redirectToEditify = () => {
-    window.open("https://apps.shopify.com/editify", "_blank");
-  };
 
   const [loading, setLoading] = useState(false);
   const [loadingStarter, setLoadingStarter] = useState(false);
@@ -61,7 +44,15 @@ export default function HomePage() {
     const res = await fetch("/api/check")
       .then((response) => response.json())
       .then((data) => {
-        dispatch({ type: "SET_IS_PREMIUM_USER", payload: data.hasPayment });
+        if (data.hasPayment === "pro") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        } else if (data.hasPayment === "starter") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        } else {
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
+        }
 
         setUserStateLoading(false);
       });
@@ -86,17 +77,7 @@ export default function HomePage() {
         setLoading(false);
       });
   };
-  const downgrade = async () => {
-    setLoading(true);
 
-    const res = await fetch("/api/downgrade")
-      .then((response) => response.json())
-      .then((data) => {
-        navigate(data.basicUrl);
-
-        setLoading(false);
-      });
-  };
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     //new
@@ -106,133 +87,156 @@ export default function HomePage() {
   }, []);
 
   return (
-    <Page
-      title="Plans"
-      defaultWidth
-    >
-      
-
-      <Modal
-        //activator={activator}
-        open={activeResizify}
-        onClose={handleChangeResizify}
-        title="Check out our other app, Resizify!"
-        primaryAction={{
-          content: "Check out app",
-          onAction: redirectToResizify,
-        }}
-      >
-        <Modal.Section>
-          <TextContainer>
-            <p>
-              Install this app to compress your store's images and upload from
-              anywhere! You can upload from Instagram, Google Drive, and more!
-            </p>
-          </TextContainer>
-        </Modal.Section>
-      </Modal>
-
-      <Modal
-        //activator={activator}
-        open={activeReview}
-        onClose={handleChangeReview}
-        title="Leave a Review on this app and get one month free!"
-        primaryAction={{
-          content: "Leave a Review",
-          onAction: redirectToEditify,
-        }}
-      >
-        <Modal.Section>
-          <TextContainer>
-            <p>
-              Leave us a review on the Shopify app store and get one month free!
-            </p>
-          </TextContainer>
-        </Modal.Section>
-      </Modal>
-
-      
-        { userStateLoading ? (
-          
-         <CustomSkeletonPage></CustomSkeletonPage>
-        
-        ) : 
-        (
+    <Page title="Plans" defaultWidth>
+      {userStateLoading ? (
+        <CustomSkeletonPage></CustomSkeletonPage>
+      ) : (
         <Layout>
           <>
-        
-          <Layout.Section oneHalf>
-            <MediaCard
-              portrait
-              title="Pro Plan"
-              description="With this plan, get all of the backdating and order editing capabilities as well as a customer portal"
-              //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
-            >
-              <img
-                alt=""
-                width="100%"
-                height="100%"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                }}
-                src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
-              />
+            <Layout.Section oneHalf>
+              <MediaCard
+                portrait
+                title="Pro Plan"
+                description="With this plan, get all of the backdating and order editing capabilities as well as a customer portal"
+                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              >
+                <img
+                  alt=""
+                  width="100%"
+                  height="100%"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
+                />
 
-              <Card.Section>
-                {(!isPremiumUser || planName === "starter") && (
-                  <Button onClick={() => upgradePro()}>
-                    {" "}
-                    {loading ? "Loading..." : "Get Pro Plan"}
-                  </Button>
-                )}
-                {planName === "pro" && (
-                  <Badge progress="complete" status="success">
-                    Active
-                  </Badge>
-                )}
-              </Card.Section>
-            </MediaCard>
-          </Layout.Section>
-          <Layout.Section oneHalf>
-            <MediaCard
-              portrait
-              title="Starter Plan"
-              description="With this plan, backdate your orders and have them show up in your analytics, no customer portal"
-              //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
-            >
-              <img
-                alt=""
-                width="100%"
-                height="100%"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                }}
-                src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CJKrvcvBnoEDEAE=.png?height=1800&width=3200"
-              />
+                <Card.Section>
+                  {(!isPremiumUser || planName === "starter") && (
+                    <Button onClick={() => upgradePro()}>
+                      {" "}
+                      {loading ? "Loading..." : "Get Pro Plan"}
+                    </Button>
+                  )}
+                  {planName === "pro" && (
+                    <div style={{ padding: "8px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                  {"    "}
+                </Card.Section>
+              </MediaCard>
+            </Layout.Section>
+            <Layout.Section oneHalf>
+              <MediaCard
+                portrait
+                title="Starter Plan"
+                description="With this plan, backdate your orders and have them show up in your analytics, no customer portal"
+                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              >
+                <img
+                  alt=""
+                  width="100%"
+                  height="100%"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CJKrvcvBnoEDEAE=.png?height=1800&width=3200"
+                />
 
-              <Card.Section>
-                {(!isPremiumUser || planName === "pro") && (
-                  <Button onClick={() => upgradeStarter()}>
-                    {" "}
-                    {loadingStarter ? "Loading..." : "Get Starter Plan"}
-                  </Button>
-                )}
-                {planName === "starter" && (
-                  <Badge progress="complete" status="success">
-                    Active
-                  </Badge>
-                )}
-              </Card.Section>
-            </MediaCard>
-          </Layout.Section>
+                <Card.Section>
+                  {(!isPremiumUser || planName === "pro") && (
+                    <Button onClick={() => upgradeStarter()}>
+                      {" "}
+                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
+                    </Button>
+                  )}
+                  {planName === "starter" && (
+                    <div style={{ padding: "8px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                </Card.Section>
+              </MediaCard>
+            </Layout.Section>
+            <Layout.Section full>
+              <Card title="Partner Apps & Reviews">
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      If you like our App and want one month free please leave a
+                      review {"  "}
+                      <Link url="https://apps.shopify.com/editify/reviews">
+                        Here
+                      </Link>
+                    </p>
+                  </div>
+                </Card.Section>
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/51d8e8f21204bd1d7146f51ba39c01e1/icon/CPyA3YzCsP8CEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      Try our other app to manage images and files{" "}
+                      <Link url="https://apps.shopify.com/compress-files?">
+                        Install Now
+                      </Link>
+                    </p>
+                  </div>
+                </Card.Section>
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/4eff7bc91792e22953e8c99acffbf4d5/icon/CPKFpaPfl4EDEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      Power your store with AI sales assistant{" "}
+                      <Link url="https://apps.shopify.com/chatify-2">
+                        Install Now
+                      </Link>
+                    </p>
+                  </div>
+                </Card.Section>
+              </Card>
+              <br></br>
 
-        </>
+              <div style={{ height: "30px" }}></div>
+            </Layout.Section>
+          </>
         </Layout>
-        )
-}    
-      
+      )}
     </Page>
   );
 }

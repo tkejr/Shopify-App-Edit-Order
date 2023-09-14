@@ -19,6 +19,7 @@ import {
   updateUserPreference,
   updateUserDetails,
   getUserIdByUrl,
+  getUser,
 } from "./db.js";
 
 import { addUser } from "./db.js";
@@ -64,7 +65,6 @@ app.get(
 
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
-    console.log("Install callback", session.shop);
 
     const url = session.shop;
     const access_token = session.accessToken;
@@ -74,71 +74,48 @@ app.get(
       session: session,
     });
     //email
+
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
-    const Installmsg = {
-      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-      from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: "LFG Ka-ching-$$ Editify",
-      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
-    };
-    
-    sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
 
-    sgMail
-      .send(Installmsg)
-      .then(() => {
-        console.log("Email sent to owners");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-      
-     
+    if (prod) {
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log("Email sent");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
       isTest: !prod,
     });
-    mixpanel.people.set(session.shop, {
-      $first_name: shopDetails[0].shop_owner,
-      $created: shopDetails[0].created_at,
-      $email: shopDetails[0].customer_email,
-      $phone: shopDetails[0].phone,
-      $country: shopDetails[0].country_name,
-      $country_code: shopDetails[0].country_code,
-      $city: shopDetails[0].city,
-      $region: shopDetails[0].province,
-      $zip: shopDetails[0].zip,
-      $shopify_plan: shopDetails[0].plan_name,
-      $eligibility: shopDetails[0].eligible_for_payments,
-      plan: "free",
-    });
-
-    if (hasPayment) {
+    if (prod) {
       mixpanel.people.set(session.shop, {
-        plan: "premium",
+        $first_name: shopDetails[0].shop_owner,
+        $created: shopDetails[0].created_at,
+        $email: shopDetails[0].customer_email,
+        $phone: shopDetails[0].phone,
+        $country: shopDetails[0].country_name,
+        $country_code: shopDetails[0].country_code,
+        $city: shopDetails[0].city,
+        $region: shopDetails[0].province,
+        $zip: shopDetails[0].zip,
+        $shopify_plan: shopDetails[0].plan_name,
+        $eligibility: shopDetails[0].eligible_for_payments,
+        plan: "free",
       });
+      if (hasPayment) {
+        mixpanel.people.set(session.shop, {
+          plan: "premium",
+        });
+      }
     }
-
-    if (hasPayment) {
-      next();
-    } else {
-      res.redirect(
-        await shopify.api.billing.request({
-          session,
-          plan: plans[1],
-          isTest: !prod,
-        })
-      );
-    }
+    next();
   },
   // Load the app otherwise
   shopify.redirectToShopifyOrAppRoot()
@@ -170,15 +147,24 @@ app.get("/api/products/create", async (_req, res) => {
 });
 // Verify the user has a plan
 app.get("/api/check", async (req, res) => {
+  console.log("INSIDE CHECK API BACKEND");
+  const user = await getUser(res.locals.shopify.session.shop);
+
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
-
   try {
     await addUser(url, access_token);
   } catch (error) {
-    console.error("Error in API:", error);
+    console.log("Some error in add user");
   }
+
+  console.log(user);
+
+  const queryParams = req.query;
+  console.log(queryParams.charge_id);
+  const user_plan = user.plan;
+  const uid = user.id;
 
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
@@ -223,9 +209,7 @@ app.get("/api/check", async (req, res) => {
         query: HAS_PAYMENTS_QUERY,
       },
     });
-    console.log(
-      response.body.data.currentAppInstallation.activeSubscriptions.lineItems
-    );
+
     response.body.data.currentAppInstallation.activeSubscriptions.forEach(
       (subscription) => {
         if (subscription.name === "Editify Pro Plan") {
@@ -263,34 +247,66 @@ app.get("/api/check", async (req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: session,
   });
-  console.log(shopDetails);
-  mixpanel.people.set(session.shop, {
-    $first_name: shopDetails[0].shop_owner,
-    $created: shopDetails[0].created_at,
-    $email: shopDetails[0].customer_email,
-    $phone: shopDetails[0].phone,
-    $country: shopDetails[0].country_name,
-    $country_code: shopDetails[0].country_code,
-    $city: shopDetails[0].city,
-    $region: shopDetails[0].province,
-    $zip: shopDetails[0].zip,
-    $shopify_plan: shopDetails[0].plan_name,
-    $eligibility: shopDetails[0].eligible_for_payments,
-    plan: "free",
-  });
 
-  if (hasPayment) {
+  //setting the user in mixpanel if he didnt
+  if (prod) {
     mixpanel.people.set(session.shop, {
-      plan: "premium",
+      $first_name: shopDetails[0].shop_owner,
+      $created: shopDetails[0].created_at,
+      $email: shopDetails[0].customer_email,
+      $phone: shopDetails[0].phone,
+      $country: shopDetails[0].country_name,
+      $country_code: shopDetails[0].country_code,
+      $city: shopDetails[0].city,
+      $region: shopDetails[0].province,
+      $zip: shopDetails[0].zip,
+      $shopify_plan: shopDetails[0].plan_name,
+      $eligibility: shopDetails[0].eligible_for_payments,
+      plan: "free",
     });
   }
+  if (queryParams.charge_id != null && user.plan === "free" && prod) {
+    //update the user plan in db
+    const updatedUserDetails = await updateUserDetails(
+      uid,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      hasPayment
+    );
+
+    if (hasPayment) {
+      mixpanel.people.set(session.shop, {
+        plan: hasPayment,
+      });
+    }
+
+    //send email to us
+    const Installmsg = {
+      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+      from: "editifyshopify@gmail.com", // Change to your verified sender
+      subject: "LFG Ka-ching-$$ Editify",
+      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
+    };
+
+    sgMail
+      .send(Installmsg)
+      .then(() => {
+        console.log("Email sent to owners");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   res.json({ hasPayment });
 });
 app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify/";
+  const url = "https://" + shop + "/admin/apps/editify";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
@@ -303,11 +319,14 @@ app.get("/api/upgradePro", async (req, res) => {
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
+  //for testing if the user actually clicked on approve
 
-  mixpanel.track("Approved Charge", {
-    distinct_id: shop,
-    price: recurring_application_charge.price,
-  });
+  if (prod) {
+    mixpanel.track("Approved Charge", {
+      distinct_id: shop,
+      price: recurring_application_charge.price,
+    });
+  }
   res.json({ confirmationUrl });
 });
 app.get("/api/upgradeStarter", async (req, res) => {
@@ -327,22 +346,21 @@ app.get("/api/upgradeStarter", async (req, res) => {
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
+  if (prod) {
+    mixpanel.track("Approved Charge", {
+      distinct_id: shop,
+      price: recurring_application_charge.price,
+    });
+  }
 
-  mixpanel.track("Approved Charge", {
-    distinct_id: shop,
-    price: recurring_application_charge.price,
-  });
   res.json({ confirmationUrl });
 });
 app.get("/api/orders", async (_req, res) => {
-  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
     limit: 250, // new to make the limit 250 instead of 50
   });
-  
- 
 
   res.status(200).json(data);
 });
@@ -358,17 +376,26 @@ app.get("/api/orders/:startDate/:endDate", async (_req, res) => {
 
   res.status(200).json(data);
 });
+app.get("/api/orders/unfulfilled/:startDate/:endDate", async (_req, res) => {
+  const data = await shopify.api.rest.Order.all({
+    session: res.locals.shopify.session,
+    status: "any",
+    limit: 250, // new to make the limit 250 instead of 50
+    processed_at_min: _req.params["startDate"],
+    processed_at_max: _req.params["endDate"],
+    fulfillment_status: "unfulfilled",
+  });
+
+  res.status(200).json(data);
+});
 //getting unfulfilled orders
 app.get("/api/orders/unfulfilled", async (_req, res) => {
-   
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     //status: "unfulfilled",
     fulfillment_status: "unfulfilled",
     limit: 250,
   });
-  
-  
 
   res.status(200).json(data);
 });
@@ -505,19 +532,23 @@ app.put("/api/orders/:id", async (_req, res) => {
     status = 500;
     error = e.message;
   }
-  mixpanel.track("Edited Order", {
-    distinct_id: res.locals.shopify.session.shop,
-    order_number: order2.order_number,
-  });
+  if (prod) {
+    mixpanel.track("Edited Order", {
+      distinct_id: res.locals.shopify.session.shop,
+      order_number: order2.order_number,
+    });
+  }
   res.status(status).send({ success: status === 200, error });
 });
 
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
-  mixpanel.track("EO Page Opened", {
-    distinct_id: res.locals.shopify.session.shop,
-    orderId: _req.params["id"],
-  });
+  if (prod) {
+    mixpanel.track("EO Page Opened", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: _req.params["id"],
+    });
+  }
   const data = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
     id: _req.params["id"],
@@ -557,10 +588,12 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
   );
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
-  mixpanel.track("EO Amount Change Quantity", {
-    distinct_id: res.locals.shopify.session.shop,
-    orderId: req.params["id"],
-  });
+  if (prod) {
+    mixpanel.track("EO Amount Change Quantity", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: req.params["id"],
+    });
+  }
   //get all the vars
   const orderId = req.params["id"];
   const lineItemId = req.params["lineItemId"];
@@ -669,11 +702,13 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
-  mixpanel.track("EO Add Product to Order", {
-    distinct_id: res.locals.shopify.session.shop,
-    orderId: req.params["orderId"],
-    productId: req.params["productId"],
-  });
+  if (prod) {
+    mixpanel.track("EO Add Product to Order", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: req.params["orderId"],
+      productId: req.params["productId"],
+    });
+  }
 
   let status = 200;
   let error = null;

@@ -12,6 +12,7 @@ import {
   IndexTable,
   useIndexResourceState,
   SkeletonThumbnail,
+  Banner
 } from "@shopify/polaris";
 import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
@@ -38,7 +39,10 @@ export function EditOrderComponent(props) {
   const handleError = () => {
     setError(!error);
   };
-
+  const [modalError, setModalError] = useState(false);
+  const handleModalError = () => {
+    setModalError(!modalError);
+  };
   useEffect(() => {
     //const line_items = useSelector((state) => state.line_items);
 
@@ -83,7 +87,7 @@ export function EditOrderComponent(props) {
       setShowProducts(false);
     } else {
       //setIsLoading(false);
-      setErrorContent("There was an error adding the product to the order");
+      setErrorContent("There was an error adding the product to the order. See the reasons why that may be the case here: ");
       handleError();
     }
 
@@ -93,14 +97,17 @@ export function EditOrderComponent(props) {
 
   const [showProducts, setShowProducts] = useState(false);
   const changeAmount = async () => {
+    //error that belongs in modal
+    setQuantity("5");
+    setOriginalQuantity("1")
     if (quantity === originalQuantity) {
-      setErrorContent("Please select a quantity that is different");
-      handleError();
-    } else if (originalQuantity === "0") {
+      setErrorContent("Please select a quantity that is different from the original quantity");
+      handleModalError();
+    } else if (originalQuantity === "0") {//another error that belongs in modal
       setErrorContent(
         "Cannot change the quantity of a product that was originally zero"
       );
-      handleError();
+      handleModalError();
     } else {
       setStatus("loading");
       const requestOptions = {
@@ -116,7 +123,7 @@ export function EditOrderComponent(props) {
         setToastProps({ content: "Quantity updated" });
         props.setReloadComp(!props.reloadComp);
       } else {
-        setErrorContent("There was an error updating the quantity");
+        setErrorContent("There was an error updating the quantity. For more information on why this could have happened, visit: ");//this error can be a modal I think
         handleError();
       }
       handleChangeQuantity();
@@ -143,7 +150,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setLineItems(json);
-        console.log(json);
+        //console.log(json);
 
         setStatus("success");
       });
@@ -156,6 +163,7 @@ export function EditOrderComponent(props) {
   const [active, setActive] = useState(false);
   const handleChange = useCallback(() => setActive(!active), [active]);
   //
+
   const [activeQuantity, setActiveQuantity] = useState(false);
   const handleChangeQuantity = useCallback(
     () => setActiveQuantity(!activeQuantity),
@@ -165,8 +173,8 @@ export function EditOrderComponent(props) {
 
   const handleQuantityChange = (number) => {
     if (number < 0) {
-      setErrorContent("Quantity Must be atleast 0");
-      handleError();
+      setErrorContent("Quantity must be at least 0");//error in modal for sure
+      handleModalError();
     } else {
       setQuantity("" + number);
     }
@@ -196,10 +204,12 @@ export function EditOrderComponent(props) {
           orderName ? `Order Details for Order ${orderName}` : "Pick an Order"
         }
       >
+        
         <Card.Section>
           <Button disabled={!orderId} onClick={() => handleChange()}>
             {orderId ? "Add Product" : "Pick an Order"}
           </Button>
+          
         </Card.Section>
 
         <Card.Section title="Items">
@@ -293,7 +303,7 @@ export function EditOrderComponent(props) {
         {productId && (
           <Card.Section>
             <Button primary onClick={() => addProductVariant()}>
-              Add product
+              Confirm
             </Button>
           </Card.Section>
         )}
@@ -319,6 +329,17 @@ export function EditOrderComponent(props) {
           onAction: () => changeAmount(),
         }}
       >
+        
+        {modalError && <Banner
+            title="Error"
+            onDismiss={()=>handleModalError()}
+            status="critical"
+        >
+          <p>
+            {errorContent}          
+         </p>
+        </Banner>}
+        
         <Modal.Section>
           <TextField
             label="Quantity"
@@ -329,6 +350,7 @@ export function EditOrderComponent(props) {
             autoComplete="off"
           />
         </Modal.Section>
+        
       </Modal>
 
       {toastMarkup}

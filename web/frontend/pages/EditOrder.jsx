@@ -42,16 +42,7 @@ const PageExample = () => {
   };
   const fetch = useAuthenticatedFetch();
   const navigate = useNavigate();
-  const upgrade = async () => {
-    setLoading(true);
-    const res = await fetch("/api/upgradePortal")
-      .then((response) => response.json())
-      .then((data) => {
-        navigate(data.confirmationUrl);
-
-        setLoading(false);
-      });
-  };
+  
   const [orderId, setOrderId] = useState(0);
   const [orderName, setName] = useState();
   const [lineItems, setLineItems] = useState();
@@ -128,23 +119,6 @@ const PageExample = () => {
       defaultWidth
     >
       
-      <Modal
-        //activator={activator}
-        open={active}
-        onClose={handleChange}
-        title="Purpose of Page"
-      >
-        <Modal.Section>
-          <TextContainer>
-            <p>
-              Sometimes, a merchant is unable to edit an order that has been
-              backdated. If that is the case, this page is here so a merchant
-              can still edit their unfulfilled order.
-            </p>
-          </TextContainer>
-        </Modal.Section>
-      </Modal>
-
       {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {planName === "pro" && isPremiumUser ? (
           <>

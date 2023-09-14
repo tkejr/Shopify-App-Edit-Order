@@ -14,6 +14,7 @@ import {
   Link,
   MediaCard,
   FooterHelp,
+  List,
 } from "@shopify/polaris";
 import { useState, useCallback, useEffect } from "react";
 import { notFoundImage } from "../assets";
@@ -40,6 +41,10 @@ export default function HomePage() {
   const [showTry, setShowTry] = useState(false);
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chargeId = urlParams.get("charge_id");
+
+    console.log("Charge ID:", chargeId);
     const getAnalytics = async () => {
       try {
         const response = await fetch("/api/analytics", {
@@ -52,7 +57,7 @@ export default function HomePage() {
         if (response.ok) {
           const data = await response.json();
           setShopDeets(data.data);
-          if (data.data.no_back_orders > 1) {
+          if (data.data.no_back_orders > 0) {
             setEditedIcon(
               <Icon source={CircleTickMajor} color="success" backdrop />
             );
@@ -70,7 +75,7 @@ export default function HomePage() {
       }
     };
     const fetchRecurringCharges = async () => {
-      const res = await fetch("/api/check")
+      const res = await fetch(`/api/check?charge_id=${chargeId}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.hasPayment === "pro" || data.hasPayment === "starter") {
@@ -103,21 +108,40 @@ export default function HomePage() {
           <Page
             title="Editify"
             titleMetadata="Tracking Since 09/10/23"
-            fullWidth
+            defaultWidth
           >
-            <CalloutCard
-              title="Seamlessly Edit Your Orders"
-              illustration="https://cdn.pixabay.com/photo/2013/07/13/12/50/pencil-160443_1280.png"
-              primaryAction={{
-                content: "Backdate Orders",
-                onAction: handlePrimaryActionClick,
-              }}
-            >
-              <p>
-                Backdate Orders,Edit Orders , Customer Self Service Editing and
-                Much More
-              </p>
-            </CalloutCard>
+            <Card title="Welcome to Editify">
+              <Card.Section>
+                <TextContainer>
+                  <p>
+                    Backdate Orders, Edit Orders, Customer Self Service Editing
+                    and Much More
+                  </p>
+                </TextContainer>
+                {/* <div style={{ display: "flex" }}>
+                  <div style={{ flex: 1, marginRight: "20px" }}>
+                    <TextContainer>
+                      Install the Shopify POS App
+                      <p>
+                        Shopify POS is the easiest way to sell your products in
+                        person. Available for iPad, iPhone, and Android.
+                      </p>
+                    </TextContainer>
+                  </div>
+                  <img
+                    alt=""
+                    width="10%"
+                    height="10%"
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "center",
+                    }}
+                    src="https://cdn.pixabay.com/photo/2013/07/13/12/50/pencil-160443_1280.png"
+                  />
+                </div> */}
+              </Card.Section>
+            </Card>
+
             <br></br>
             <Layout>
               <Layout.Section oneThird>
@@ -159,16 +183,8 @@ export default function HomePage() {
             </Layout>
             <br></br>
             <Layout>
-              <Layout.Section oneHalf>
+              <Layout.Section>
                 <Card title="Setup Guide">
-                  <Card.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <Icon source={CircleTickMajor} color="success" backdrop />
-                      <div style={{ marginLeft: "10px" }}>
-                        <p>Installed App Successfully</p>
-                      </div>
-                    </div>
-                  </Card.Section>
                   <Card.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {planIcon}
@@ -189,12 +205,38 @@ export default function HomePage() {
                       </div>
                     </div>
                   </Card.Section>
+                  <Card.Section title="Steps to Backdate">
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ marginLeft: "10px" }}>
+                        <List type="bullet">
+                          <List.Item>Select An Order</List.Item>
+                          <List.Item>Select Date</List.Item>
+                          <List.Item>Click Submit</List.Item>
+                        </List>
+                      </div>
+                    </div>
+                  </Card.Section>
+                  {/* <Card.Section>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ marginLeft: "10px" }}>
+                        <p>2. Select Date</p>
+                      </div>
+                    </div>
+                  </Card.Section>
+                  <Card.Section>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ marginLeft: "10px" }}>
+                        <p>3 . Click Submit</p>
+                      </div>
+                    </div>
+                  </Card.Section> */}
+
                   <Card.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {editedIcon}
                       <div style={{ marginLeft: "10px" }}>
                         <p>
-                          Edited an Order 🎉{" "}
+                          Backdated an Order 🎉{" "}
                           {showTry && (
                             <Link
                               onClick={() => {
@@ -210,71 +252,7 @@ export default function HomePage() {
                   </Card.Section>
                 </Card>
               </Layout.Section>
-              <Layout.Section oneHalf>
-                <Card title="Partner Apps & Reviews">
-                  <Card.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <img
-                        src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
-                        alt="Your Image Description"
-                        style={{
-                          borderRadius: "8px",
-                          marginRight: "10px",
-                          width: "50px",
-                          height: "50px",
-                        }}
-                      />
-                      <p style={{ margin: 0 }}>
-                        If you like our App and want one month free please leave
-                        a review {"  "}
-                        <Link url="https://apps.shopify.com/editify/reviews">
-                          Here
-                        </Link>
-                      </p>
-                    </div>
-                  </Card.Section>
-                  <Card.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <img
-                        src="https://cdn.shopify.com/app-store/listing_images/51d8e8f21204bd1d7146f51ba39c01e1/icon/CPyA3YzCsP8CEAE=.png"
-                        alt="Your Image Description"
-                        style={{
-                          borderRadius: "8px",
-                          marginRight: "10px",
-                          width: "50px",
-                          height: "50px",
-                        }}
-                      />
-                      <p style={{ margin: 0 }}>
-                        Try our other app to manage images and files{" "}
-                        <Link url="https://apps.shopify.com/compress-files?">
-                          Install Now
-                        </Link>
-                      </p>
-                    </div>
-                  </Card.Section>
-                  <Card.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <img
-                        src="https://cdn.shopify.com/app-store/listing_images/4eff7bc91792e22953e8c99acffbf4d5/icon/CPKFpaPfl4EDEAE=.png"
-                        alt="Your Image Description"
-                        style={{
-                          borderRadius: "8px",
-                          marginRight: "10px",
-                          width: "50px",
-                          height: "50px",
-                        }}
-                      />
-                      <p style={{ margin: 0 }}>
-                        Power your store with AI sales assistant{" "}
-                        <Link url="https://apps.shopify.com/chatify-2">
-                          Install Now
-                        </Link>
-                      </p>
-                    </div>
-                  </Card.Section>
-                </Card>
-              </Layout.Section>
+              <Layout.Section oneHalf></Layout.Section>
             </Layout>
             <FooterHelp>
               Learn more about{" "}
