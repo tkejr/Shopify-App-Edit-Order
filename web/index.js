@@ -19,6 +19,7 @@ import {
   updateUserPreference,
   updateUserDetails,
   getUserIdByUrl,
+  getUser,
 } from "./db.js";
 
 import { addUser } from "./db.js";
@@ -51,7 +52,7 @@ const app = express();
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
 
-//sgMail.setApiKey(SEND_GRID_API_KEY);
+sgMail.setApiKey(SEND_GRID_API_KEY);
 
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -64,7 +65,6 @@ app.get(
 
     const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
-    console.log("Install callback", session.shop);
 
     const url = session.shop;
     const access_token = session.accessToken;
@@ -77,26 +77,12 @@ app.get(
 
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
-    const Installmsg = {
-      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-      from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: "LFG Ka-ching-$$ Editify",
-      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
-    };
+
     if (prod) {
       sgMail
         .send(msg)
         .then(() => {
           console.log("Email sent");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-
-      sgMail
-        .send(Installmsg)
-        .then(() => {
-          console.log("Email sent to owners");
         })
         .catch((error) => {
           console.error(error);
@@ -129,18 +115,7 @@ app.get(
         });
       }
     }
-
-    if (hasPayment) {
-      next();
-    } else {
-      res.redirect(
-        await shopify.api.billing.request({
-          session,
-          plan: plans[1],
-          isTest: !prod,
-        })
-      );
-    }
+    next();
   },
   // Load the app otherwise
   shopify.redirectToShopifyOrAppRoot()
@@ -172,15 +147,24 @@ app.get("/api/products/create", async (_req, res) => {
 });
 // Verify the user has a plan
 app.get("/api/check", async (req, res) => {
+  console.log("INSIDE CHECK API BACKEND");
+  const user = await getUser(res.locals.shopify.session.shop);
+
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
-
   try {
     await addUser(url, access_token);
   } catch (error) {
-    console.error("Error in API:", error);
+    console.log("Some error in add user");
   }
+
+  console.log(user);
+
+  const queryParams = req.query;
+  console.log(queryParams.charge_id);
+  const user_plan = user.plan;
+  const uid = user.id;
 
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
@@ -225,9 +209,7 @@ app.get("/api/check", async (req, res) => {
         query: HAS_PAYMENTS_QUERY,
       },
     });
-    console.log(
-      response.body.data.currentAppInstallation.activeSubscriptions.lineItems
-    );
+
     response.body.data.currentAppInstallation.activeSubscriptions.forEach(
       (subscription) => {
         if (subscription.name === "Editify Pro Plan") {
@@ -265,7 +247,8 @@ app.get("/api/check", async (req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: session,
   });
-  console.log(shopDetails);
+
+  //setting the user in mixpanel if he didnt
   if (prod) {
     mixpanel.people.set(session.shop, {
       $first_name: shopDetails[0].shop_owner,
@@ -281,11 +264,40 @@ app.get("/api/check", async (req, res) => {
       $eligibility: shopDetails[0].eligible_for_payments,
       plan: "free",
     });
+  }
+  if (queryParams.charge_id != null && user.plan === "free" && prod) {
+    //update the user plan in db
+    const updatedUserDetails = await updateUserDetails(
+      uid,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      hasPayment
+    );
+
     if (hasPayment) {
       mixpanel.people.set(session.shop, {
-        plan: "premium",
+        plan: hasPayment,
       });
     }
+
+    //send email to us
+    const Installmsg = {
+      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+      from: "editifyshopify@gmail.com", // Change to your verified sender
+      subject: "LFG Ka-ching-$$ Editify",
+      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
+    };
+
+    sgMail
+      .send(Installmsg)
+      .then(() => {
+        console.log("Email sent to owners");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   res.json({ hasPayment });
@@ -294,7 +306,7 @@ app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify/";
+  const url = "https://" + shop + "/admin/apps/editify";
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
@@ -307,6 +319,7 @@ app.get("/api/upgradePro", async (req, res) => {
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
+  //for testing if the user actually clicked on approve
 
   if (prod) {
     mixpanel.track("Approved Charge", {

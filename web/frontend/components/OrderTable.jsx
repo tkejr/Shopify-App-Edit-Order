@@ -8,7 +8,8 @@ import {
   TextField,
   Modal,
   DatePicker,
-  Page
+  Page,
+  ButtonGroup,
 } from "@shopify/polaris";
 import React from "react";
 import { useAppQuery } from "../hooks";
@@ -108,54 +109,49 @@ export function OrderTable(props) {
 
   //advanced Search
   const [active, setActive] = useState(false);
-const [hasDates, setHasDates] = useState(false);
-const handleChange = useCallback(() =>  setActive(!active) , [active]  );
-const getCustomOrderDates = () => {
-    
-
-     setStatus('loading')
-        fetch("/api/orders/" + selectedDates.start + "/" + selectedDates.end)
-          .then((response) => response.json())
-          .then((json) => {
-            setRawData(json);
-            setStatus("success");
-          });
-      handleChange()
-      setHasDates(true)
-      //props.setReload(!props.reload)
-}
-const clearDates = () => {
-  
-  if(hasDates){
-    setStatus('loading')
-    getData()
-    handleChange()
-    setSelectedDates({
-      start: new Date(),
-      end: new Date(),
-      })
-    //setDate({month: 8, year: 2023})
+  const [hasDates, setHasDates] = useState(false);
+  const handleChange = useCallback(() => setActive(!active), [active]);
+  const getCustomOrderDates = () => {
+    setStatus("loading");
+    fetch("/api/orders/" + selectedDates.start + "/" + selectedDates.end)
+      .then((response) => response.json())
+      .then((json) => {
+        setRawData(json);
+        setStatus("success");
+      });
+    handleChange();
+    setHasDates(true);
     //props.setReload(!props.reload)
-  }
-  else{
-    //handleChange()
-  }
-  setHasDates(false)
-   
-}
-//dates
-const [{month, year}, setDate] = useState({month: 8, year: 2023});
-const [selectedDates, setSelectedDates] = useState({
-//start: new Date('Sat Sep 09 2023 00:00:00 GMT-0500 (EST)'),
-//end: new Date('Sat Sep 16 2023 00:00:00 GMT-0500 (EST)'),
-start: new Date(),
-end: new Date(),
-});
+  };
+  const clearDates = () => {
+    if (hasDates) {
+      setStatus("loading");
+      getData();
+      handleChange();
+      setSelectedDates({
+        start: new Date(),
+        end: new Date(),
+      });
+      //setDate({month: 8, year: 2023})
+      //props.setReload(!props.reload)
+    } else {
+      //handleChange()
+    }
+    setHasDates(false);
+  };
+  //dates
+  const [{ month, year }, setDate] = useState({ month: 8, year: 2023 });
+  const [selectedDates, setSelectedDates] = useState({
+    //start: new Date('Sat Sep 09 2023 00:00:00 GMT-0500 (EST)'),
+    //end: new Date('Sat Sep 16 2023 00:00:00 GMT-0500 (EST)'),
+    start: new Date(),
+    end: new Date(),
+  });
 
-const handleMonthChange = useCallback(
-(month, year) => setDate({month, year}),
-[],
-);
+  const handleMonthChange = useCallback(
+    (month, year) => setDate({ month, year }),
+    []
+  );
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id, currency }, index) => (
       <IndexTable.Row
@@ -178,69 +174,67 @@ const handleMonthChange = useCallback(
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
         <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
-        <IndexTable.Cell>{total_price} {currency}</IndexTable.Cell>
+        <IndexTable.Cell>
+          {total_price} {currency}
+        </IndexTable.Cell>
       </IndexTable.Row>
     )
   );
 
   return (
     <Card>
-      
       <FiltersComponent
         onSearch={(value) => {
           setSearch(value);
           setCurrentPage(1);
         }}
       />
-      <div style={{padding:"10px"}}>
-    
-      <Button
-      plain
-      disclosure={expanded ? 'up' : 'down'}
-      onClick={() => {
-        setExpanded(!expanded);
-      }}
-    >
-      {expanded ? 'Show less' : 'Show more'}
-    </Button>
+      <div style={{ padding: "10px" }}>
+        <Button
+          plain
+          disclosure={expanded ? "up" : "down"}
+          onClick={() => {
+            setExpanded(!expanded);
+          }}
+        >
+          {expanded ? "Close" : "Filter By Date"}
+        </Button>
       </div>
-      {expanded &&
-        <Card sectioned
-      >
-        <Card.Section>
-        <DatePicker
+      {expanded && (
+        <div
+          style={{
+            padding: "20px",
+          }}
+        >
+          <DatePicker
             month={month}
             year={year}
             onChange={setSelectedDates}
             onMonthChange={handleMonthChange}
             selected={selectedDates}
             allowRange
-        />
-        <br></br>
-        <Button
-          disabled={!hasDates}
-          onClick={() => clearDates()}
-          destructive
-        >
-          
-          { "Clear"}
-          {" "}
-        </Button>
-        
-        <Button
-          //disabled={!hasDates}
-          onClick={() => getCustomOrderDates()}
-          primary={true}
-          
-        >
-          {" "}
-          { "Search"}
-        </Button>
-        </Card.Section>
-        
-        
-      </Card>
-}
+          />
+          <br></br>
+          <ButtonGroup>
+            <Button
+              disabled={!hasDates}
+              onClick={() => clearDates()}
+              destructive
+            >
+              {"Clear"}{" "}
+            </Button>
+
+            <Button
+              //disabled={!hasDates}
+              onClick={() => getCustomOrderDates()}
+              primary={true}
+            >
+              {" "}
+              {"Search"}
+            </Button>
+          </ButtonGroup>
+        </div>
+      )}
       <br></br>
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />

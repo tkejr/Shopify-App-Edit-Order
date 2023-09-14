@@ -160,7 +160,8 @@ const updateUserDetails = async (
   emailSentIncrement,
   backOrdersIncrement,
   editOrdersIncrement,
-  custEditOrdersIncrement
+  custEditOrdersIncrement,
+  planValue
 ) => {
   try {
     let updateQuery = "";
@@ -195,6 +196,16 @@ const updateUserDetails = async (
         "no_cust_edit_orders = no_cust_edit_orders + $" +
         (queryParams.length + 1);
       queryParams.push(custEditOrdersIncrement);
+    }
+
+    // New condition to update plan
+    if (planValue !== undefined) {
+      if (typeof planValue !== "string") {
+        throw new Error("planValue must be of type string");
+      }
+      if (queryParams.length > 0) updateQuery += ", ";
+      updateQuery += "plan = $" + (queryParams.length + 1);
+      queryParams.push(planValue);
     }
 
     if (queryParams.length === 0) {

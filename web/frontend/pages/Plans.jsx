@@ -15,13 +15,12 @@ import {
   Frame,
   VideoThumbnail,
   SkeletonPage,
-  
   SkeletonDisplayText,
-  SkeletonBodyText
+  SkeletonBodyText,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-import CustomSkeletonPage from '../components/SkeletonPage'
+import CustomSkeletonPage from "../components/SkeletonPage";
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -78,7 +77,7 @@ export default function HomePage() {
         setLoading(false);
       });
   };
-  
+
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     //new
@@ -88,101 +87,156 @@ export default function HomePage() {
   }, []);
 
   return (
-    <Page
-      title="Plans"
-      defaultWidth
-    >
-       
-        { userStateLoading ? (
-          
-         <CustomSkeletonPage></CustomSkeletonPage>
-        
-        ) : 
-        (
+    <Page title="Plans" defaultWidth>
+      {userStateLoading ? (
+        <CustomSkeletonPage></CustomSkeletonPage>
+      ) : (
         <Layout>
           <>
-        
-          <Layout.Section oneHalf>
-            <MediaCard
-              portrait
-              title="Pro Plan"
-              description="With this plan, get all of the backdating and order editing capabilities as well as a customer portal"
-              //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
-            >
-              <img
-                alt=""
-                width="100%"
-                height="100%"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                }}
-                src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
-              />
+            <Layout.Section oneHalf>
+              <MediaCard
+                portrait
+                title="Pro Plan"
+                description="With this plan, get all of the backdating and order editing capabilities as well as a customer portal"
+                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              >
+                <img
+                  alt=""
+                  width="100%"
+                  height="100%"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
+                />
 
-              <Card.Section>
-                {(!isPremiumUser || planName === "starter") && (
-                  <Button onClick={() => upgradePro()}>
-                    {" "}
-                    {loading ? "Loading..." : "Get Pro Plan"}
-                  </Button>
-                )}
-                {planName === "pro" && (
-                  <div style={{padding:'8px'}}>
-                  <Badge progress="complete" status="success">
-                    {" "}
-                    Active
-                  </Badge>
-                  
-                 
+                <Card.Section>
+                  {(!isPremiumUser || planName === "starter") && (
+                    <Button onClick={() => upgradePro()}>
+                      {" "}
+                      {loading ? "Loading..." : "Get Pro Plan"}
+                    </Button>
+                  )}
+                  {planName === "pro" && (
+                    <div style={{ padding: "8px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                  {"    "}
+                </Card.Section>
+              </MediaCard>
+            </Layout.Section>
+            <Layout.Section oneHalf>
+              <MediaCard
+                portrait
+                title="Starter Plan"
+                description="With this plan, backdate your orders and have them show up in your analytics, no customer portal"
+                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              >
+                <img
+                  alt=""
+                  width="100%"
+                  height="100%"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CJKrvcvBnoEDEAE=.png?height=1800&width=3200"
+                />
+
+                <Card.Section>
+                  {(!isPremiumUser || planName === "pro") && (
+                    <Button onClick={() => upgradeStarter()}>
+                      {" "}
+                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
+                    </Button>
+                  )}
+                  {planName === "starter" && (
+                    <div style={{ padding: "8px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                </Card.Section>
+              </MediaCard>
+            </Layout.Section>
+            <Layout.Section full>
+              <Card title="Partner Apps & Reviews">
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      If you like our App and want one month free please leave a
+                      review {"  "}
+                      <Link url="https://apps.shopify.com/editify/reviews">
+                        Here
+                      </Link>
+                    </p>
                   </div>
-                )}
-                {"    "}
-              </Card.Section>
-            </MediaCard>
-          </Layout.Section>
-          <Layout.Section oneHalf>
-            <MediaCard
-              portrait
-              title="Starter Plan"
-              description="With this plan, backdate your orders and have them show up in your analytics, no customer portal"
-              //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
-            >
-              <img
-                alt=""
-                width="100%"
-                height="100%"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                }}
-                src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CJKrvcvBnoEDEAE=.png?height=1800&width=3200"
-              />
-
-              <Card.Section>
-                {(!isPremiumUser || planName === "pro") && (
-                  <Button onClick={() => upgradeStarter()}>
-                    {" "}
-                    {loadingStarter ? "Loading..." : "Get Starter Plan"}
-                  </Button>
-                )}
-                {planName === "starter" && (
-                  <div style={{padding:'8px'}}>
-                  <Badge progress="complete" status="success">
-                    {" "}
-                    Active
-                  </Badge>
+                </Card.Section>
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/51d8e8f21204bd1d7146f51ba39c01e1/icon/CPyA3YzCsP8CEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      Try our other app to manage images and files{" "}
+                      <Link url="https://apps.shopify.com/compress-files?">
+                        Install Now
+                      </Link>
+                    </p>
                   </div>
-                )}
-              </Card.Section>
-            </MediaCard>
-          </Layout.Section>
+                </Card.Section>
+                <Card.Section>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/4eff7bc91792e22953e8c99acffbf4d5/icon/CPKFpaPfl4EDEAE=.png"
+                      alt="Your Image Description"
+                      style={{
+                        borderRadius: "8px",
+                        marginRight: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    <p style={{ margin: 0 }}>
+                      Power your store with AI sales assistant{" "}
+                      <Link url="https://apps.shopify.com/chatify-2">
+                        Install Now
+                      </Link>
+                    </p>
+                  </div>
+                </Card.Section>
+              </Card>
+              <br></br>
 
-        </>
+              <div style={{ height: "30px" }}></div>
+            </Layout.Section>
+          </>
         </Layout>
-        )
-}    
-      
+      )}
     </Page>
   );
 }
