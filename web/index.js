@@ -268,6 +268,8 @@ app.get("/api/check", async (req, res) => {
   if (
     queryParams.charge_id != undefined &&
     queryParams.charge_id != null &&
+    queryParams.charge_id != "null" &&
+    queryParams.charge_id != "undefined" &&
     user.plan === "free" &&
     prod
   ) {
