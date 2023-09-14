@@ -75,20 +75,6 @@ app.get(
     });
     //email
 
-    const shopEmail = "" + shopDetails[0].email;
-    const msg = await emailHelper(shopEmail);
-
-    if (prod) {
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-
     const hasPayment = await shopify.api.billing.check({
       session,
       plans: plans,
@@ -153,8 +139,26 @@ app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
+  const shopDetails = await shopify.api.rest.Shop.all({
+    session: sess,
+  });
   try {
     await addUser(url, access_token);
+
+    //send only on new install
+    const shopEmail = "" + shopDetails[0].email;
+    const msg = await emailHelper(shopEmail);
+
+    if (prod) {
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log("Email sent");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   } catch (error) {
     console.log("Some error in add user");
   }
@@ -244,9 +248,6 @@ app.get("/api/check", async (req, res) => {
     }
   }
   //return subscriptionLineItem;
-  const shopDetails = await shopify.api.rest.Shop.all({
-    session: session,
-  });
 
   //setting the user in mixpanel if he didnt
   if (prod) {
@@ -293,7 +294,7 @@ app.get("/api/check", async (req, res) => {
     const Installmsg = {
       to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
       from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: "LFG Ka-ching-$$ Editify",
+      subject: `LFG Ka-ching-$$ Editify ${hasPayment}`,
       text: `An Installation was made by ${shopDetails[0].shop_owner}`,
     };
 
