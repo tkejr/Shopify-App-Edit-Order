@@ -265,7 +265,12 @@ app.get("/api/check", async (req, res) => {
       plan: "free",
     });
   }
-  if (queryParams.charge_id != undefined && user.plan === "free" && prod) {
+  if (
+    queryParams.charge_id != undefined &&
+    queryParams.charge_id != null &&
+    user.plan === "free" &&
+    prod
+  ) {
     //update the user plan in db
     const updatedUserDetails = await updateUserDetails(
       uid,
