@@ -230,8 +230,6 @@ app.get("/api/checkAdvanced", async (req, res) => {
 
   var user;
   try {
-    user = await getUser(res.locals.shopify.session.shop);
-  } catch (error) {
     console.log("User didn't exist");
     console.log("======= ADDING USER ==============");
     user = await addUser(url, access_token);
@@ -249,7 +247,11 @@ app.get("/api/checkAdvanced", async (req, res) => {
           console.error(error);
         });
     }
+  } catch (error) {
+    console.log(error);
   }
+
+  user = await getUser(res.locals.shopify.session.shop);
 
   console.log(user);
 
