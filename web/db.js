@@ -108,7 +108,7 @@ const addUser = async (url, accessToken) => {
 
     await addUserPreference(userId, 900, false);
 
-    return result.rows[0].id;
+    return result.rows[0];
   } catch (error) {
     console.error("Error adding user:", error);
     throw error;

@@ -29,6 +29,7 @@ import {
 import { useAuthenticatedFetch } from "../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
 import CustomSkeletonPage from "../components/SkeletonPage";
+import { onCLS, onFID, onLCP } from "web-vitals";
 
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
@@ -75,7 +76,7 @@ export default function HomePage() {
       }
     };
     const fetchRecurringCharges = async () => {
-      const res = await fetch(`/api/check?charge_id=${chargeId}`)
+      const res = await fetch(`/api/checkAdvanced?charge_id=${chargeId}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.hasPayment === "pro" || data.hasPayment === "starter") {
