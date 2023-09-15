@@ -31,6 +31,7 @@ import {
 } from "../components";
 import ErrorBanner from "../components/ErrorBanner";
 import { useSelector, useDispatch } from "react-redux";
+import { edit_paywall } from "../assets";
 
 const PageExample = () => {
   const [show, setShow] = useState(false);
@@ -100,7 +101,7 @@ const PageExample = () => {
               objectFit: "cover",
               objectPosition: "center",
             }}
-            src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+            src={edit_paywall}
           />
         </MediaCard>
       </Frame>

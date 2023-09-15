@@ -135,6 +135,91 @@ app.get("/api/products/create", async (_req, res) => {
 // Verify the user has a plan
 
 app.get("/api/check", async (req, res) => {
+  const sess = res.locals.shopify.session;
+  const url = sess.shop;
+
+  const HAS_PAYMENTS_QUERY = `
+  query appSubscription {  
+    currentAppInstallation {
+      activeSubscriptions {
+            id
+            name
+            lineItems {
+                  id
+                  plan {
+                    pricingDetails {
+                      __typename
+                      ... on AppUsagePricing {
+                        terms
+                        balanceUsed {
+                          amount
+                        }
+                        cappedAmount {
+                          amount
+                        }
+                      }
+                    }
+                  }
+                }
+            }
+          }
+      }
+  `;
+
+  const session = res.locals.shopify.session;
+
+  const client = new shopify.api.clients.Graphql({ session });
+  let subscriptionLineItem = {};
+  let hasPayment;
+  //const planName = Object.keys(billingConfig)[0];
+
+  //const planDescription = billingConfig[planName].usageTerms;
+
+  try {
+    const response = await client.query({
+      data: {
+        query: HAS_PAYMENTS_QUERY,
+      },
+    });
+
+    response.body.data.currentAppInstallation.activeSubscriptions.forEach(
+      (subscription) => {
+        if (subscription.name === "Editify Pro Plan") {
+          hasPayment = "pro";
+          /*
+          subscription.lineItems.forEach((lineItem) => {
+            if (lineItem.plan.pricingDetails.terms === planDescription) {
+              subscriptionLineItem = {
+                id: lineItem.id,
+                balanceUsed: parseFloat(
+                  lineItem.plan.pricingDetails.balanceUsed.amount
+                ),
+                cappedAmount: parseFloat(
+                  lineItem.plan.pricingDetails.cappedAmount.amount
+                ),
+              };
+            }
+          });
+          */
+        } else if (subscription.name === "Editify Starter Plan") {
+          hasPayment = "starter";
+        }
+      }
+    );
+  } catch (error) {
+    if (error) {
+      throw new Error(
+        `${error.message}\n${JSON.stringify(error.response, null, 2)}`
+      );
+    } else {
+      throw error;
+    }
+  }
+
+  res.json({ hasPayment });
+});
+
+app.get("/api/checkAdvanced", async (req, res) => {
   console.log("INSIDE CHECK API BACKEND");
   const sess = res.locals.shopify.session;
   const url = sess.shop;
@@ -143,10 +228,13 @@ app.get("/api/check", async (req, res) => {
     session: sess,
   });
 
+  var user;
   try {
+    user = await getUser(res.locals.shopify.session.shop);
+  } catch (error) {
+    console.log("User didn't exist");
     console.log("======= ADDING USER ==============");
-    const userAdded = await addUser(url, access_token);
-
+    user = await addUser(url, access_token);
     //send only on new install
     const shopEmail = "" + shopDetails[0].email;
     const msg = await emailHelper(shopEmail);
@@ -161,11 +249,7 @@ app.get("/api/check", async (req, res) => {
           console.error(error);
         });
     }
-  } catch (error) {
-    console.log("Some error in add user");
   }
-
-  const user = await getUser(res.locals.shopify.session.shop);
 
   console.log(user);
 
@@ -243,7 +327,7 @@ app.get("/api/check", async (req, res) => {
       }
     );
   } catch (error) {
-    if (error instanceof GraphqlQueryError) {
+    if (error) {
       throw new Error(
         `${error.message}\n${JSON.stringify(error.response, null, 2)}`
       );
@@ -255,22 +339,22 @@ app.get("/api/check", async (req, res) => {
 
   //setting the user in mixpanel if he didnt
 
-  if (prod) {
-    mixpanel.people.set(session.shop, {
-      $first_name: shopDetails[0].shop_owner,
-      $created: shopDetails[0].created_at,
-      $email: shopDetails[0].customer_email,
-      $phone: shopDetails[0].phone,
-      $country: shopDetails[0].country_name,
-      $country_code: shopDetails[0].country_code,
-      $city: shopDetails[0].city,
-      $region: shopDetails[0].province,
-      $zip: shopDetails[0].zip,
-      $shopify_plan: shopDetails[0].plan_name,
-      $eligibility: shopDetails[0].eligible_for_payments,
-      plan: "free",
-    });
-  }
+  // if (prod) {
+  //   mixpanel.people.set(session.shop, {
+  //     $first_name: shopDetails[0].shop_owner,
+  //     $created: shopDetails[0].created_at,
+  //     $email: shopDetails[0].customer_email,
+  //     $phone: shopDetails[0].phone,
+  //     $country: shopDetails[0].country_name,
+  //     $country_code: shopDetails[0].country_code,
+  //     $city: shopDetails[0].city,
+  //     $region: shopDetails[0].province,
+  //     $zip: shopDetails[0].zip,
+  //     $shopify_plan: shopDetails[0].plan_name,
+  //     $eligibility: shopDetails[0].eligible_for_payments,
+  //     plan: "free",
+  //   });
+  // }
 
   // A new customer subscribed to our plan
   if (
