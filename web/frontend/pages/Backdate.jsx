@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-import CustomSkeletonPage from '../components/SkeletonPage';
+import CustomSkeletonPage from "../components/SkeletonPage";
 import ErrorBanner from "../components/ErrorBanner";
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
@@ -125,17 +125,15 @@ export default function Backdate() {
   };
 
   //error stuff
-  const[url, setUrl]= useState('')
-  const[errorContent, setErrorContent]= useState('')
+  const [url, setUrl] = useState("");
+  const [errorContent, setErrorContent] = useState("");
+  const [buttonText, setButtonText] = useState("Learn More");
   const [error, setError] = useState(false);
   const handleError = () => {
     setError(!error);
   };
   return (
-    <Page
-      title="Backdate Order"
-      defaultWidth
-    >
+    <Page title="Backdate Order" defaultWidth>
       <Modal
         //activator={activator}
         open={activeResizify}
@@ -175,38 +173,49 @@ export default function Backdate() {
         </Modal.Section>
       </Modal>
 
-
-      {<ErrorBanner open={error} onClose={handleError} content={errorContent} url={url}></ErrorBanner>}
-      {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
-        {(planName === "pro" || planName === "starter") && isPremiumUser ? (
-          <>
-            <Layout.Section oneHalf>
-              {
-                <OrderTable
-                  toggleShow={toggleShow}
-                  setOrderId={setOrderId}
-                  setName={setName}
+      {
+        <ErrorBanner
+          open={error}
+          onClose={handleError}
+          content={errorContent}
+          url={url}
+          buttonText={buttonText}
+        ></ErrorBanner>
+      }
+      {userStateLoading ? (
+        <CustomSkeletonPage></CustomSkeletonPage>
+      ) : (
+        <Layout>
+          {(planName === "pro" || planName === "starter") && isPremiumUser ? (
+            <>
+              <Layout.Section oneHalf>
+                {
+                  <OrderTable
+                    toggleShow={toggleShow}
+                    setOrderId={setOrderId}
+                    setName={setName}
+                    reloadComp={reloadComp}
+                  />
+                }
+              </Layout.Section>
+              <Layout.Section oneHalf>
+                <DatePickerExample
+                  orderId={orderId}
+                  orderName={orderName}
                   reloadComp={reloadComp}
+                  setReloadComp={setReloadComp}
+                  setErrorContent={setErrorContent}
+                  setButtonText={setButtonText}
+                  setUrl={setUrl}
+                  handleError={handleError}
                 />
-              }
-            </Layout.Section>
-            <Layout.Section oneHalf>
-              <DatePickerExample
-                orderId={orderId}
-                orderName={orderName}
-                reloadComp={reloadComp}
-                setReloadComp={setReloadComp}
-                setErrorContent={setErrorContent}
-                setUrl={setUrl}
-                handleError={handleError}
-              />
-            </Layout.Section>
-          </>
-        ) : (
-          checkPremiumUserContent()
-        )}
-      </Layout>)
-}
+              </Layout.Section>
+            </>
+          ) : (
+            checkPremiumUserContent()
+          )}
+        </Layout>
+      )}
     </Page>
   );
 }

@@ -15,7 +15,7 @@ import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
 import { SearchMinor } from "@shopify/polaris-icons";
 import { useState, useCallback, useMemo, useEffect } from "react";
-import CustomSkeletonPage from '../components/SkeletonPage';
+import CustomSkeletonPage from "../components/SkeletonPage";
 import { useAuthenticatedFetch } from "../hooks";
 import {
   TitleBar,
@@ -43,7 +43,7 @@ const PageExample = () => {
   };
   const fetch = useAuthenticatedFetch();
   const navigate = useNavigate();
-  
+
   const [orderId, setOrderId] = useState(0);
   const [orderName, setName] = useState();
   const [lineItems, setLineItems] = useState();
@@ -114,52 +114,58 @@ const PageExample = () => {
     setActive(!active);
   }, [active]);
 
-  const[url, setUrl]= useState('')
-  const[errorContent, setErrorContent]= useState('')
+  const [url, setUrl] = useState("");
+  const [errorContent, setErrorContent] = useState("");
   const [error, setError] = useState(false);
   const handleError = () => {
     setError(!error);
   };
   return (
-    <Page
-      title="Edit Order"
-      defaultWidth
-    >
-    
-      {<ErrorBanner open={error} onClose={handleError} content={errorContent} url={url}></ErrorBanner>}
-      {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
-        {planName === "pro" && isPremiumUser ? (
-          <>
-            <Layout.Section oneHalf>
-              {
-                <OrderTableEditOrder
-                  toggleShow={toggleShow}
-                  setOrderId={setOrderId}
-                  setName={setName}
+    <Page title="Edit Order" defaultWidth>
+      {
+        <ErrorBanner
+          open={error}
+          onClose={handleError}
+          content={errorContent}
+          url={url}
+          buttonText={"Learn More"}
+        ></ErrorBanner>
+      }
+      {userStateLoading ? (
+        <CustomSkeletonPage></CustomSkeletonPage>
+      ) : (
+        <Layout>
+          {planName === "pro" && isPremiumUser ? (
+            <>
+              <Layout.Section oneHalf>
+                {
+                  <OrderTableEditOrder
+                    toggleShow={toggleShow}
+                    setOrderId={setOrderId}
+                    setName={setName}
+                    reloadComp={reloadComp}
+                    setLineItems={setLineItems}
+                  />
+                }
+              </Layout.Section>
+              <Layout.Section oneHalf>
+                <EditOrderComponent
+                  orderId={orderId}
+                  orderName={orderName}
                   reloadComp={reloadComp}
-                  setLineItems={setLineItems}
+                  setReloadComp={setReloadComp}
+                  lineItems={lineItems}
+                  setErrorContent={setErrorContent}
+                  setUrl={setUrl}
+                  handleError={handleError}
                 />
-              }
-            </Layout.Section>
-            <Layout.Section oneHalf>
-              <EditOrderComponent
-                orderId={orderId}
-                orderName={orderName}
-                reloadComp={reloadComp}
-                setReloadComp={setReloadComp}
-                lineItems={lineItems}
-                
-                setErrorContent={setErrorContent}
-                setUrl={setUrl}
-                handleError={handleError}
-              />
-            </Layout.Section>
-          </>
-        ) : (
-          checkPremiumUserContent()
-        )}
-      </Layout>)
-}
+              </Layout.Section>
+            </>
+          ) : (
+            checkPremiumUserContent()
+          )}
+        </Layout>
+      )}
     </Page>
   );
 };

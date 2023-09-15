@@ -22,7 +22,7 @@ import {
   getUser,
 } from "./db.js";
 
-import { addUser } from "./db.js";  
+import { addUser } from "./db.js";
 
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
@@ -142,7 +142,7 @@ app.get("/api/check", async (req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: sess,
   });
-  
+
   try {
     await addUser(url, access_token);
 
@@ -252,7 +252,6 @@ app.get("/api/check", async (req, res) => {
 
   //setting the user in mixpanel if he didnt
 
-  
   if (prod) {
     mixpanel.people.set(session.shop, {
       $first_name: shopDetails[0].shop_owner,
@@ -317,7 +316,10 @@ app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify";
+  var url = "https://" + shop + "/admin/apps/editify-dev";
+  if (prod) {
+    url = "https://" + shop + "/admin/apps/editify";
+  }
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
@@ -344,7 +346,10 @@ app.get("/api/upgradeStarter", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
   ///IMPORTANT, change this to just /editify in prod
-  const url = "https://" + shop + "/admin/apps/editify/";
+  var url = "https://" + shop + "/admin/apps/editify-dev";
+  if (prod) {
+    url = "https://" + shop + "/admin/apps/editify";
+  }
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Starter Plan";
@@ -367,13 +372,11 @@ app.get("/api/upgradeStarter", async (req, res) => {
   res.json({ confirmationUrl });
 });
 app.get("/api/orders", async (_req, res) => {
-  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     status: "any",
     limit: 250, // new to make the limit 250 instead of 50
   });
-  
 
   res.status(200).json(data);
 });
@@ -403,7 +406,6 @@ app.get("/api/orders/unfulfilled/:startDate/:endDate", async (_req, res) => {
 });
 //getting unfulfilled orders
 app.get("/api/orders/unfulfilled", async (_req, res) => {
-  
   const data = await shopify.api.rest.Order.all({
     session: res.locals.shopify.session,
     //status: "unfulfilled",
@@ -418,7 +420,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
 
   const order = new shopify.api.rest.Order({
-     session: res.locals.shopify.session,
+    session: res.locals.shopify.session,
   });
   //old way to get order above, now we find the specific order by the id and use that to copy all of the contents over
   const orderTesting = await shopify.api.rest.Order.find({

@@ -22,7 +22,6 @@ export function DatePickerExample(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
 
-  const [errorContent, setErrorContent] = useState("");
   const [error, setError] = useState(false);
   ////new code
   const orderId = useSelector((state) => state.orderId);
@@ -63,14 +62,7 @@ export function DatePickerExample(props) {
   };
 
   const submitDate = () => {
-    let defaultDate = new Date('Jan 17 2023');
-    //this never gets called
-    if (!orderId) {
-      //alert("Choose an order first")
-      setErrorContent("Choose an order first");
-      handleError();
-      return;
-    }
+    let defaultDate = new Date("Jan 17 2023");
 
     if (
       selectedDates.start.getFullYear() === defaultDate.getFullYear() &&
@@ -78,8 +70,9 @@ export function DatePickerExample(props) {
       selectedDates.start.getDate() === defaultDate.getDate()
     ) {
       //Banner error, but smaller one
-      setErrorContent("Remember to choose an order date as well");
-      handleError();
+      props.setErrorContent("Remember to choose an order date as well");
+      props.setButtonText("");
+      props.handleError();
       return;
     }
     updateOrder(props.orderId, ConvertDate(selectedDates.start));
@@ -104,9 +97,11 @@ export function DatePickerExample(props) {
     } else {
       setIsLoading(false);
       //Banner error
-     
-      props.setErrorContent("There was an error updating the date. See the reasons why that may be the case here: ");
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders")
+
+      props.setErrorContent(
+        "There was an error updating the date. See the reasons why that may be the case here: "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
   };
@@ -140,7 +135,6 @@ export function DatePickerExample(props) {
         </Button>
         {toastMarkup}
       </Card>
-      <ErrorBanner open={error} onClose={handleError} content={errorContent} />
     </Frame>
   );
 }

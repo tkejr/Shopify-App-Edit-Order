@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Modal, TextContainer, Banner, Button, Link} from "@shopify/polaris";
+import { Modal, TextContainer, Banner, Button, Link } from "@shopify/polaris";
 
-function ErrorBanner({ open, onClose, content, url }) {
+function ErrorBanner({ open, onClose, content, url, buttonText }) {
   const [isError, setIsError] = useState(open);
 
   useEffect(() => {
@@ -22,33 +22,30 @@ function ErrorBanner({ open, onClose, content, url }) {
     setIsError(false);
     onClose();
   }, [onClose]);
-  
+
   return (
     <>
-   
-  {isError && <div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-    <Banner
+      {isError && (
+        <div style={{ paddingTop: "10px", paddingBottom: "10px" }}>
+          <Banner
             title="Error"
-            onDismiss={()=>handleError()}
+            onDismiss={() => handleError()}
             status="critical"
-        >
-          <p>
-            {content}          
-         </p>
+          >
+            <p>{content}</p>
 
-         <div style={{paddingTop:"10px"}}>
-         <Link url={url}>
-         <Button>
-         
-          Learn More
-         
-         </Button>
-         </Link>
-         </div>
-         
-        </Banner>
+            <div style={{ paddingTop: "10px" }}>
+              <Link url={url}>
+                {console.log("This is button text")}
+                {console.log(buttonText)}
+                {(buttonText !== "" || buttonText == "undefined") && (
+                  <Button>{buttonText}</Button>
+                )}
+              </Link>
+            </div>
+          </Banner>
         </div>
-}
+      )}
     </>
   );
 }

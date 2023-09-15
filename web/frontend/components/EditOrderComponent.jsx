@@ -12,7 +12,7 @@ import {
   IndexTable,
   useIndexResourceState,
   SkeletonThumbnail,
-  Banner
+  Banner,
 } from "@shopify/polaris";
 import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
@@ -87,8 +87,11 @@ export function EditOrderComponent(props) {
       //setIsLoading(false);
 
       //banner error
-      props.setErrorContent("There was an error adding the product to the order. See the reasons why that may be the case here: ");
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders")
+
+      props.setErrorContent(
+        "There was an error adding the product to the order. See the reasons why that may be the case here: "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
 
@@ -98,13 +101,14 @@ export function EditOrderComponent(props) {
 
   const [showProducts, setShowProducts] = useState(false);
   const changeAmount = async () => {
-
-
     //error that belongs in modal
     if (quantity === originalQuantity) {
-      setErrorContent(`Please select a quantity that is different from the original quantity: ${originalQuantity}`);
+      setErrorContent(
+        `Please select a quantity that is different from the original quantity: ${originalQuantity}`
+      );
       handleModalError();
-    } else if (originalQuantity === "0") {//another error that belongs in modal
+    } else if (originalQuantity === "0") {
+      //another error that belongs in modal
       setErrorContent(
         "Cannot change the quantity of a product that was originally zero"
       );
@@ -125,10 +129,11 @@ export function EditOrderComponent(props) {
         props.setReloadComp(!props.reloadComp);
       } else {
         //banner error
-        props.setErrorContent("There was an error updating the quantity. For more information on why this could have happened, click the button below: ");
-        props.setUrl('https://help.shopify.com/en/manual/orders/edit-orders')
+        props.setErrorContent(
+          "There was an error updating the quantity. For more information on why this could have happened, click the button below: "
+        );
+        props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
         props.handleError();
-        
       }
       handleChangeQuantity();
       setReload(!reload);
@@ -138,7 +143,7 @@ export function EditOrderComponent(props) {
   const openQuantity = (id, quantity) => {
     setErrorContent("");
     setModalError(false);
-   
+
     handleId(id);
     //setFulfillable(quantity)
     setQuantity("" + quantity);
@@ -180,7 +185,7 @@ export function EditOrderComponent(props) {
 
   const handleQuantityChange = (number) => {
     if (number < 0) {
-      setErrorContent("Quantity must be at least 0");//error in modal for sure
+      setErrorContent("Quantity must be at least 0"); //error in modal for sure
       handleModalError();
     } else {
       setQuantity("" + number);
@@ -211,12 +216,10 @@ export function EditOrderComponent(props) {
           orderName ? `Order Details for Order ${orderName}` : "Pick an Order"
         }
       >
-        
         <Card.Section>
           <Button disabled={!orderId} onClick={() => handleChange()}>
             {orderId ? "Add Product" : "Pick an Order"}
           </Button>
-          
         </Card.Section>
 
         <Card.Section title="Items">
@@ -336,19 +339,18 @@ export function EditOrderComponent(props) {
           onAction: () => changeAmount(),
         }}
       >
-        
-        {modalError && <div style={{padding:'10px'}}><Banner
-            title="Error"
-            onDismiss={()=>handleModalError()}
-            status="critical"
-        >
-          <p>
-            {errorContent}          
-         </p>
-        </Banner>
-        </div>
-        }
-        
+        {modalError && (
+          <div style={{ padding: "10px" }}>
+            <Banner
+              title="Error"
+              onDismiss={() => handleModalError()}
+              status="critical"
+            >
+              <p>{errorContent}</p>
+            </Banner>
+          </div>
+        )}
+
         <Modal.Section>
           <TextField
             label="Quantity"
@@ -359,11 +361,9 @@ export function EditOrderComponent(props) {
             autoComplete="off"
           />
         </Modal.Section>
-        
       </Modal>
 
       {toastMarkup}
-     
     </Frame>
   );
 }

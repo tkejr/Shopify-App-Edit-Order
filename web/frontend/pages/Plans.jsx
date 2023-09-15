@@ -13,7 +13,7 @@ import {
   Badge,
   MediaCard,
   List,
-  Icon
+  Icon,
 } from "@shopify/polaris";
 import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -92,25 +92,20 @@ export default function HomePage() {
         <Layout>
           <>
             <Layout.Section oneHalf>
-              <Card
-               sectioned
-              >
-                 <PlanCard 
-                      planName="Pro Plan"
-                      price="9.99"
-                      features={[
-                        'Backdate Orders',
-                        'Unlimited Date Edits',
-                        'Updates Sales in Shopify Analytics',
-                        'Use for Financial Reporting',
-                        'Customer self-service editing with Customer Portal',
-                        'Priority Support'
-                      ]}
-                      upgrade={upgradePro}
-
-                      >
-
-                      </PlanCard>
+              <Card sectioned>
+                <PlanCard
+                  planName="Pro Plan"
+                  price="9.99"
+                  features={[
+                    "Backdate Orders",
+                    "Unlimited Date Edits",
+                    "Updates Sales in Shopify Analytics",
+                    "Use for Financial Reporting",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradePro}
+                ></PlanCard>
 
                 <Card.Section>
                   {(!isPremiumUser || planName === "starter") && (
@@ -132,23 +127,20 @@ export default function HomePage() {
               </Card>
             </Layout.Section>
             <Layout.Section oneHalf>
-              <Card
-                sectioned
-              >
-                <PlanCard 
-                      planName="Starter Plan"
-                      price="4.99"
-                      features={[
-                        'Backdate Orders',
-                        'Unlimited Date Edits',
-                        'Updates Sales in Shopify Analytics',
-                        
-                      ]}
-                      upgrade={upgradeStarter}
-
-                      >
-
-                      </PlanCard>
+              <Card sectioned>
+                <PlanCard
+                  planName="Starter Plan"
+                  price="4.99"
+                  features={[
+                    "Backdate Orders",
+                    "Unlimited Date Edits",
+                    "Updates Sales in Shopify Analytics",
+                    "Use for Financial Reporting",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradeStarter}
+                ></PlanCard>
 
                 <Card.Section>
                   {(!isPremiumUser || planName === "pro") && (
@@ -231,9 +223,6 @@ export default function HomePage() {
                     </p>
                   </div>
                 </Card.Section>
-               
-                
-                      
               </Card>
               <br></br>
 
@@ -245,4 +234,3 @@ export default function HomePage() {
     </Page>
   );
 }
-

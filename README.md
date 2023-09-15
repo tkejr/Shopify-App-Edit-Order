@@ -37,6 +37,11 @@ The following Shopify tools complement these third-party tools to ease app devel
 
 ## Getting started
 
+1. Must have a .env with this 
+DATABASE_URL =
+ENVIRONMENT = "dev"
+EMAIL_API_KEY =  
+
 ### Requirements
 
 1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
