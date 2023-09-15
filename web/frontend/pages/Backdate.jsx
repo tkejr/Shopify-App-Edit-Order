@@ -15,6 +15,7 @@ import {
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from '../components/SkeletonPage';
+import ErrorBanner from "../components/ErrorBanner";
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";
 import { ProductsCard, OrderTable, DatePickerExample } from "../components";
@@ -123,6 +124,13 @@ export default function Backdate() {
     );
   };
 
+  //error stuff
+  const[url, setUrl]= useState('')
+  const[errorContent, setErrorContent]= useState('')
+  const [error, setError] = useState(false);
+  const handleError = () => {
+    setError(!error);
+  };
   return (
     <Page
       title="Backdate Order"
@@ -167,6 +175,8 @@ export default function Backdate() {
         </Modal.Section>
       </Modal>
 
+
+      {<ErrorBanner open={error} onClose={handleError} content={errorContent} url={url}></ErrorBanner>}
       {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {(planName === "pro" || planName === "starter") && isPremiumUser ? (
           <>
@@ -186,6 +196,9 @@ export default function Backdate() {
                 orderName={orderName}
                 reloadComp={reloadComp}
                 setReloadComp={setReloadComp}
+                setErrorContent={setErrorContent}
+                setUrl={setUrl}
+                handleError={handleError}
               />
             </Layout.Section>
           </>

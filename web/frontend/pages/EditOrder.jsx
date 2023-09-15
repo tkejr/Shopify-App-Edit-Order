@@ -29,6 +29,7 @@ import {
   EditOrderComponent,
   OrderTableEditOrder,
 } from "../components";
+import ErrorBanner from "../components/ErrorBanner";
 import { useSelector, useDispatch } from "react-redux";
 
 const PageExample = () => {
@@ -113,12 +114,19 @@ const PageExample = () => {
     setActive(!active);
   }, [active]);
 
+  const[url, setUrl]= useState('')
+  const[errorContent, setErrorContent]= useState('')
+  const [error, setError] = useState(false);
+  const handleError = () => {
+    setError(!error);
+  };
   return (
     <Page
       title="Edit Order"
       defaultWidth
     >
-      
+    
+      {<ErrorBanner open={error} onClose={handleError} content={errorContent} url={url}></ErrorBanner>}
       {userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Layout>
         {planName === "pro" && isPremiumUser ? (
           <>
@@ -140,6 +148,10 @@ const PageExample = () => {
                 reloadComp={reloadComp}
                 setReloadComp={setReloadComp}
                 lineItems={lineItems}
+                
+                setErrorContent={setErrorContent}
+                setUrl={setUrl}
+                handleError={handleError}
               />
             </Layout.Section>
           </>

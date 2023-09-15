@@ -63,7 +63,8 @@ export function DatePickerExample(props) {
   };
 
   const submitDate = () => {
-    let defaultDate = new Date("January 17, 2023 03:24:00");
+    let defaultDate = new Date('Jan 17 2023');
+    //this never gets called
     if (!orderId) {
       //alert("Choose an order first")
       setErrorContent("Choose an order first");
@@ -76,7 +77,8 @@ export function DatePickerExample(props) {
       selectedDates.start.getMonth() === defaultDate.getMonth() &&
       selectedDates.start.getDate() === defaultDate.getDate()
     ) {
-      setErrorContent("Choose an order date as well");
+      //Banner error, but smaller one
+      setErrorContent("Remember to choose an order date as well");
       handleError();
       return;
     }
@@ -101,8 +103,11 @@ export function DatePickerExample(props) {
       props.setReloadComp(!props.reloadComp);
     } else {
       setIsLoading(false);
-      setErrorContent("There was an error updating the date");
-      handleError();
+      //Banner error
+     
+      props.setErrorContent("There was an error updating the date. See the reasons why that may be the case here: ");
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders")
+      props.handleError();
     }
   };
 

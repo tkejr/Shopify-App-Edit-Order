@@ -46,6 +46,7 @@ export default function HomePage() {
 
     console.log("Charge ID:", chargeId);
     const getAnalytics = async () => {
+      /*
       try {
         const response = await fetch("/api/analytics", {
           method: "GET",
@@ -73,6 +74,7 @@ export default function HomePage() {
       } catch (error) {
         console.error("Error getting analytics", error);
       }
+      */ 
     };
     const fetchRecurringCharges = async () => {
       const res = await fetch(`/api/check?charge_id=${chargeId}`)

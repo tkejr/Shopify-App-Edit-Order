@@ -44,8 +44,6 @@ export function EditOrderComponent(props) {
     setModalError(!modalError);
   };
   useEffect(() => {
-    //const line_items = useSelector((state) => state.line_items);
-
     if (orderId && orderName) {
       getLineItems();
     }
@@ -87,8 +85,11 @@ export function EditOrderComponent(props) {
       setShowProducts(false);
     } else {
       //setIsLoading(false);
-      setErrorContent("There was an error adding the product to the order. See the reasons why that may be the case here: ");
-      handleError();
+
+      //banner error
+      props.setErrorContent("There was an error adding the product to the order. See the reasons why that may be the case here: ");
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders")
+      props.handleError();
     }
 
     setReload(!reload);
@@ -97,11 +98,11 @@ export function EditOrderComponent(props) {
 
   const [showProducts, setShowProducts] = useState(false);
   const changeAmount = async () => {
+
+
     //error that belongs in modal
-    setQuantity("5");
-    setOriginalQuantity("1")
     if (quantity === originalQuantity) {
-      setErrorContent("Please select a quantity that is different from the original quantity");
+      setErrorContent(`Please select a quantity that is different from the original quantity: ${originalQuantity}`);
       handleModalError();
     } else if (originalQuantity === "0") {//another error that belongs in modal
       setErrorContent(
@@ -123,8 +124,11 @@ export function EditOrderComponent(props) {
         setToastProps({ content: "Quantity updated" });
         props.setReloadComp(!props.reloadComp);
       } else {
-        setErrorContent("There was an error updating the quantity. For more information on why this could have happened, visit: ");//this error can be a modal I think
-        handleError();
+        //banner error
+        props.setErrorContent("There was an error updating the quantity. For more information on why this could have happened, click the button below: ");
+        props.setUrl('https://help.shopify.com/en/manual/orders/edit-orders')
+        props.handleError();
+        
       }
       handleChangeQuantity();
       setReload(!reload);
@@ -132,6 +136,9 @@ export function EditOrderComponent(props) {
     }
   };
   const openQuantity = (id, quantity) => {
+    setErrorContent("");
+    setModalError(false);
+   
     handleId(id);
     //setFulfillable(quantity)
     setQuantity("" + quantity);
@@ -330,7 +337,7 @@ export function EditOrderComponent(props) {
         }}
       >
         
-        {modalError && <Banner
+        {modalError && <div style={{padding:'10px'}}><Banner
             title="Error"
             onDismiss={()=>handleModalError()}
             status="critical"
@@ -338,7 +345,9 @@ export function EditOrderComponent(props) {
           <p>
             {errorContent}          
          </p>
-        </Banner>}
+        </Banner>
+        </div>
+        }
         
         <Modal.Section>
           <TextField
@@ -354,7 +363,7 @@ export function EditOrderComponent(props) {
       </Modal>
 
       {toastMarkup}
-      <ErrorBanner open={error} onClose={handleError} content={errorContent} />
+     
     </Frame>
   );
 }

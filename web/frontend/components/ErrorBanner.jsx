@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Modal, TextContainer, Banner } from "@shopify/polaris";
+import { Modal, TextContainer, Banner, Button, Link} from "@shopify/polaris";
 
-function ErrorBanner({ open, onClose, content }) {
+function ErrorBanner({ open, onClose, content, url }) {
   const [isError, setIsError] = useState(open);
 
   useEffect(() => {
@@ -10,7 +10,7 @@ function ErrorBanner({ open, onClose, content }) {
       const timer = setTimeout(() => {
         setIsError(false);
         onClose();
-      }, 5000); // 5000 ms = 5 seconds
+      }, 10000); // 10000 ms = 10 seconds, people are slow readers
 
       return () => {
         clearTimeout(timer);
@@ -22,17 +22,34 @@ function ErrorBanner({ open, onClose, content }) {
     setIsError(false);
     onClose();
   }, [onClose]);
-
+  
   return (
-    <Modal open={isError} onClose={handleError} title="Error Message">
-      <Modal.Section>
-        <TextContainer>
-          <Banner status="critical">
-            <p>{content}</p>
-          </Banner>
-        </TextContainer>
-      </Modal.Section>
-    </Modal>
+    <>
+   
+  {isError && <div style={{paddingTop:'10px', paddingBottom:'10px'}}>
+    <Banner
+            title="Error"
+            onDismiss={()=>handleError()}
+            status="critical"
+        >
+          <p>
+            {content}          
+         </p>
+
+         <div style={{paddingTop:"10px"}}>
+         <Link url={url}>
+         <Button>
+         
+          Learn More
+         
+         </Button>
+         </Link>
+         </div>
+         
+        </Banner>
+        </div>
+}
+    </>
   );
 }
 

@@ -12,12 +12,10 @@ import {
   TextStyle,
   Badge,
   MediaCard,
-  Frame,
-  VideoThumbnail,
-  SkeletonPage,
-  SkeletonDisplayText,
-  SkeletonBodyText,
+  List,
+  Icon
 } from "@shopify/polaris";
+import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
@@ -94,22 +92,25 @@ export default function HomePage() {
         <Layout>
           <>
             <Layout.Section oneHalf>
-              <MediaCard
-                portrait
-                title="Pro Plan"
-                description="With this plan, get all of the backdating and order editing capabilities as well as a customer portal"
-                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              <Card
+               sectioned
               >
-                <img
-                  alt=""
-                  width="100%"
-                  height="100%"
-                  style={{
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  }}
-                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
-                />
+                 <PlanCard 
+                      planName="Pro Plan"
+                      price="9.99"
+                      features={[
+                        'Backdate Orders',
+                        'Unlimited Date Edits',
+                        'Updates Sales in Shopify Analytics',
+                        'Use for Financial Reporting',
+                        'Customer self-service editing with Customer Portal',
+                        'Priority Support'
+                      ]}
+                      upgrade={upgradePro}
+
+                      >
+
+                      </PlanCard>
 
                 <Card.Section>
                   {(!isPremiumUser || planName === "starter") && (
@@ -128,25 +129,26 @@ export default function HomePage() {
                   )}
                   {"    "}
                 </Card.Section>
-              </MediaCard>
+              </Card>
             </Layout.Section>
             <Layout.Section oneHalf>
-              <MediaCard
-                portrait
-                title="Starter Plan"
-                description="With this plan, backdate your orders and have them show up in your analytics, no customer portal"
-                //popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
+              <Card
+                sectioned
               >
-                <img
-                  alt=""
-                  width="100%"
-                  height="100%"
-                  style={{
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  }}
-                  src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CJKrvcvBnoEDEAE=.png?height=1800&width=3200"
-                />
+                <PlanCard 
+                      planName="Starter Plan"
+                      price="4.99"
+                      features={[
+                        'Backdate Orders',
+                        'Unlimited Date Edits',
+                        'Updates Sales in Shopify Analytics',
+                        
+                      ]}
+                      upgrade={upgradeStarter}
+
+                      >
+
+                      </PlanCard>
 
                 <Card.Section>
                   {(!isPremiumUser || planName === "pro") && (
@@ -156,7 +158,7 @@ export default function HomePage() {
                     </Button>
                   )}
                   {planName === "starter" && (
-                    <div style={{ padding: "8px" }}>
+                    <div style={{ padding: "6px" }}>
                       <Badge progress="complete" status="success">
                         {" "}
                         Active
@@ -164,7 +166,7 @@ export default function HomePage() {
                     </div>
                   )}
                 </Card.Section>
-              </MediaCard>
+              </Card>
             </Layout.Section>
             <Layout.Section full>
               <Card title="Partner Apps & Reviews">
@@ -229,6 +231,9 @@ export default function HomePage() {
                     </p>
                   </div>
                 </Card.Section>
+               
+                
+                      
               </Card>
               <br></br>
 
@@ -240,3 +245,4 @@ export default function HomePage() {
     </Page>
   );
 }
+
