@@ -95,8 +95,8 @@ const getUserIdByUrl = async (userUrl) => {
 const addUser = async (url, accessToken) => {
   try {
     const query = {
-      text: "INSERT INTO users (url, access_token) VALUES ($1, $2) RETURNING id",
-      values: [url, accessToken],
+      text: "INSERT INTO users (url, access_token,free_trial_used) VALUES ($1, $2, $3) RETURNING id",
+      values: [url, accessToken, false],
     };
 
     const result = await pool.query(query);
@@ -157,7 +157,7 @@ const getUser = async (userUrl) => {
 
 const updateUserDetails = async (
   userId,
-  emailSentIncrement,
+  freeTrialUsed,
   backOrdersIncrement,
   editOrdersIncrement,
   custEditOrdersIncrement,
@@ -168,12 +168,12 @@ const updateUserDetails = async (
     let queryParams = [];
     let returningColumns = "*";
 
-    if (emailSentIncrement !== undefined) {
-      if (typeof emailSentIncrement !== "boolean") {
-        throw new Error("emailSentIncrement must be of type boolean");
+    if (freeTrialUsed !== undefined) {
+      if (typeof freeTrialUsed !== "boolean") {
+        throw new Error("freeTrialUsed must be of type boolean");
       }
-      updateQuery += "email_sent = $1";
-      queryParams.push(emailSentIncrement);
+      updateQuery += "free_trial_used = $1";
+      queryParams.push(freeTrialUsed);
     }
 
     if (backOrdersIncrement !== undefined) {

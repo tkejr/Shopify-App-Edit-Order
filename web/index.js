@@ -13,6 +13,7 @@ import nodemailer from "nodemailer";
 
 import sgMail from "@sendgrid/mail";
 import { emailHelper } from "./email-helper.js";
+import { getFreeTrialDays } from "./free_trial_helper.js";
 import { pushNotify } from "./push-notification.js";
 
 import {
@@ -132,10 +133,9 @@ app.get("/api/products/create", async (_req, res) => {
   res.status(status).send({ success: status === 200, error });
 });
 // Verify the user has a plan
+
 app.get("/api/check", async (req, res) => {
   console.log("INSIDE CHECK API BACKEND");
-  const user = await getUser(res.locals.shopify.session.shop);
-
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
@@ -144,7 +144,8 @@ app.get("/api/check", async (req, res) => {
   });
 
   try {
-    await addUser(url, access_token);
+    console.log("======= ADDING USER ==============");
+    const userAdded = await addUser(url, access_token);
 
     //send only on new install
     const shopEmail = "" + shopDetails[0].email;
@@ -163,6 +164,8 @@ app.get("/api/check", async (req, res) => {
   } catch (error) {
     console.log("Some error in add user");
   }
+
+  const user = await getUser(res.locals.shopify.session.shop);
 
   console.log(user);
 
@@ -268,6 +271,8 @@ app.get("/api/check", async (req, res) => {
       plan: "free",
     });
   }
+
+  // A new customer subscribed to our plan
   if (
     queryParams.charge_id != undefined &&
     queryParams.charge_id != null &&
@@ -315,6 +320,7 @@ app.get("/api/check", async (req, res) => {
 app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
+  const freedays = await getFreeTrialDays(shop);
   ///IMPORTANT, change this to just /editify in prod
   var url = "https://" + shop + "/admin/apps/editify-dev";
   if (prod) {
@@ -326,7 +332,7 @@ app.get("/api/upgradePro", async (req, res) => {
   recurring_application_charge.price = 9.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
-  recurring_application_charge.trial_days = 3;
+  recurring_application_charge.trial_days = freedays;
   recurring_application_charge.test = !prod;
   await recurring_application_charge.save({
     update: true,
@@ -342,9 +348,21 @@ app.get("/api/upgradePro", async (req, res) => {
   }
   res.json({ confirmationUrl });
 });
+
+app.get("/api/getFreeDays", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+  const freedays = await getFreeTrialDays(shop);
+
+  res.status(200).json(freedays);
+});
+
 app.get("/api/upgradeStarter", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
+  const freedays = await getFreeTrialDays(shop);
+  console.log("========Free days========");
+  console.log(freedays);
   ///IMPORTANT, change this to just /editify in prod
   var url = "https://" + shop + "/admin/apps/editify-dev";
   if (prod) {
@@ -356,7 +374,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   recurring_application_charge.price = 4.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
-  recurring_application_charge.trial_days = 3;
+  recurring_application_charge.trial_days = freedays;
   recurring_application_charge.test = !prod;
   await recurring_application_charge.save({
     update: true,
