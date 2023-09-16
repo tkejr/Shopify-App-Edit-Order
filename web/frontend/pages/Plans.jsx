@@ -164,7 +164,7 @@ export default function HomePage() {
               <Card title="Partner Apps & Reviews">
                 <Card.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
+                    {/* <img
                       src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
                       alt="Your Image Description"
                       style={{
@@ -173,7 +173,7 @@ export default function HomePage() {
                         width: "50px",
                         height: "50px",
                       }}
-                    />
+                    /> */}
                     <p style={{ margin: 0 }}>
                       If you like our App and want one month free please leave a
                       review {"  "}
