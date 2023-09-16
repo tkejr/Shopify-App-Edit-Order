@@ -24,7 +24,7 @@ import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
-import CustomSkeletonPage from '../components/SkeletonPage';
+import CustomSkeletonPage from "../components/SkeletonPage";
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -301,133 +301,137 @@ export default function CustomerPortal() {
   return (
     <Frame>
       {planName === "pro" && isPremiumUser ? (
-        userStateLoading ? (<CustomSkeletonPage></CustomSkeletonPage>) : (<Page
-          backAction={{ content: "Products", url: "#" }}
-          title="Customer Portal"
-          titleMetadata={settingStatusMarkup}
-          primaryAction={{
-            content: contentStatus,
-            onAction: () => {
-              updatePreference({
-                enable: !enabled,
-              });
-            },
-          }}
-        >
-          <Card title="About">
-            <Card.Section>
-              <p>
-                Allow Customers to manage and edit their orders through their
-                customer order status page. To use Order Editor's Customer
-                Portal, you must have customer accounts enabled for your store.
-              </p>
-              <img
+        userStateLoading ? (
+          <CustomSkeletonPage></CustomSkeletonPage>
+        ) : (
+          <Page
+            backAction={{ content: "Products", url: "#" }}
+            title="Customer Portal"
+            titleMetadata={settingStatusMarkup}
+            primaryAction={{
+              content: contentStatus,
+              onAction: () => {
+                updatePreference({
+                  enable: !enabled,
+                });
+              },
+            }}
+          >
+            <Card title="About">
+              <Card.Section>
+                <p>
+                  Allow Customers to manage and edit their orders through their
+                  customer order status page. To use Order Editor's Customer
+                  Portal, you must have customer accounts enabled for your
+                  store.
+                </p>
+                {/* <img
                 style={{
                   width: "80vw", // This makes the image take up to 80% of the viewport width
                   maxWidth: "50%", // This ensures the image never exceeds the size of its container
                 }}
                 src={cust1} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
-              />{" "}
-            </Card.Section>
-          </Card>
-          <Card title="Install Customer Portal">
-            <Card.Section>
-              {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
-              <p>
-                Add the Customer Portal snippet to the additional scripts in
-                your order status page. This snippet contains your unique
-                account token that should be kept secret. Make sure you have
-                customer accounts enabled
-              </p>
-              <br></br>
-            </Card.Section>
-            <Card.Section title="Step 1: Copy the install snippet">
-              <TextField
-                value={copiedContent}
-                multiline={4}
-                disabled
-                style={{
-                  backgroundColor: "#f0f0f0", // Light grey background color
-                  color: "#888888", // Grey text color
-                }}
-                labelStyle={{
-                  fontWeight: "bold", // Make the label bold
-                }}
-              />
-              <br></br>
-              <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
-              {toastMarkup}
-            </Card.Section>
-            <Card.Section title="Step 2: Add to your order status page">
-              <h1>
-                Add the snippet to the additional scripts in your{" "}
-                <a href={dynamicLink} target="_blank">
-                  order status page
-                </a>
-              </h1>
-              <br></br>
-              <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "80%", // This ensures the image never exceeds the size of its container
-                }}
-                src={cust2} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "}
-            </Card.Section>
-            <Card.Section title="Step 3: View Order">
-              <h1>
-                Click on View Order to see the checkout page and see the
-                customer portal box embedded onto that page like showed in the
-                photo below
-              </h1>
-              <br></br>
-              <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
-                }} // Set the width using inline styles
-                src={cust3} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "}
-              <br></br>
-              <br></br>
-              <Button onClick={getOrder}>View Order Status</Button>
-            </Card.Section>
-          </Card>
-          <Card
-            title="Customer editing"
-            primaryFooterAction={{
-              content: "Save",
-              onAction: () => {
-                // setToastContent(selected);
-                // toggleActive();
-                updatePreference({
-                  time_to_edit: timeStringToSeconds(selected),
-                });
-              },
-            }}
-          >
-            {/* Content of the card */}
+              />{" "} */}
+              </Card.Section>
+            </Card>
+            <Card title="Install Customer Portal">
+              <Card.Section>
+                {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
+                <p>
+                  Add the Customer Portal snippet to the additional scripts in
+                  your order status page. This snippet contains your unique
+                  account token that should be kept secret. Make sure you have
+                  customer accounts enabled
+                </p>
+                <br></br>
+              </Card.Section>
+              <Card.Section title="Step 1: Copy the install snippet">
+                <TextField
+                  value={copiedContent}
+                  multiline={4}
+                  disabled
+                  style={{
+                    backgroundColor: "#f0f0f0", // Light grey background color
+                    color: "#888888", // Grey text color
+                  }}
+                  labelStyle={{
+                    fontWeight: "bold", // Make the label bold
+                  }}
+                />
+                <br></br>
+                <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
+                {toastMarkup}
+              </Card.Section>
+              <Card.Section title="Step 2: Add to your order status page">
+                <h1>
+                  Add the snippet to the additional scripts in your{" "}
+                  <a href={dynamicLink} target="_blank">
+                    order status page
+                  </a>
+                </h1>
+                <br></br>
+                <img
+                  style={{
+                    width: "80vw", // This makes the image take up to 80% of the viewport width
+                    maxWidth: "80%", // This ensures the image never exceeds the size of its container
+                  }}
+                  src={cust2} // Make sure cust1 contains a valid image URL
+                  alt="Customer Image"
+                />{" "}
+              </Card.Section>
+              <Card.Section title="Step 3: View Order">
+                <h1>
+                  Click on View Order to see the checkout page and see the
+                  customer portal box embedded onto that page like showed in the
+                  photo below
+                </h1>
+                <br></br>
+                {/* <img
+                  style={{
+                    width: "80vw", // This makes the image take up to 80% of the viewport width
+                    maxWidth: "50%", // This ensures the image never exceeds the size of its container
+                  }} // Set the width using inline styles
+                  src={cust3} // Make sure cust1 contains a valid image URL
+                  alt="Customer Image"
+                />{" "} */}
+                <br></br>
+                <br></br>
+                <Button onClick={getOrder}>View Order Status</Button>
+              </Card.Section>
+            </Card>
+            <Card
+              title="Customer editing"
+              primaryFooterAction={{
+                content: "Save",
+                onAction: () => {
+                  // setToastContent(selected);
+                  // toggleActive();
+                  updatePreference({
+                    time_to_edit: timeStringToSeconds(selected),
+                  });
+                },
+              }}
+            >
+              {/* Content of the card */}
 
-            <Card.Section>
-              <h1>Adjust when customers can edit their orders.</h1>
-              <br></br>
-              <Select
-                options={options}
-                onChange={handleSelectChange}
-                value={selected}
-              />
-            </Card.Section>
-          </Card>
-          <ErrorBanner
-            open={error}
-            onClose={handleError}
-            content={toastContent}
-          />
-        </Page>)
-
+              <Card.Section>
+                <h1>Adjust when customers can edit their orders.</h1>
+                <br></br>
+                <Select
+                  options={options}
+                  onChange={handleSelectChange}
+                  value={selected}
+                />
+              </Card.Section>
+            </Card>
+            <ErrorBanner
+              open={error}
+              onClose={handleError}
+              content={toastContent}
+            />
+          </Page>
+        )
       ) : (
         checkPremiumUserContent()
       )}
