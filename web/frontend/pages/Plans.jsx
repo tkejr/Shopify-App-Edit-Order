@@ -17,7 +17,7 @@ import {
 } from "@shopify/polaris";
 import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
 import { trophyImage } from "../assets";
 import { useNavigate } from "@shopify/app-bridge-react";

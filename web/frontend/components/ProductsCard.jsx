@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   Heading,
@@ -48,7 +48,7 @@ export function ProductsCard() {
       });
     }
   };
-  
+
   return (
     <>
       {toastMarkup}

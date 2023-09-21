@@ -11,9 +11,8 @@ import {
   Page,
   ButtonGroup,
 } from "@shopify/polaris";
-import React from "react";
 import { useAppQuery } from "../hooks";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
 import Paginate from "./Paginate";

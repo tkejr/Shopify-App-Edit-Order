@@ -11,7 +11,7 @@ import {
   Button,
   Banner,
 } from "@shopify/polaris";
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 import ErrorBanner from "../components/ErrorBanner";
