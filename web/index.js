@@ -28,6 +28,7 @@ import { addUser } from "./db.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import orderBillingRoutes from "./routes/orderBillingRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -138,6 +139,12 @@ app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
   const url = sess.shop;
 
+  //harcoding for review stores
+  if (url == "momiji-kids.myshopify.com") {
+    res.json({ hasPayment: "pro" });
+    return;
+  }
+
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
     currentAppInstallation {
@@ -227,6 +234,11 @@ app.get("/api/checkAdvanced", async (req, res) => {
   const shopDetails = await shopify.api.rest.Shop.all({
     session: sess,
   });
+  //harcoding for review stores
+  if (url == "momiji-kids.myshopify.com") {
+    res.json({ hasPayment: "pro" });
+    return;
+  }
 
   var user;
   try {
@@ -920,6 +932,9 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
 
   res.status(status).send({ success: status === 200, error });
 });
+
+//Order Billing routes
+app.use("/api/orderBilling", orderBillingRoutes);
 
 //customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
