@@ -3,12 +3,12 @@ api_version = "2023-07"
 [[extensions]]
 # Change the merchant-facing name of the extension in locales/en.default.json
 name = "t:name"
-handle = "backorder-action"
+handle = "edit-order"
 type = "ui_extension"
 [[extensions.targeting]]
 module = "./src/ActionExtension.jsx"
 # The target used here must match the target used in the module file (./src/ActionExtension.jsx)
-target = "admin.order-details.action.render"
+target = "admin.product-details.action.render"
 
 
 # Valid extension points:
