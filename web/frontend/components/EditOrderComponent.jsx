@@ -13,6 +13,7 @@ import {
   useIndexResourceState,
   SkeletonThumbnail,
   Banner,
+  FormLayout,
 } from "@shopify/polaris";
 import React from "react";
 import { Autocomplete, Icon } from "@shopify/polaris";
@@ -36,6 +37,15 @@ export function EditOrderComponent(props) {
   const [source, setSource] = useState("");
   const [errorContent, setErrorContent] = useState("");
   const [error, setError] = useState(false);
+  const [billingDetails, setBillingDetails] = useState(null);
+
+  const handleFieldChange = (fieldName, value) => {
+    setBillingDetails({
+      ...billingDetails,
+      [fieldName]: value,
+    });
+  };
+
   const handleError = () => {
     setError(!error);
   };
@@ -46,6 +56,7 @@ export function EditOrderComponent(props) {
   useEffect(() => {
     if (orderId && orderName) {
       getLineItems();
+      getOrderBilling();
     }
   }, [props.orderId, reload]);
 
@@ -152,6 +163,39 @@ export function EditOrderComponent(props) {
     handleChangeQuantity();
   };
   //
+
+  const getOrderBilling = async () => {
+    fetch("/api/orderBilling/" + orderId)
+      .then((response) => response.json())
+      .then((json) => {
+        setBillingDetails(json);
+      });
+  };
+
+  const updateOrderBilling = async () => {
+    try {
+      const response = await fetch(`/api/orderBilling/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(billingDetails),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update billing details");
+      }
+
+      // Handle success, e.g., show a success message
+      console.log("Billing details updated successfully");
+    } catch (error) {
+      // Handle error, e.g., show an error message
+      console.error("Error updating billing details:", error);
+    }
+
+    setActiveBilling(false);
+  };
+
   const getLineItems = async () => {
     setStatus("loading");
     setProduct([]);
@@ -175,6 +219,13 @@ export function EditOrderComponent(props) {
   const [active, setActive] = useState(false);
   const handleChange = useCallback(() => setActive(!active), [active]);
   //
+
+  //open billing modal
+  const [activeBilling, setActiveBilling] = useState(false);
+  const handleChangeBilling = useCallback(
+    () => setActiveBilling(!activeBilling),
+    [activeBilling]
+  );
 
   const [activeQuantity, setActiveQuantity] = useState(false);
   const handleChangeQuantity = useCallback(
@@ -217,9 +268,22 @@ export function EditOrderComponent(props) {
         }
       >
         <Card.Section>
-          <Button disabled={!orderId} onClick={() => handleChange()}>
-            {orderId ? "Add Product" : "Pick an Order"}
-          </Button>
+          {orderId ? (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div style={{ marginRight: "10px" }}>
+                <Button onClick={() => handleChange()}>Add Product</Button>
+              </div>
+              <div>
+                <Button onClick={() => handleChangeBilling()}>
+                  Shipping Address
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button disabled={true} onClick={() => handleChange()}>
+              Pick an Order
+            </Button>
+          )}
         </Card.Section>
 
         <Card.Section title="Items">
@@ -361,6 +425,104 @@ export function EditOrderComponent(props) {
             autoComplete="off"
           />
         </Modal.Section>
+      </Modal>
+
+      <Modal
+        //Billing
+        // activator={activator}
+        open={activeBilling}
+        onClose={handleChangeBilling}
+        title="Order Shipping Address"
+        primaryAction={{
+          content: "Update",
+          onAction: updateOrderBilling,
+        }}
+      >
+        {billingDetails && (
+          <Modal.Section>
+            <FormLayout>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="Address 1"
+                  value={billingDetails.address1}
+                  onChange={(value) => handleFieldChange("address1", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Address 2"
+                  value={billingDetails.address2 || ""}
+                  onChange={(value) => handleFieldChange("address2", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="City"
+                  value={billingDetails.city}
+                  onChange={(value) => handleFieldChange("city", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Country"
+                  value={billingDetails.country}
+                  onChange={(value) => handleFieldChange("country", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="First Name"
+                  value={billingDetails.first_name || ""}
+                  onChange={(value) => handleFieldChange("first_name", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Last Name"
+                  value={billingDetails.last_name}
+                  onChange={(value) => handleFieldChange("last_name", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                {/* <TextField
+                type="text"
+                label="Latitude"
+                value={billingDetails.latitude || ""}
+                onChange={(value) => handleFieldChange("latitude", value)}
+              /> */}
+              </FormLayout.Group>
+
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="Phone"
+                  value={billingDetails.phone || ""}
+                  onChange={(value) => handleFieldChange("phone", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Province"
+                  value={billingDetails.province}
+                  onChange={(value) => handleFieldChange("province", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                {/* <TextField
+                type="text"
+                label="Province Code"
+                value={billingDetails.province_code}
+                onChange={(value) => handleFieldChange("province_code", value)}
+              /> */}
+                <TextField
+                  type="text"
+                  label="ZIP"
+                  value={billingDetails.zip}
+                  onChange={(value) => handleFieldChange("zip", value)}
+                />
+              </FormLayout.Group>
+            </FormLayout>
+          </Modal.Section>
+        )}
       </Modal>
 
       {toastMarkup}
