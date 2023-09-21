@@ -6,7 +6,6 @@ import {
   Image,
   Stack,
   Link,
-  Heading,
   Button,
   Modal,
   Frame,
