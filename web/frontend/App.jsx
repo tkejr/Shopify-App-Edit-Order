@@ -37,6 +37,10 @@ export default function App() {
                     label: "Plans",
                     destination: "/Plans",
                   },
+                  {
+                    label: "Help and Support",
+                    destination: "/Help",
+                  },
                 ]}
               />
               <Routes pages={pages} />

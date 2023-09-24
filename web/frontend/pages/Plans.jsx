@@ -94,6 +94,40 @@ export default function HomePage() {
             <Layout.Section oneHalf>
               <Card sectioned>
                 <PlanCard
+                  planName="Starter Plan"
+                  price="4.99"
+                  features={[
+                    "Backdate Orders",
+                    "Unlimited Date Edits",
+                    "Updates Sales in Shopify Analytics",
+                    "Use for Financial Reporting",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradeStarter}
+                ></PlanCard>
+
+                <Card.Section>
+                  {(!isPremiumUser || planName === "pro") && (
+                    <Button onClick={() => upgradeStarter()}>
+                      {" "}
+                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
+                    </Button>
+                  )}
+                  {planName === "starter" && (
+                    <div style={{ padding: "6px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                </Card.Section>
+              </Card>
+            </Layout.Section>
+            <Layout.Section oneHalf>
+              <Card sectioned>
+                <PlanCard
                   planName="Pro Plan"
                   price="9.99"
                   features={[
@@ -126,46 +160,12 @@ export default function HomePage() {
                 </Card.Section>
               </Card>
             </Layout.Section>
-            <Layout.Section oneHalf>
-              <Card sectioned>
-                <PlanCard
-                  planName="Starter Plan"
-                  price="4.99"
-                  features={[
-                    "Backdate Orders",
-                    "Unlimited Date Edits",
-                    "Updates Sales in Shopify Analytics",
-                    "Use for Financial Reporting",
-                    "Customer self-service editing with Customer Portal",
-                    "Priority Support",
-                  ]}
-                  upgrade={upgradeStarter}
-                ></PlanCard>
-
-                <Card.Section>
-                  {(!isPremiumUser || planName === "pro") && (
-                    <Button onClick={() => upgradeStarter()}>
-                      {" "}
-                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
-                    </Button>
-                  )}
-                  {planName === "starter" && (
-                    <div style={{ padding: "6px" }}>
-                      <Badge progress="complete" status="success">
-                        {" "}
-                        Active
-                      </Badge>
-                    </div>
-                  )}
-                </Card.Section>
-              </Card>
-            </Layout.Section>
             <Layout.Section full>
               <Card title="Partner Apps & Reviews">
                 <Card.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    {/* <img
-                      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
+                    <img
+                      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/COK0p_7krYEDEAE=.png"
                       alt="Your Image Description"
                       style={{
                         borderRadius: "8px",
@@ -173,7 +173,7 @@ export default function HomePage() {
                         width: "50px",
                         height: "50px",
                       }}
-                    /> */}
+                    />
                     <p style={{ margin: 0 }}>
                       If you like our App and want one month free please leave a
                       review {"  "}
