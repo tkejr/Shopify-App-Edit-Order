@@ -228,9 +228,25 @@ app.get("/api/check", async (req, res) => {
 
 app.get("/api/checkAdvanced", async (req, res) => {
   console.log("INSIDE CHECK API BACKEND");
+
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
+
+  const webhooks = await shopify.api.rest.Webhook.all({
+    session: sess,
+  });
+  // const webhook = new shopify.api.rest.Webhook({ session: sess });
+  // webhook.address =
+  //   "https://editify-dev-91eba309cd61.herokuapp.com/api/w/uninstall";
+  // webhook.topic = "app/uninstalled";
+  // webhook.format = "json";
+  // await webhook.save({
+  //   update: true,
+  // });
+
+  console.log("=========== WEBHOOKS ==============");
+  console.log(webhooks);
   const shopDetails = await shopify.api.rest.Shop.all({
     session: sess,
   });

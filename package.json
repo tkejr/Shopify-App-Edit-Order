@@ -12,12 +12,20 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "3.38.0",
-    "@shopify/cli": "3.38.0",
+    "@shopify/app": "^3.49.3",
+    "@shopify/checkout-ui-extensions-react": "^0.24.0",
+    "@shopify/cli": "^3.49.3",
+    "@shopify/polaris": "^11.19.0",
+    "@shopify/ui-extensions": "2023.7.x",
+    "@shopify/ui-extensions-react": "2023.7.x",
     "cors": "^2.8.5",
     "mixpanel": "^0.17.0",
     "mixpanel-browser": "^2.47.0",
+    "react": "18.2.0",
     "web-vitals": "^3.4.0"
   },
-  "author": "tanmay"
+  "author": "tanmay",
+  "overrides": {
+    "@types/react": "17.0.30"
+  }
 }

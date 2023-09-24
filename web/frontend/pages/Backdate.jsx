@@ -6,14 +6,13 @@ import {
   Image,
   Stack,
   Link,
-  Heading,
   Button,
   Modal,
   Frame,
   MediaCard,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
 import ErrorBanner from "../components/ErrorBanner";
 import { trophyImage } from "../assets";

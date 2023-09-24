@@ -16,7 +16,7 @@ import {
   FooterHelp,
   List,
 } from "@shopify/polaris";
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { notFoundImage } from "../assets";
 import {
   OrdersMajor,

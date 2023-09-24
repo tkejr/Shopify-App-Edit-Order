@@ -1,8 +1,6 @@
 import {
   DatePicker,
   TextContainer,
-  DisplayText,
-  Heading,
   TextStyle,
   Card,
   Toast,
@@ -11,7 +9,7 @@ import {
   Button,
   Banner,
 } from "@shopify/polaris";
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 import ErrorBanner from "../components/ErrorBanner";
@@ -114,7 +112,7 @@ export function DatePickerExample(props) {
             You can Backdate an order by selecting a date from the calendar
             below.
           </p>
-          <Heading element="h4">Pick Date</Heading>
+          <h1 element="h4">Pick Date</h1>
         </TextContainer>
         <DatePicker
           month={month}

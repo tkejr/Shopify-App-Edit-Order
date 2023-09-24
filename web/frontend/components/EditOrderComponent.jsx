@@ -173,6 +173,8 @@ export function EditOrderComponent(props) {
   };
 
   const updateOrderBilling = async () => {
+    console.log("In here");
+    setActiveBilling(false);
     try {
       const response = await fetch(`/api/orderBilling/${orderId}`, {
         method: "PUT",
@@ -192,8 +194,6 @@ export function EditOrderComponent(props) {
       // Handle error, e.g., show an error message
       console.error("Error updating billing details:", error);
     }
-
-    setActiveBilling(false);
   };
 
   const getLineItems = async () => {
