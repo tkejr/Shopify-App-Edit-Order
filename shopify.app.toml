@@ -1,3 +1,28 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
+name = "editify-dev-ag"
+client_id = "df842b020756353ee85492e9a41ebeaf"
+application_url = "https://global-wicked-graduate-pants.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_orders, read_customers, write_customers, write_orders, read_products, write_order_edits"
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://global-wicked-graduate-pants.trycloudflare.com/auth/callback",
+  "https://global-wicked-graduate-pants.trycloudflare.com/auth/shopify/callback",
+  "https://global-wicked-graduate-pants.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "albertogaucin.myshopify.com"

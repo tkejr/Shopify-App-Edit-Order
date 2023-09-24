@@ -1,19 +1,13 @@
 import {
   Page,
-  Badge,
-  Banner,
+  
   MediaCard,
   Frame,
   Layout,
-  Button,
-  Modal,
-  TextContainer,
-  IndexTable,
-  useIndexResourceState,
+  
 } from "@shopify/polaris";
 import React from "react";
-import { Autocomplete, Icon } from "@shopify/polaris";
-import { SearchMinor } from "@shopify/polaris-icons";
+
 import { useState, useCallback, useMemo, useEffect } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
 import { useAuthenticatedFetch } from "../hooks";
@@ -23,9 +17,6 @@ import {
   useNavigate,
 } from "@shopify/app-bridge-react";
 import {
-  ProductsCard,
-  OrderTable,
-  DatePickerExample,
   EditOrderComponent,
   OrderTableEditOrder,
 } from "../components";

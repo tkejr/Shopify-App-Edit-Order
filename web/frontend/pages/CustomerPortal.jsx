@@ -16,7 +16,7 @@ import {
   Modal,
   TextContainer,
 } from "@shopify/polaris";
-import { cust1 } from "../assets";
+import { cust1, edit_paywall } from "../assets";
 import { cust2 } from "../assets";
 import { cust3 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
@@ -291,7 +291,7 @@ export default function CustomerPortal() {
               objectFit: "cover",
               objectPosition: "center",
             }}
-            src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/desktop_screenshot/CPW1ysvBnoEDEAE=.png?height=1800&width=3200"
+            src={edit_paywall}
           />
         </MediaCard>
       </Page>
