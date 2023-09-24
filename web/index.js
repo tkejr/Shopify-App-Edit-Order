@@ -112,6 +112,45 @@ app.post(
   shopify.config.webhooks.path,
   shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
+// Process webhooks
+app.post(
+  "/api/w/uninstall",
+  express.text({ type: "*/*" }),
+  async (req, res) => {
+    try {
+      // Note: the express.text() middleware reads the body as a string and makes it available at req.body.
+
+      console.log("====== UNINSTALL WEBHOOK DATA ========");
+      const shop_data = JSON.parse(req.body);
+      console.log(shop_data);
+      console.log(shop_data.email);
+
+      // Your webhook processing logic here
+      const Installmsg = {
+        to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+        from: "editifyshopify@gmail.com", // Change to your verified sender
+        subject: `Fucking Hell - ${shop_data.name} Uninstalled`,
+        text: `IMPROVE THE APP`,
+      };
+
+      sgMail
+        .send(Installmsg)
+        .then(() => {
+          console.log("Email sent to owners");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      // Send a 200 status response
+      res.status(200).send("Webhook received and processed successfully");
+    } catch (error) {
+      console.log(error.message);
+      // Handle any errors that occur during webhook processing
+      res.status(500).send("Error processing webhook");
+    }
+  }
+);
 
 // All endpoints after this point will require an active session
 app.use("/api/*", shopify.validateAuthenticatedSession());
@@ -228,9 +267,25 @@ app.get("/api/check", async (req, res) => {
 
 app.get("/api/checkAdvanced", async (req, res) => {
   console.log("INSIDE CHECK API BACKEND");
+
   const sess = res.locals.shopify.session;
   const url = sess.shop;
   const access_token = sess.accessToken;
+
+  const webhooks = await shopify.api.rest.Webhook.all({
+    session: sess,
+  });
+  // const webhook = new shopify.api.rest.Webhook({ session: sess });
+  // webhook.address =
+  //   "https://editify-dev-91eba309cd61.herokuapp.com/api/w/uninstall";
+  // webhook.topic = "app/uninstalled";
+  // webhook.format = "json";
+  // await webhook.save({
+  //   update: true,
+  // });
+
+  console.log("=========== WEBHOOKS ==============");
+  console.log(webhooks);
   const shopDetails = await shopify.api.rest.Shop.all({
     session: sess,
   });

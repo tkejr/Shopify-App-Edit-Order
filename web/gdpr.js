@@ -79,6 +79,19 @@ export default {
       //   "shop_id": 954889,
       //   "shop_domain": "{shop}.myshopify.com"
       // }
+      console.log("======= UNINSTALL WEBHOOK ==========");
+      console.log(payload);
+    },
+  },
+
+  APP_UNINSTALL: {
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "/api/w/uninstall", // Set the path for your new webhook
+    callback: async (topic, shop, body, webhookId) => {
+      console.log("=== INSIDE UNINSTALL WEBHOOK ====");
+      const payload = JSON.parse(body);
+      console.log(payload);
+      // Handle your new webhook here
     },
   },
 };

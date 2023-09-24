@@ -8,7 +8,7 @@ type = "ui_extension"
 [[extensions.targeting]]
 module = "./src/ActionExtension.jsx"
 # The target used here must match the target used in the module file (./src/ActionExtension.jsx)
-target = "admin.product-details.action.render"
+target = "admin.order-details.action.render"
 
 
 # Valid extension points:
