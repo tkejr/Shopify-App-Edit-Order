@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model custom_preferences {
+  id           Int      @id @default(autoincrement())
+  user_id      Int?
+  time_to_edit Int?
+  enable       Boolean? @default(false)
+  users        users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id                  Int                  @id @default(autoincrement())
+  url                 String?              @unique(map: "unique_url") @db.VarChar(255)
+  access_token        String?              @db.VarChar(255)
+  no_back_orders      Int?                 @default(0)
+  no_edit_orders      Int?                 @default(0)
+  no_cust_edit_orders Int?                 @default(0)
+  plan                String?              @default("free") @db.VarChar
+  free_trial_used     Boolean?             @default(true)
+  custom_preferences  custom_preferences[]
+}

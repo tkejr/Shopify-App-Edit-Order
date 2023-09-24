@@ -1,30 +1,13 @@
-import pkg from "pg";
-const { Pool } = pkg;
-import dotenv from "dotenv";
-dotenv.config();
-console.log("process.env.DATABASE_URL", process.env.DATABASE_URL);
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 const getUserPreferences = async (userId) => {
   try {
-    const query = {
-      text: `SELECT * FROM custom_preferences WHERE user_id = $1`,
-      values: [userId],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User ID not found
-    }
-
-    return result.rows[0];
+    return await prisma.custom_preferences.findFirst({
+      where: {
+        user_id: userId,
+      },
+    });
   } catch (error) {
     console.error("Error fetching user preferences:", error);
     throw error;
@@ -33,39 +16,13 @@ const getUserPreferences = async (userId) => {
 
 const updateUserPreference = async (userId, timeToEdit, enable) => {
   try {
-    let updateQuery = "";
-    let queryParams = [];
-    let returningColumns = "*";
-
-    if (timeToEdit !== undefined) {
-      updateQuery += "time_to_edit = $1";
-      queryParams.push(timeToEdit);
-    }
-
-    if (enable !== undefined) {
-      if (queryParams.length > 0) updateQuery += ", ";
-      updateQuery += "enable = $" + (queryParams.length + 1);
-      queryParams.push(enable);
-    }
-
-    if (queryParams.length === 0) {
-      return null; // No valid update data provided
-    }
-
-    const query = {
-      text: `UPDATE custom_preferences SET ${updateQuery} WHERE user_id = $${
-        queryParams.length + 1
-      } RETURNING ${returningColumns}`,
-      values: [...queryParams, userId],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User ID not found
-    }
-
-    return result.rows[0];
+    return await prisma.custom_preferences.update({
+      where: { user_id: userId },
+      data: {
+        time_to_edit: timeToEdit,
+        enable: enable,
+      },
+    });
   } catch (error) {
     console.error("Error updating preference:", error);
     throw error;
@@ -74,18 +31,11 @@ const updateUserPreference = async (userId, timeToEdit, enable) => {
 
 const getUserIdByUrl = async (userUrl) => {
   try {
-    const query = {
-      text: "SELECT id FROM users WHERE url = $1",
-      values: [userUrl],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User with given URL not found
-    }
-
-    return result.rows[0].id;
+    const user = await prisma.users.findFirst({
+      where: { url: userUrl },
+      select: { id: true },
+    });
+    return user ? user.id : null;
   } catch (error) {
     console.error("Error getting user ID by URL:", error);
     throw error;
@@ -94,21 +44,16 @@ const getUserIdByUrl = async (userUrl) => {
 
 const addUser = async (url, accessToken) => {
   try {
-    const query = {
-      text: "INSERT INTO users (url, access_token,free_trial_used) VALUES ($1, $2, $3) RETURNING id",
-      values: [url, accessToken, false],
-    };
+    const user = await prisma.users.create({
+      data: {
+        url: url,
+        access_token: accessToken,
+        free_trial_used: false,
+      },
+    });
 
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // Error occurred while adding user
-    }
-    const userId = result.rows[0].id;
-
-    await addUserPreference(userId, 900, false);
-
-    return result.rows[0];
+    await addUserPreference(user.id, 900, false);
+    return user;
   } catch (error) {
     console.error("Error adding user:", error);
     throw error;
@@ -117,18 +62,13 @@ const addUser = async (url, accessToken) => {
 
 const addUserPreference = async (userId, timeToEdit, enable) => {
   try {
-    const query = {
-      text: "INSERT INTO custom_preferences (user_id, time_to_edit, enable) VALUES ($1, $2, $3) RETURNING *",
-      values: [userId, timeToEdit, enable],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // Error occurred while adding user preference
-    }
-
-    return result.rows[0];
+    return await prisma.custom_preferences.create({
+      data: {
+        user_id: userId,
+        time_to_edit: timeToEdit,
+        enable: enable,
+      },
+    });
   } catch (error) {
     console.error("Error adding user preference:", error);
     throw error;
@@ -137,20 +77,11 @@ const addUserPreference = async (userId, timeToEdit, enable) => {
 
 const getUser = async (userUrl) => {
   try {
-    const query = {
-      text: "SELECT * FROM users WHERE url = $1",
-      values: [userUrl],
-    };
-
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User with given URL not found
-    }
-
-    return result.rows[0];
+    return await prisma.users.findFirst({
+      where: { url: userUrl },
+    });
   } catch (error) {
-    console.error("Error getting user ID by URL:", error);
+    console.error("Error getting user:", error);
     throw error;
   }
 };
@@ -164,68 +95,42 @@ const updateUserDetails = async (
   planValue
 ) => {
   try {
-    let updateQuery = "";
-    let queryParams = [];
-    let returningColumns = "*";
+    // Construct the update data object dynamically
+    const updateData = {};
+    console.log(" ========= IN UPDATE USER DETAILS ============");
 
     if (freeTrialUsed !== undefined) {
-      if (typeof freeTrialUsed !== "boolean") {
-        throw new Error("freeTrialUsed must be of type boolean");
-      }
-      updateQuery += "free_trial_used = $1";
-      queryParams.push(freeTrialUsed);
+      updateData.free_trial_used = freeTrialUsed;
     }
 
     if (backOrdersIncrement !== undefined) {
-      if (queryParams.length > 0) updateQuery += ", ";
-      updateQuery +=
-        "no_back_orders = no_back_orders + $" + (queryParams.length + 1);
-      queryParams.push(backOrdersIncrement);
+      updateData.no_back_orders = { increment: backOrdersIncrement };
     }
 
     if (editOrdersIncrement !== undefined) {
-      if (queryParams.length > 0) updateQuery += ", ";
-      updateQuery +=
-        "no_edit_orders = no_edit_orders + $" + (queryParams.length + 1);
-      queryParams.push(editOrdersIncrement);
+      updateData.no_edit_orders = { increment: editOrdersIncrement };
     }
 
     if (custEditOrdersIncrement !== undefined) {
-      if (queryParams.length > 0) updateQuery += ", ";
-      updateQuery +=
-        "no_cust_edit_orders = no_cust_edit_orders + $" +
-        (queryParams.length + 1);
-      queryParams.push(custEditOrdersIncrement);
+      updateData.no_cust_edit_orders = { increment: custEditOrdersIncrement };
     }
 
-    // New condition to update plan
     if (planValue !== undefined) {
-      if (typeof planValue !== "string") {
-        throw new Error("planValue must be of type string");
-      }
-      if (queryParams.length > 0) updateQuery += ", ";
-      updateQuery += "plan = $" + (queryParams.length + 1);
-      queryParams.push(planValue);
+      updateData.plan = planValue;
     }
 
-    if (queryParams.length === 0) {
-      return null; // No valid update data provided
+    // If no valid update data is provided, return null
+    if (Object.keys(updateData).length === 0) {
+      return null;
     }
 
-    const query = {
-      text: `UPDATE users SET ${updateQuery} WHERE id = $${
-        queryParams.length + 1
-      } RETURNING ${returningColumns}`,
-      values: [...queryParams, userId],
-    };
+    // Use Prisma to update the user details
+    const result = await prisma.users.update({
+      where: { id: userId },
+      data: updateData,
+    });
 
-    const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      return null; // User ID not found
-    }
-
-    return result.rows[0];
+    return result;
   } catch (error) {
     console.error("Error updating user details:", error);
     throw error;

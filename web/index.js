@@ -717,7 +717,6 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
-  /*
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -725,7 +724,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
     undefined,
     1
   );
-  */
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   if (prod) {
@@ -832,7 +831,6 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
-  /*
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -840,7 +838,7 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
     undefined,
     1
   );
-  */
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
