@@ -84,9 +84,9 @@ export default {
     },
   },
 
-  APP_UNINSTALL: {
+  APP_UNINSTALLED: {
     deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/w/uninstall", // Set the path for your new webhook
+    callbackUrl: "/api/webhooks", // Set the path for your new webhook
     callback: async (topic, shop, body, webhookId) => {
       console.log("=== INSIDE UNINSTALL WEBHOOK ====");
       const payload = JSON.parse(body);
