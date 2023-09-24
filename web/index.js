@@ -678,6 +678,13 @@ app.put("/api/orders/:id", async (_req, res) => {
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
+
+    if (prod) {
+      mixpanel.track("Backdate Fail", {
+        distinct_id: res.locals.shopify.session.shop,
+        error: e.message,
+      });
+    }
     error = e.message;
   }
   if (prod) {
