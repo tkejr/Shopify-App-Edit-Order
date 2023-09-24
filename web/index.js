@@ -126,6 +126,8 @@ app.post(
       console.log(shop_data.email);
 
       // Your webhook processing logic here
+
+      //Send Email to us so we know uninstalled happen
       const Installmsg = {
         to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
         from: "editifyshopify@gmail.com", // Change to your verified sender
@@ -141,6 +143,11 @@ app.post(
         .catch((error) => {
           console.error(error);
         });
+
+      //Log the uninstall in Mixpanel
+      mixpanel.track("Uninstall", {
+        distinct_id: shop_data.myshopify_domain,
+      });
 
       // Send a 200 status response
       res.status(200).send("Webhook received and processed successfully");
