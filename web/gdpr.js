@@ -3,7 +3,7 @@ import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
 import sgMail from "@sendgrid/mail";
-import { uninstallEmailHelper } from "./email-helper";
+import { uninstallEmailHelper } from "./email-helper.js";
 
 export default {
   /**
