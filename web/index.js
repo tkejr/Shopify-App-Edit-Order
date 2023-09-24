@@ -112,52 +112,6 @@ app.post(
   shopify.config.webhooks.path,
   shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
-// Process webhooks
-app.post(
-  "/api/w/uninstall",
-  express.text({ type: "*/*" }),
-  async (req, res) => {
-    try {
-      // Note: the express.text() middleware reads the body as a string and makes it available at req.body.
-
-      console.log("====== UNINSTALL WEBHOOK DATA ========");
-      const shop_data = JSON.parse(req.body);
-      console.log(shop_data);
-      console.log(shop_data.email);
-
-      // Your webhook processing logic here
-
-      //Send Email to us so we know uninstalled happen
-      const Installmsg = {
-        to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-        from: "editifyshopify@gmail.com", // Change to your verified sender
-        subject: `Fucking Hell - ${shop_data.name} Uninstalled`,
-        text: `IMPROVE THE APP`,
-      };
-
-      sgMail
-        .send(Installmsg)
-        .then(() => {
-          console.log("Email sent to owners");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-
-      //Log the uninstall in Mixpanel
-      mixpanel.track("Uninstall", {
-        distinct_id: shop_data.myshopify_domain,
-      });
-
-      // Send a 200 status response
-      res.status(200).send("Webhook received and processed successfully");
-    } catch (error) {
-      console.log(error.message);
-      // Handle any errors that occur during webhook processing
-      res.status(500).send("Error processing webhook");
-    }
-  }
-);
 
 // All endpoints after this point will require an active session
 app.use("/api/*", shopify.validateAuthenticatedSession());

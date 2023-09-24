@@ -1,4 +1,7 @@
 import { DeliveryMethod } from "@shopify/shopify-api";
+const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
+const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
+import sgMail from "@sendgrid/mail";
 
 export default {
   /**
@@ -79,8 +82,6 @@ export default {
       //   "shop_id": 954889,
       //   "shop_domain": "{shop}.myshopify.com"
       // }
-      console.log("======= UNINSTALL WEBHOOK ==========");
-      console.log(payload);
     },
   },
 
@@ -89,9 +90,37 @@ export default {
     callbackUrl: "/api/webhooks", // Set the path for your new webhook
     callback: async (topic, shop, body, webhookId) => {
       console.log("=== INSIDE UNINSTALL WEBHOOK ====");
-      const payload = JSON.parse(body);
-      console.log(payload);
       // Handle your new webhook here
+
+      const shop_data = JSON.parse(body);
+      console.log(shop_data);
+      console.log(shop_data.email);
+
+      // Your webhook processing logic here
+
+      //Send Email to us so we know uninstalled happen
+      const Installmsg = {
+        to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+        from: "editifyshopify@gmail.com", // Change to your verified sender
+        subject: `Fucking Hell - ${shop_data.name} Uninstalled`,
+        text: `IMPROVE THE APP ALREADY`,
+      };
+
+      sgMail
+        .send(Installmsg)
+        .then(() => {
+          console.log("Email sent to owners");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      //Log the uninstall in Mixpanel
+      mixpanel.track("Uninstall", {
+        distinct_id: shop_data.myshopify_domain,
+      });
+
+      //Send email to customers
     },
   },
 };
