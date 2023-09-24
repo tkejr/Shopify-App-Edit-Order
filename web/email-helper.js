@@ -81,5 +81,82 @@ const emailHelper = async (shopEmail) => {
   };
   return msg;
 };
+const uninstallEmailHelper = async (shopEmail) => {
+  const msg = {
+    to: shopEmail, // Change to your recipient
+    from: "editifyshopify@gmail.com", // Change to your verified sender
+    subject: "Editify | Uninstalled :(",
+    text: "Sorry to See you go !",
+    html: `
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <tr>
+        <td align="center" style="padding:0;">
+            <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                <tr>
+                    <td align="center" style="padding:40px 0 30px 0;background:#ffffff;">
+                        <img width="100" src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png" alt="Editify Logo" width="300" style="height:auto;display:block;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:36px 30px 42px 30px;">
+                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                            <tr>
+                                <td style="padding:0 0 36px 0;color:#153643;">
+                                    <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Your Feedback Matters to Editify</h1>
+                                    <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">We noticed that you've recently uninstalled the Editify app from your Shopify store. We are committed to improving and would highly value your feedback to enhance the experience for our users. Please share your thoughts with us by <a href="https://www.editify.kejrtech.com/feedback" style="color:#ee4c50;text-decoration:underline;">clicking here</a>.</p>
+                                    <p style="margin:0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Considering giving Editify another try? <a href="https://apps.shopify.com/editify" style="color:#ee4c50;text-decoration:underline;">Reinstall Editify now</a> and experience the new improvements.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0;">
+                                    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                        <tr>
+                                            <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+                                                <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/left.gif" alt="Feature Image" width="260" style="height:auto;display:block;" /></p>
+                                                <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Editify saves you from returns. Enable customers to edit orders directly!</p>
+                                            </td>
+                                            <td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
+                                            <td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+                                                <p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="https://assets.codepen.io/210284/right.gif" alt="Feature Image" width="260" style="height:auto;display:block;" /></p>
+                                                <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">Backdating an order is simplified with Editify. Just a click, and you're done!</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:30px;background:#ee4c50;">
+                        <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
+                            <tr>
+                                <td style="padding:0;width:50%;" align="left">
+                                    <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
+                                    </p>
+                                </td>
+                                <td style="padding:0;width:50%;" align="right">
+                                    <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
+                                        <tr>
+                                            <td style="padding:0 0 0 10px;width:38px;">
+                                                <a href="https://twitter.com/1_Day_Apps" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 
-export { emailHelper };
+        `,
+  };
+  return msg;
+};
+
+export { emailHelper, uninstallEmailHelper };
