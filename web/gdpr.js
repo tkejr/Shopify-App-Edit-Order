@@ -3,6 +3,7 @@ import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
 import sgMail from "@sendgrid/mail";
+import { uninstallEmailHelper } from "./email-helper";
 
 export default {
   /**
@@ -95,7 +96,7 @@ export default {
 
       const shop_data = JSON.parse(body);
       console.log(shop_data);
-      console.log(shop_data.email);
+      const shopEmail = shop_data.email;
 
       // Your webhook processing logic here
 
@@ -122,6 +123,15 @@ export default {
       });
 
       //Send email to customers
+      const uninstallMsg = await uninstallEmailHelper(shopEmail);
+      sgMail
+        .send(uninstallMsg)
+        .then(() => {
+          console.log("Email sent to customers");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };
