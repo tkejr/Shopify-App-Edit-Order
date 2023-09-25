@@ -1,25 +1,22 @@
 import {
-  Card,
   Page,
   Layout,
   TextContainer,
-  Image,
-  Stack,
-  Link,
-  Button,
   Modal,
   Frame,
   MediaCard,
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
+
 import React, { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
 import ErrorBanner from "../components/ErrorBanner";
-import { trophyImage } from "../assets";
+
 import { useNavigate } from "@shopify/app-bridge-react";
-import { ProductsCard, OrderTable, DatePickerExample } from "../components";
+import {  OrderTable, DatePickerExample } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
+import { edit_paywall } from "../assets";
+
 
 export default function Backdate() {
   const fetch = useAuthenticatedFetch();
@@ -116,7 +113,7 @@ export default function Backdate() {
               objectFit: "cover",
               objectPosition: "center",
             }}
-            src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/promotional_image/CKzLs8vBnoEDEAE=.png?height=1800&width=3200"
+            src={edit_paywall}
           />
         </MediaCard>
       </Frame>

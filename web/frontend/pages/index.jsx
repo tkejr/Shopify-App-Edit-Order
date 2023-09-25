@@ -1,28 +1,21 @@
 import {
   Card,
-  EmptyState,
   Page,
   Layout,
   Icon,
-  CalloutCard,
-  SkeletonPage,
-  SkeletonBodyText,
   TextContainer,
-  SkeletonDisplayText,
-  Loading,
   Frame,
   Link,
-  MediaCard,
   FooterHelp,
   List,
 } from "@shopify/polaris";
 import React, { useState, useCallback, useEffect } from "react";
-import { notFoundImage } from "../assets";
+
 import {
   OrdersMajor,
   EditMajor,
   CustomersMajor,
-  ChecklistMajor,
+  
   CircleTickMajor,
   CircleCancelMajor,
 } from "@shopify/polaris-icons";
