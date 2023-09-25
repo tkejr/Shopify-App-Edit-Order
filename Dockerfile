@@ -6,5 +6,7 @@ EXPOSE 8081
 WORKDIR /app
 COPY web .
 RUN npm install
+RUN npm install -g prisma
+RUN prisma generate
 RUN cd frontend && npm install && npm run build
 CMD ["npm", "run", "serve"]

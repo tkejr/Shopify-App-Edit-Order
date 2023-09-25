@@ -2,29 +2,20 @@ import {
   Card,
   Page,
   Layout,
-  TextContainer,
-  Image,
-  Stack,
   Link,
-  Heading,
   Button,
-  Modal,
-  TextStyle,
   Badge,
-  MediaCard,
-  List,
-  Icon,
 } from "@shopify/polaris";
 import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
 import CustomSkeletonPage from "../components/SkeletonPage";
-import { trophyImage } from "../assets";
+
 import { useNavigate } from "@shopify/app-bridge-react";
-import { ProductsCard, OrderTable, DatePickerExample } from "../components";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
-
+import {chatify_logo, editify_logo, resizify_logo} from '../assets'
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
 
@@ -94,6 +85,40 @@ export default function HomePage() {
             <Layout.Section oneHalf>
               <Card sectioned>
                 <PlanCard
+                  planName="Starter Plan"
+                  price="4.99"
+                  features={[
+                    "Backdate Orders",
+                    "Unlimited Date Edits",
+                    "Updates Sales in Shopify Analytics",
+                    "Use for Financial Reporting",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradeStarter}
+                ></PlanCard>
+
+                <Card.Section>
+                  {(!isPremiumUser || planName === "pro") && (
+                    <Button onClick={() => upgradeStarter()}>
+                      {" "}
+                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
+                    </Button>
+                  )}
+                  {planName === "starter" && (
+                    <div style={{ padding: "6px" }}>
+                      <Badge progress="complete" status="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                </Card.Section>
+              </Card>
+            </Layout.Section>
+            <Layout.Section oneHalf>
+              <Card sectioned>
+                <PlanCard
                   planName="Pro Plan"
                   price="9.99"
                   features={[
@@ -126,46 +151,12 @@ export default function HomePage() {
                 </Card.Section>
               </Card>
             </Layout.Section>
-            <Layout.Section oneHalf>
-              <Card sectioned>
-                <PlanCard
-                  planName="Starter Plan"
-                  price="4.99"
-                  features={[
-                    "Backdate Orders",
-                    "Unlimited Date Edits",
-                    "Updates Sales in Shopify Analytics",
-                    "Use for Financial Reporting",
-                    "Customer self-service editing with Customer Portal",
-                    "Priority Support",
-                  ]}
-                  upgrade={upgradeStarter}
-                ></PlanCard>
-
-                <Card.Section>
-                  {(!isPremiumUser || planName === "pro") && (
-                    <Button onClick={() => upgradeStarter()}>
-                      {" "}
-                      {loadingStarter ? "Loading..." : "Get Starter Plan"}
-                    </Button>
-                  )}
-                  {planName === "starter" && (
-                    <div style={{ padding: "6px" }}>
-                      <Badge progress="complete" status="success">
-                        {" "}
-                        Active
-                      </Badge>
-                    </div>
-                  )}
-                </Card.Section>
-              </Card>
-            </Layout.Section>
             <Layout.Section full>
               <Card title="Partner Apps & Reviews">
                 <Card.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    {/* <img
-                      src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png"
+                    <img
+                      src={editify_logo}
                       alt="Your Image Description"
                       style={{
                         borderRadius: "8px",
@@ -173,7 +164,7 @@ export default function HomePage() {
                         width: "50px",
                         height: "50px",
                       }}
-                    /> */}
+                    />
                     <p style={{ margin: 0 }}>
                       If you like our App and want one month free please leave a
                       review {"  "}
@@ -186,7 +177,7 @@ export default function HomePage() {
                 <Card.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img
-                      src="https://cdn.shopify.com/app-store/listing_images/51d8e8f21204bd1d7146f51ba39c01e1/icon/CPyA3YzCsP8CEAE=.png"
+                      src={resizify_logo}
                       alt="Your Image Description"
                       style={{
                         borderRadius: "8px",
@@ -206,7 +197,7 @@ export default function HomePage() {
                 <Card.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img
-                      src="https://cdn.shopify.com/app-store/listing_images/4eff7bc91792e22953e8c99acffbf4d5/icon/CPKFpaPfl4EDEAE=.png"
+                      src={chatify_logo}
                       alt="Your Image Description"
                       style={{
                         borderRadius: "8px",

@@ -15,7 +15,7 @@ const emailHelper = async (shopEmail) => {
             <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
               <tr>
                 <td align="center" style="padding:40px 0 30px 0;background:#ffffff;">
-                  <img src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png" alt="" width="300" style="height:auto;display:block;" />
+                  <img src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/COK0p_7krYEDEAE=.png" alt="" width="300" style="height:auto;display:block;" />
                 </td>
               </tr>
               <tr>
@@ -56,7 +56,7 @@ const emailHelper = async (shopEmail) => {
                     <tr>
                       <td style="padding:0;width:50%;" align="left">
                         <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                          &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
+                          &reg; KejrTech 2023<br/><a href="http://www.kejrtech.com" style="color:#ffffff;text-decoration:underline;"></a>
                         </p>
                       </td>
                       <td style="padding:0;width:50%;" align="right">
@@ -94,7 +94,7 @@ const uninstallEmailHelper = async (shopEmail) => {
             <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
                 <tr>
                     <td align="center" style="padding:40px 0 30px 0;background:#ffffff;">
-                        <img width="100" src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/CJ3q_YWkjoADEAE=.png" alt="Editify Logo" width="300" style="height:auto;display:block;" />
+                        <img width="100" src="https://cdn.shopify.com/app-store/listing_images/bf5dc60d84716ebd5705f5fbd4e12e90/icon/COK0p_7krYEDEAE=.png" alt="Editify Logo" width="300" style="height:auto;display:block;" />
                     </td>
                 </tr>
                 <tr>
@@ -133,7 +133,7 @@ const uninstallEmailHelper = async (shopEmail) => {
                             <tr>
                                 <td style="padding:0;width:50%;" align="left">
                                     <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                                        &reg; KejrTech 2023<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
+                                        &reg; KejrTech 2023<br/><a href="http://www.kejrtech.com" style="color:#ffffff;text-decoration:underline;"></a>
                                     </p>
                                 </td>
                                 <td style="padding:0;width:50%;" align="right">

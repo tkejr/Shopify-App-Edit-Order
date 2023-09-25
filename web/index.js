@@ -120,20 +120,30 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/api/products/create", async (_req, res) => {
-  let status = 200;
-  let error = null;
-
-  try {
-    await productCreator(res.locals.shopify.session);
-  } catch (e) {
-    console.log(`Failed to process products/create: ${e.message}`);
-    status = 500;
-    error = e.message;
-  }
-  res.status(status).send({ success: status === 200, error });
-});
 // Verify the user has a plan
+
+app.post("/api/email", async (req, res) => {
+  const sess = res.locals.shopify.session;
+  const url = sess.shop;
+  const { name, email, message } = req.body;
+  const feedbackMsg = {
+    to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+    from: "editifyshopify@gmail.com", // Change to your verified sender
+    subject: `Feedback form has been submitted by ${name}`,
+    text: `A feedback form was filled with feedbacl message ${message} and their emai is ${email}`,
+  };
+
+  sgMail
+    .send(feedbackMsg)
+    .then(() => {
+      console.log("Email sent to owners for feedback");
+      res.sendStatus(200); // Send a 200 OK status response
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send({ message: "Failed to send email." }); // Send a 500 status response for server errors
+    });
+});
 
 app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
@@ -233,9 +243,6 @@ app.get("/api/checkAdvanced", async (req, res) => {
   const url = sess.shop;
   const access_token = sess.accessToken;
 
-  const webhooks = await shopify.api.rest.Webhook.all({
-    session: sess,
-  });
   // const webhook = new shopify.api.rest.Webhook({ session: sess });
   // webhook.address =
   //   "https://editify-dev-91eba309cd61.herokuapp.com/api/w/uninstall";
@@ -244,9 +251,6 @@ app.get("/api/checkAdvanced", async (req, res) => {
   // await webhook.save({
   //   update: true,
   // });
-
-  console.log("=========== WEBHOOKS ==============");
-  console.log(webhooks);
   const shopDetails = await shopify.api.rest.Shop.all({
     session: sess,
   });
@@ -365,28 +369,7 @@ app.get("/api/checkAdvanced", async (req, res) => {
       throw error;
     }
   }
-  //return subscriptionLineItem;
 
-  //setting the user in mixpanel if he didnt
-
-  // if (prod) {
-  //   mixpanel.people.set(session.shop, {
-  //     $first_name: shopDetails[0].shop_owner,
-  //     $created: shopDetails[0].created_at,
-  //     $email: shopDetails[0].customer_email,
-  //     $phone: shopDetails[0].phone,
-  //     $country: shopDetails[0].country_name,
-  //     $country_code: shopDetails[0].country_code,
-  //     $city: shopDetails[0].city,
-  //     $region: shopDetails[0].province,
-  //     $zip: shopDetails[0].zip,
-  //     $shopify_plan: shopDetails[0].plan_name,
-  //     $eligibility: shopDetails[0].eligible_for_payments,
-  //     plan: "free",
-  //   });
-  // }
-
-  // A new customer subscribed to our plan
   if (
     queryParams.charge_id != undefined &&
     queryParams.charge_id != null &&
@@ -678,6 +661,13 @@ app.put("/api/orders/:id", async (_req, res) => {
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
+
+    if (prod) {
+      mixpanel.track("Backdate Fail", {
+        distinct_id: res.locals.shopify.session.shop,
+        error: e.message,
+      });
+    }
     error = e.message;
   }
   if (prod) {
@@ -727,7 +717,6 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
-  /*
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -735,7 +724,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
     undefined,
     1
   );
-  */
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   if (prod) {
@@ -842,7 +831,6 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
-  /*
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -850,7 +838,7 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
     undefined,
     1
   );
-  */
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });
   //get all the vars
