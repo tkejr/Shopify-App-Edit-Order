@@ -15,7 +15,6 @@ import {
   OrdersMajor,
   EditMajor,
   CustomersMajor,
-  
   CircleTickMajor,
   CircleCancelMajor,
 } from "@shopify/polaris-icons";
@@ -69,7 +68,7 @@ export default function HomePage() {
       }
     };
     const fetchRecurringCharges = async () => {
-      const res = await fetch(`/api/checkAdvanced?charge_id=${chargeId}`)
+      const res = await fetch(`/api/check`)
         .then((response) => response.json())
         .then((data) => {
           if (data.hasPayment === "pro" || data.hasPayment === "starter") {

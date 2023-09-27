@@ -16,14 +16,7 @@ import { emailHelper } from "./email-helper.js";
 import { getFreeTrialDays } from "./free_trial_helper.js";
 import { pushNotify } from "./push-notification.js";
 
-import {
-  updateUserPreference,
-  updateUserDetails,
-  getUserIdByUrl,
-  getUser,
-} from "./db.js";
-
-import { addUser } from "./db.js";
+import { updateUserDetails, getUserIdByUrl } from "./db.js";
 
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
@@ -236,184 +229,14 @@ app.get("/api/check", async (req, res) => {
   res.json({ hasPayment });
 });
 
-app.get("/api/checkAdvanced", async (req, res) => {
-  console.log("INSIDE CHECK API BACKEND");
-
-  const sess = res.locals.shopify.session;
-  const url = sess.shop;
-  const access_token = sess.accessToken;
-
-  // const webhook = new shopify.api.rest.Webhook({ session: sess });
-  // webhook.address =
-  //   "https://editify-dev-91eba309cd61.herokuapp.com/api/w/uninstall";
-  // webhook.topic = "app/uninstalled";
-  // webhook.format = "json";
-  // await webhook.save({
-  //   update: true,
-  // });
-  const shopDetails = await shopify.api.rest.Shop.all({
-    session: sess,
-  });
-  //harcoding for review stores
-  if (url == "momiji-kids.myshopify.com") {
-    res.json({ hasPayment: "pro" });
-    return;
-  }
-
-  var user;
-  try {
-    console.log("User didn't exist");
-    console.log("======= ADDING USER ==============");
-    user = await addUser(url, access_token);
-    //send only on new install
-    const shopEmail = "" + shopDetails[0].email;
-    const msg = await emailHelper(shopEmail);
-
-    if (prod) {
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-
-  user = await getUser(res.locals.shopify.session.shop);
-
-  console.log(user);
-
-  const queryParams = req.query;
-  console.log(queryParams.charge_id);
-  const user_plan = user.plan;
-  const uid = user.id;
-
-  const HAS_PAYMENTS_QUERY = `
-  query appSubscription {  
-    currentAppInstallation {
-      activeSubscriptions {
-            id
-            name
-            lineItems {
-                  id
-                  plan {
-                    pricingDetails {
-                      __typename
-                      ... on AppUsagePricing {
-                        terms
-                        balanceUsed {
-                          amount
-                        }
-                        cappedAmount {
-                          amount
-                        }
-                      }
-                    }
-                  }
-                }
-            }
-          }
-      }
-  `;
-
+app.get("/api/getFreeDays", async (req, res) => {
   const session = res.locals.shopify.session;
+  const shop = session.shop;
+  const freedays = await getFreeTrialDays(shop);
 
-  const client = new shopify.api.clients.Graphql({ session });
-  let subscriptionLineItem = {};
-  let hasPayment;
-  //const planName = Object.keys(billingConfig)[0];
-
-  //const planDescription = billingConfig[planName].usageTerms;
-
-  try {
-    const response = await client.query({
-      data: {
-        query: HAS_PAYMENTS_QUERY,
-      },
-    });
-
-    response.body.data.currentAppInstallation.activeSubscriptions.forEach(
-      (subscription) => {
-        if (subscription.name === "Editify Pro Plan") {
-          hasPayment = "pro";
-          /*
-          subscription.lineItems.forEach((lineItem) => {
-            if (lineItem.plan.pricingDetails.terms === planDescription) {
-              subscriptionLineItem = {
-                id: lineItem.id,
-                balanceUsed: parseFloat(
-                  lineItem.plan.pricingDetails.balanceUsed.amount
-                ),
-                cappedAmount: parseFloat(
-                  lineItem.plan.pricingDetails.cappedAmount.amount
-                ),
-              };
-            }
-          });
-          */
-        } else if (subscription.name === "Editify Starter Plan") {
-          hasPayment = "starter";
-        }
-      }
-    );
-  } catch (error) {
-    if (error) {
-      throw new Error(
-        `${error.message}\n${JSON.stringify(error.response, null, 2)}`
-      );
-    } else {
-      throw error;
-    }
-  }
-
-  if (
-    queryParams.charge_id != undefined &&
-    queryParams.charge_id != null &&
-    queryParams.charge_id != "null" &&
-    queryParams.charge_id != "undefined" &&
-    user.plan === "free" &&
-    prod
-  ) {
-    //update the user plan in db
-    const updatedUserDetails = await updateUserDetails(
-      uid,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      hasPayment
-    );
-
-    if (hasPayment) {
-      mixpanel.people.set(session.shop, {
-        plan: hasPayment,
-      });
-    }
-
-    //send email to us
-    const Installmsg = {
-      to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-      from: "editifyshopify@gmail.com", // Change to your verified sender
-      subject: `LFG Ka-ching-$$ Editify ${hasPayment}`,
-      text: `An Installation was made by ${shopDetails[0].shop_owner}`,
-    };
-
-    sgMail
-      .send(Installmsg)
-      .then(() => {
-        console.log("Email sent to owners");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  res.json({ hasPayment });
+  res.status(200).json(freedays);
 });
+
 app.get("/api/upgradePro", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
@@ -435,23 +258,8 @@ app.get("/api/upgradePro", async (req, res) => {
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
-  //for testing if the user actually clicked on approve
-
-  if (prod) {
-    mixpanel.track("Approved Charge", {
-      distinct_id: shop,
-      price: recurring_application_charge.price,
-    });
-  }
+  //for testing if the user actually clicked on approvexs
   res.json({ confirmationUrl });
-});
-
-app.get("/api/getFreeDays", async (req, res) => {
-  const session = res.locals.shopify.session;
-  const shop = session.shop;
-  const freedays = await getFreeTrialDays(shop);
-
-  res.status(200).json(freedays);
 });
 
 app.get("/api/upgradeStarter", async (req, res) => {
@@ -477,12 +285,6 @@ app.get("/api/upgradeStarter", async (req, res) => {
     update: true,
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
-  if (prod) {
-    mixpanel.track("Approved Charge", {
-      distinct_id: shop,
-      price: recurring_application_charge.price,
-    });
-  }
 
   res.json({ confirmationUrl });
 });

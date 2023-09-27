@@ -14,18 +14,15 @@ const getUserPreferences = async (userId) => {
   }
 };
 
-const updateUserPreference = async (userId, timeToEdit, enable) => {
+const updateUserPreference = async (userId, data) => {
+  console.log(userId, data);
   try {
-    return await prisma.custom_preferences.update({
+    return await prisma.custom_preferences.updateMany({
       where: { user_id: userId },
-      data: {
-        time_to_edit: timeToEdit,
-        enable: enable,
-      },
+      data: data,
     });
   } catch (error) {
-    console.error("Error updating preference:", error);
-    throw error;
+    console.error("Error updating preference:" + error);
   }
 };
 
@@ -77,9 +74,16 @@ const addUserPreference = async (userId, timeToEdit, enable) => {
 
 const getUser = async (userUrl) => {
   try {
-    return await prisma.users.findFirst({
+    const user = await prisma.users.findFirst({
       where: { url: userUrl },
     });
+
+    // Check if user is not found
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
   } catch (error) {
     console.error("Error getting user:", error);
     throw error;
@@ -137,6 +141,24 @@ const updateUserDetails = async (
   }
 };
 
+async function updateUser(userUrl, data) {
+  try {
+    const updatedUser = await prisma.users.update({
+      where: {
+        url: userUrl,
+      },
+      data: data,
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export {
   updateUserPreference,
   getUserIdByUrl,
@@ -145,4 +167,5 @@ export {
   getUserPreferences,
   getUser,
   updateUserDetails,
+  updateUser,
 };
