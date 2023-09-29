@@ -53,7 +53,7 @@ export function OrderTableEditOrder(props) {
   const ITEMS_PER_PAGE = 10;
   //new way to get the data
   const getData = () => {
-    fetch("/api/orders/unfulfilled")
+    fetch("/api/orders")
       .then((response) => response.json())
       .then((json) => {
         setRawData(json);
