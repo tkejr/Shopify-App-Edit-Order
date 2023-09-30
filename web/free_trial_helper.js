@@ -9,7 +9,12 @@ import {
 } from "./db.js";
 
 const getFreeTrialDays = async (shopEmail) => {
-  const user = await getUser(shopEmail);
+  var user;
+  try {
+    user = await getUser(shopEmail);
+  } catch {
+    return 3;
+  }
   //remove after getting the tag
   if (shopEmail == "audittesting.myshopify.com") {
     return 3;

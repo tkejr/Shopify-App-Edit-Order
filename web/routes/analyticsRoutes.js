@@ -1,5 +1,5 @@
 import express from "express";
-import { getUser } from "../db.js";
+import { getUser, addUser } from "../db.js";
 import shopify from "../shopify.js";
 import Mixpanel from "mixpanel";
 import { DataType } from "@shopify/shopify-api";
@@ -11,6 +11,14 @@ router.get("/", async (req, res) => {
   mixpanel.track("View Analytics", {
     distinct_id: res.locals.shopify.session.shop,
   });
+
+  // try {
+  //   console.log("======= ADDING USER ==============");
+  //   const addUser = await addUser(url, "temp_access");
+  // } catch {
+  //   console.log("user already exists");
+  // }
+
   try {
     const data = await getUser(res.locals.shopify.session.shop);
 
