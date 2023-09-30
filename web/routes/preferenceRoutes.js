@@ -3,6 +3,7 @@ import {
   updateUserPreference,
   getUserIdByUrl,
   getUserPreferences,
+  updateUser,
 } from "../db.js";
 import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
@@ -42,31 +43,18 @@ router.put("/", async (req, res) => {
   });
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
+  console.log("===== TEST in CP====");
+  console.log(session);
 
-  const { time_to_edit, enable } = req.body;
+  const updateData = {
+    access_token: session.accessToken,
+  };
 
-  try {
-    const userId = await getUserIdByUrl(shopUrl);
+  console.log("Setting User access Token");
+  const updatedUser = await updateUser(shopUrl, updateData);
+  const updatePref = await updateUserPreference(updatedUser.id, req.body);
 
-    if (userId === null) {
-      return res.status(404).send("User not found for the given shop URL");
-    }
-
-    const updatedPreference = await updateUserPreference(
-      userId,
-      time_to_edit,
-      enable
-    );
-
-    if (updatedPreference === null) {
-      return res.status(400).send("Invalid update data");
-    }
-
-    res.json(updatedPreference);
-  } catch (error) {
-    console.error("Error in preferenceRoutes:", error);
-    res.status(500).send("Internal server error");
-  }
+  res.status(200);
 });
 
 export default router;

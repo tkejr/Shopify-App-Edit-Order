@@ -3,7 +3,9 @@ import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const SEND_GRID_API_KEY = process.env.EMAIL_API_KEY || "";
 import sgMail from "@sendgrid/mail";
-import { uninstallEmailHelper } from "./email-helper.js";
+import { uninstallEmailHelper, emailHelper } from "./email-helper.js";
+import shopify from "./shopify.js";
+import { addUser, getUserIdByUrl, updateUserDetails } from "./db.js";
 
 export default {
   /**
@@ -140,6 +142,7 @@ export default {
     callbackUrl: "/api/webhooks",
     callback: async (topic, shop, body, webhookId) => {
       console.log(shop);
+      console.log("======= Inside App Subcription Update ========");
       const payload = JSON.parse(body);
 
       console.log(payload.app_subscription.status);
@@ -150,6 +153,63 @@ export default {
         status: payload.app_subscription.status,
         capped_amount: payload.app_subscription.capped_amount,
       });
+
+      if (payload.app_subscription.status == "ACTIVE") {
+        try {
+          console.log("======= ADDING USER ==============");
+          user = await addUser(url, "temp_access");
+
+          //If added successfully means new user so send an email to user and owners
+
+          const shopDetails = await shopify.api.rest.Shop.all({
+            session: sess,
+          });
+
+          const shopEmail = "" + shopDetails[0].email;
+          const msg = await emailHelper(shopEmail);
+
+          sgMail
+            .send(msg)
+            .then(() => {
+              console.log("Email sent");
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+
+          //send email to us
+          const Installmsg = {
+            to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+            from: "editifyshopify@gmail.com", // Change to your verified sender
+            subject: `LFG Ka-ching-$$  ${payload.app_subscription.name}`,
+            text: `An Installation was made by ${shop} `,
+          };
+
+          sgMail
+            .send(Installmsg)
+            .then(() => {
+              console.log("Email sent to owners");
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        } catch {
+          console.log("User already Exists");
+        }
+
+        //changing the plan in db
+        const uid = await getUserIdByUrl(url);
+        const updatedUserDetails = await updateUserDetails(
+          uid,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          payload.app_subscription.name
+        );
+
+        //send only on new install
+      }
       console.log(payload);
     },
   },

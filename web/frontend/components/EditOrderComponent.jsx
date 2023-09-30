@@ -8,9 +8,7 @@ import {
   Layout,
   Button,
   Modal,
-  TextContainer,
-  IndexTable,
-  useIndexResourceState,
+  ButtonGroup,
   SkeletonThumbnail,
   Banner,
   FormLayout,
@@ -38,10 +36,17 @@ export function EditOrderComponent(props) {
   const [errorContent, setErrorContent] = useState("");
   const [error, setError] = useState(false);
   const [billingDetails, setBillingDetails] = useState(null);
-
+  const [shippingDetails, setShippingDetails] = useState(null);
+  const [updateButton, setUpdateButton] = useState('Update');
   const handleFieldChange = (fieldName, value) => {
     setBillingDetails({
       ...billingDetails,
+      [fieldName]: value,
+    });
+  };
+  const handleFieldChangeShipping = (fieldName, value) => {
+    setShippingDetails({
+      ...shippingDetails,
       [fieldName]: value,
     });
   };
@@ -57,6 +62,7 @@ export function EditOrderComponent(props) {
     if (orderId && orderName) {
       getLineItems();
       getOrderBilling();
+      getOrderShipping();
     }
   }, [props.orderId, reload]);
 
@@ -169,12 +175,19 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setBillingDetails(json);
+        console.log('here isn fsf ')
+      });
+  };
+  const getOrderShipping = async () => {
+    fetch("/api/orderBilling/shipping/" + orderId)
+      .then((response) => response.json())
+      .then((json) => {
+        setShippingDetails(json);
       });
   };
 
   const updateOrderBilling = async () => {
-    console.log("In here");
-    setActiveBilling(false);
+    setUpdateButton("Loading...")
     try {
       const response = await fetch(`/api/orderBilling/${orderId}`, {
         method: "PUT",
@@ -186,16 +199,53 @@ export function EditOrderComponent(props) {
 
       if (!response.ok) {
         throw new Error("Failed to update billing details");
+        
       }
-
-      // Handle success, e.g., show a success message
-      console.log("Billing details updated successfully");
+      setToastProps({ content: "Billing details updated successfully" });
     } catch (error) {
       // Handle error, e.g., show an error message
       console.error("Error updating billing details:", error);
+      props.setErrorContent(
+        "There was an error updating the billing details to the order. See the reasons why that may be the case here: "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      props.handleError();
+      props.setReloadComp(!props.reloadComp);
     }
+    setUpdateButton('Update')
+    props.setReloadComp(!props.reloadComp);
+    setActiveBilling(false);
   };
+  const updateOrderShipping = async () => {
+    setUpdateButton("Loading...")
+    
+    try {
+      const response = await fetch(`/api/orderBilling/shipping/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(shippingDetails),
+      });
 
+      if (!response.ok) {
+        throw new Error("Failed to update shipping details");
+      }
+      
+      setToastProps({ content: "Shipping details updated successfully" });
+    } catch (error) {
+      // Handle error, e.g., show an error message
+      console.error("Error updating billing details:", error);
+      props.setErrorContent(
+        "There was an error updating the billing details to the order. See the reasons why that may be the case here: "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      props.handleError();
+    }
+    setUpdateButton('Update')
+    props.setReloadComp(!props.reloadComp);
+    setActiveShipping(false);
+  };
   const getLineItems = async () => {
     setStatus("loading");
     setProduct([]);
@@ -227,6 +277,11 @@ export function EditOrderComponent(props) {
     [activeBilling]
   );
 
+  const [activeShipping, setActiveShipping] = useState(false);
+  const handleChangeShipping= useCallback(
+    () => setActiveShipping(!activeShipping),
+    [activeShipping]
+  );
   const [activeQuantity, setActiveQuantity] = useState(false);
   const handleChangeQuantity = useCallback(
     () => setActiveQuantity(!activeQuantity),
@@ -270,14 +325,15 @@ export function EditOrderComponent(props) {
         <Card.Section>
           {orderId ? (
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{ marginRight: "10px" }}>
-                <Button onClick={() => handleChange()}>Add Product</Button>
-              </div>
-              <div>
-                <Button onClick={() => handleChangeBilling()}>
+              
+              
+              <ButtonGroup>
+              <Button onClick={() => handleChange()}>Add Product</Button>
+              <Button onClick={() => handleChangeShipping()}>
                   Shipping Address
                 </Button>
-              </div>
+               <Button onClick={()=>handleChangeBilling()}>Billing Address</Button>
+              </ButtonGroup>
             </div>
           ) : (
             <Button disabled={true} onClick={() => handleChange()}>
@@ -432,9 +488,9 @@ export function EditOrderComponent(props) {
         // activator={activator}
         open={activeBilling}
         onClose={handleChangeBilling}
-        title="Order Shipping Address"
+        title="Order Billing Address"
         primaryAction={{
-          content: "Update",
+          content: updateButton,
           onAction: updateOrderBilling,
         }}
       >
@@ -525,6 +581,103 @@ export function EditOrderComponent(props) {
         )}
       </Modal>
 
+      <Modal
+        //Billing
+        // activator={activator}
+        open={activeShipping}
+        onClose={handleChangeShipping}
+        title="Order Shipping Address"
+        primaryAction={{
+          content: updateButton,
+          onAction: updateOrderShipping,
+        }}
+      >
+        {shippingDetails && (
+          <Modal.Section>
+            <FormLayout>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="Address 1"
+                  value={shippingDetails.address1}
+                  onChange={(value) => handleFieldChangeShipping("address1", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Address 2"
+                  value={shippingDetails.address2 || ""}
+                  onChange={(value) => handleFieldChangeShipping("address2", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="City"
+                  value={shippingDetails.city}
+                  onChange={(value) => handleFieldChangeShipping("city", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Country"
+                  value={shippingDetails.country}
+                  onChange={(value) => handleFieldChangeShipping("country", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="First Name"
+                  value={shippingDetails.first_name || ""}
+                  onChange={(value) => handleFieldChangeShipping("first_name", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Last Name"
+                  value={shippingDetails.last_name}
+                  onChange={(value) => handleFieldChangeShipping("last_name", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                {/* <TextField
+                type="text"
+                label="Latitude"
+                value={billingDetails.latitude || ""}
+                onChange={(value) => handleFieldChange("latitude", value)}
+              /> */}
+              </FormLayout.Group>
+
+              <FormLayout.Group>
+                <TextField
+                  type="text"
+                  label="Phone"
+                  value={shippingDetails.phone || ""}
+                  onChange={(value) => handleFieldChangeShipping("phone", value)}
+                />
+                <TextField
+                  type="text"
+                  label="Province"
+                  value={shippingDetails.province}
+                  onChange={(value) => handleFieldChangeShipping("province", value)}
+                />
+              </FormLayout.Group>
+              <FormLayout.Group>
+                {/* <TextField
+                type="text"
+                label="Province Code"
+                value={billingDetails.province_code}
+                onChange={(value) => handleFieldChange("province_code", value)}
+              /> */}
+                <TextField
+                  type="text"
+                  label="ZIP"
+                  value={shippingDetails.zip}
+                  onChange={(value) => handleFieldChangeShipping("zip", value)}
+                />
+              </FormLayout.Group>
+            </FormLayout>
+          </Modal.Section>
+        )}
+      </Modal>
       {toastMarkup}
     </Frame>
   );
