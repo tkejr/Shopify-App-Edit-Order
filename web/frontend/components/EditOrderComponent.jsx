@@ -23,6 +23,7 @@ import { TitleBar, ResourcePicker } from "@shopify/app-bridge-react";
 import { primaryAction } from "@shopify/app-bridge/actions/Toast";
 import { useSelector, useDispatch } from "react-redux";
 import ErrorBanner from "../components/ErrorBanner";
+import InvoiceModal from "../components/SendInvoice";
 
 export function EditOrderComponent(props) {
   const fetch = useAuthenticatedFetch();
@@ -37,7 +38,7 @@ export function EditOrderComponent(props) {
   const [error, setError] = useState(false);
   const [billingDetails, setBillingDetails] = useState(null);
   const [shippingDetails, setShippingDetails] = useState(null);
-  const [updateButton, setUpdateButton] = useState('Update');
+  const [updateButton, setUpdateButton] = useState("Update");
   const handleFieldChange = (fieldName, value) => {
     setBillingDetails({
       ...billingDetails,
@@ -175,7 +176,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setBillingDetails(json);
-        console.log('here isn fsf ')
+        console.log("here isn fsf ");
       });
   };
   const getOrderShipping = async () => {
@@ -187,7 +188,7 @@ export function EditOrderComponent(props) {
   };
 
   const updateOrderBilling = async () => {
-    setUpdateButton("Loading...")
+    setUpdateButton("Loading...");
     try {
       const response = await fetch(`/api/orderBilling/${orderId}`, {
         method: "PUT",
@@ -199,7 +200,6 @@ export function EditOrderComponent(props) {
 
       if (!response.ok) {
         throw new Error("Failed to update billing details");
-        
       }
       setToastProps({ content: "Billing details updated successfully" });
     } catch (error) {
@@ -212,13 +212,13 @@ export function EditOrderComponent(props) {
       props.handleError();
       props.setReloadComp(!props.reloadComp);
     }
-    setUpdateButton('Update')
+    setUpdateButton("Update");
     props.setReloadComp(!props.reloadComp);
     setActiveBilling(false);
   };
   const updateOrderShipping = async () => {
-    setUpdateButton("Loading...")
-    
+    setUpdateButton("Loading...");
+
     try {
       const response = await fetch(`/api/orderBilling/shipping/${orderId}`, {
         method: "PUT",
@@ -231,7 +231,7 @@ export function EditOrderComponent(props) {
       if (!response.ok) {
         throw new Error("Failed to update shipping details");
       }
-      
+
       setToastProps({ content: "Shipping details updated successfully" });
     } catch (error) {
       // Handle error, e.g., show an error message
@@ -242,7 +242,7 @@ export function EditOrderComponent(props) {
       props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
-    setUpdateButton('Update')
+    setUpdateButton("Update");
     props.setReloadComp(!props.reloadComp);
     setActiveShipping(false);
   };
@@ -278,7 +278,7 @@ export function EditOrderComponent(props) {
   );
 
   const [activeShipping, setActiveShipping] = useState(false);
-  const handleChangeShipping= useCallback(
+  const handleChangeShipping = useCallback(
     () => setActiveShipping(!activeShipping),
     [activeShipping]
   );
@@ -325,14 +325,15 @@ export function EditOrderComponent(props) {
         <Card.Section>
           {orderId ? (
             <div style={{ display: "flex", justifyContent: "center" }}>
-              
-              
               <ButtonGroup>
-              <Button onClick={() => handleChange()}>Add Product</Button>
-              <Button onClick={() => handleChangeShipping()}>
+                <Button onClick={() => handleChange()}>Add Product</Button>
+                <Button onClick={() => handleChangeShipping()}>
                   Shipping Address
                 </Button>
-               <Button onClick={()=>handleChangeBilling()}>Billing Address</Button>
+                <Button onClick={() => handleChangeBilling()}>
+                  Billing Address
+                </Button>
+                <InvoiceModal />
               </ButtonGroup>
             </div>
           ) : (
@@ -600,13 +601,17 @@ export function EditOrderComponent(props) {
                   type="text"
                   label="Address 1"
                   value={shippingDetails.address1}
-                  onChange={(value) => handleFieldChangeShipping("address1", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("address1", value)
+                  }
                 />
                 <TextField
                   type="text"
                   label="Address 2"
                   value={shippingDetails.address2 || ""}
-                  onChange={(value) => handleFieldChangeShipping("address2", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("address2", value)
+                  }
                 />
               </FormLayout.Group>
               <FormLayout.Group>
@@ -620,7 +625,9 @@ export function EditOrderComponent(props) {
                   type="text"
                   label="Country"
                   value={shippingDetails.country}
-                  onChange={(value) => handleFieldChangeShipping("country", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("country", value)
+                  }
                 />
               </FormLayout.Group>
               <FormLayout.Group>
@@ -628,13 +635,17 @@ export function EditOrderComponent(props) {
                   type="text"
                   label="First Name"
                   value={shippingDetails.first_name || ""}
-                  onChange={(value) => handleFieldChangeShipping("first_name", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("first_name", value)
+                  }
                 />
                 <TextField
                   type="text"
                   label="Last Name"
                   value={shippingDetails.last_name}
-                  onChange={(value) => handleFieldChangeShipping("last_name", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("last_name", value)
+                  }
                 />
               </FormLayout.Group>
               <FormLayout.Group>
@@ -651,13 +662,17 @@ export function EditOrderComponent(props) {
                   type="text"
                   label="Phone"
                   value={shippingDetails.phone || ""}
-                  onChange={(value) => handleFieldChangeShipping("phone", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("phone", value)
+                  }
                 />
                 <TextField
                   type="text"
                   label="Province"
                   value={shippingDetails.province}
-                  onChange={(value) => handleFieldChangeShipping("province", value)}
+                  onChange={(value) =>
+                    handleFieldChangeShipping("province", value)
+                  }
                 />
               </FormLayout.Group>
               <FormLayout.Group>

@@ -148,10 +148,10 @@ export default function CustomerPortal() {
 
   const getOrder = async () => {
     //if already saved no need to make a backend request again
-    if (statusUrl) {
-      window.open(statusUrl, "_blank");
-      return;
-    }
+    // if (statusUrl) {
+    //   window.open(statusUrl, "_blank");
+    //   return;
+    // }
     try {
       const response = await fetch("/api/viewLast", {
         method: "GET",
@@ -163,10 +163,12 @@ export default function CustomerPortal() {
 
       if (response.ok) {
         const data = await response.json();
-        setIsError(false);
-        setToastContent("Order Fetched Successfully");
-        setStatusUrl(data.data[0].order_status_url);
-        window.open(data.data[0].order_status_url, "_blank");
+        // setIsError(false);
+        // setToastContent("Order Fetched un");
+        console.log("DEBUG");
+        console.log(data.data[0]);
+        // setStatusUrl(data.data[0].order_status_url);
+        // window.open(data.data[0].order_status_url, "_blank");
         toggleActive();
       } else {
         setToastContent("Some Problem Occurred With API");
