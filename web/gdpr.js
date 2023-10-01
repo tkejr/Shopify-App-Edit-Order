@@ -157,7 +157,7 @@ export default {
       if (payload.app_subscription.status == "ACTIVE") {
         try {
           console.log("======= ADDING USER ==============");
-          user = await addUser(url, "temp_access");
+          user = await addUser(shop, "temp_access");
 
           //If added successfully means new user so send an email to user and owners
 
@@ -198,7 +198,7 @@ export default {
         }
 
         //changing the plan in db
-        const uid = await getUserIdByUrl(url);
+        const uid = await getUserIdByUrl(shop);
         const updatedUserDetails = await updateUserDetails(
           uid,
           undefined,
