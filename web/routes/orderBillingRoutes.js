@@ -40,7 +40,7 @@ router.put("/:id", async (req, res) => {
 
   const newOrder = new shopify.api.rest.Order({ session: session });
   newOrder.line_items = order.line_items;
-  
+
   edited_billing.name =
     edited_billing.first_name + " " + edited_billing.last_name;
   newOrder.billing_address = edited_billing;
@@ -114,11 +114,11 @@ router.put("/:id", async (req, res) => {
   newOrder.current_total_price_set = order.current_total_price_set;
   newOrder.current_total_tax = order.current_total_tax;
   newOrder.current_total_tax_set = order.current_total_tax_set;
-  
+
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
 
-  newOrder.email = order.email;
+  // newOrder.email = order.email;
   newOrder.estimated_taxes = order.estimated_taxes;
   newOrder.gateway = order.gateway;
   newOrder.landing_site = order.landing_site;
@@ -127,7 +127,6 @@ router.put("/:id", async (req, res) => {
 
   newOrder.note_attributes = order.note_attributes;
 
-  
   newOrder.order_status_url = order.order_status_url;
   newOrder.original_total_duties_set = order.original_total_duties_set;
 

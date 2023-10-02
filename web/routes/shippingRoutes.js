@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import {
   updateUserPreference,
@@ -13,41 +11,40 @@ import shopify from "../shopify.js";
 const router = express.Router();
 
 router.get("/:id", async (req, res) => {
-    const session = res.locals.shopify.session;
-    const shopUrl = session.shop;
-    console.log("========== In Update Shipping =============");
-    const orderData = await shopify.api.rest.Order.find({
-      session: session,
-      id: req.params["id"],
-      fields: "shipping_lines",
-    });
-    //orderData.shipping_lines
-    res.json(orderData.shipping_lines);
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  console.log("========== In Update Shipping =============");
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "shipping_lines",
   });
+  //orderData.shipping_lines
+  res.json(orderData.shipping_lines);
+});
 
 router.get("/taxLines/:id", async (req, res) => {
-    const session = res.locals.shopify.session;
-    const shopUrl = session.shop;
-    
-    const orderData = await shopify.api.rest.Order.find({
-      session: session,
-      id: req.params["id"],
-      fields: "tax_lines",
-    });
-    
-    res.json(orderData.tax_lines);
-  });
-  router.put("/:id", async (req, res) => {
-    
-    const session = res.locals.shopify.session;
-    const shopUrl = session.shop;
-    const shipping_and_tax_info = req.body;
-    const updated_shipping_lines  = shipping_and_tax_info.shippingCostDetails;
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
 
-    //console.log("========",updated_shipping_lines, shipping_and_tax_info)
-    //const updated_tax_lines  = shipping_and_tax_info.taxLines;
-    //console.log('==========',updated_tax_lines)
-    /*
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "tax_lines",
+  });
+
+  res.json(orderData.tax_lines);
+});
+router.put("/:id", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  const shipping_and_tax_info = req.body;
+  const updated_shipping_lines = shipping_and_tax_info.shippingCostDetails;
+
+  //console.log("========",updated_shipping_lines, shipping_and_tax_info)
+  //const updated_tax_lines  = shipping_and_tax_info.taxLines;
+  //console.log('==========',updated_tax_lines)
+  /*
     const line_item_tax_lines = [{
        
         "rate": updated_tax_lines[0].rate,
@@ -61,48 +58,46 @@ router.get("/taxLines/:id", async (req, res) => {
 ]
 */
 
-    
-    const orderId = req.params["id"];
-    let status = 200;
-    let error;
-    const order = await shopify.api.rest.Order.find({ session: session, id: req.params["id"] });
-    const newOrder =  new shopify.api.rest.Order({ session: session });
-    //newOrder.shipping_lines = updated_shipping_lines;
-    newOrder.shipping_lines=  [
-        {
-    
-        "title": ""+  updated_shipping_lines[0].title,
-        "price": "" + updated_shipping_lines[0].price,
-        
-           
-        }
-       
-    ]
-    if (order.financial_status === "paid") {
-        newOrder.transactions = [
-          {
-            kind: "sale",
-            status: "success",
-            amount: parseFloat(order.total_price - order.total_discounts),
-          },
-        ];
-      }
+  const orderId = req.params["id"];
+  let status = 200;
+  let error;
+  const order = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+  });
+  const newOrder = new shopify.api.rest.Order({ session: session });
+  //newOrder.shipping_lines = updated_shipping_lines;
+  newOrder.shipping_lines = [
+    {
+      title: "" + updated_shipping_lines[0].title,
+      price: "" + updated_shipping_lines[0].price,
+    },
+  ];
+  if (order.financial_status === "paid") {
+    newOrder.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: parseFloat(order.total_price - order.total_discounts),
+      },
+    ];
+  }
 
-    //newOrder.tax_lines = updated_tax_lines; 
-    newOrder.line_items = order.line_items; 
-    if (order.tags) {
-        newOrder.tags = order.tags;
-      }
-    newOrder.number = order.number;
-    newOrder.name = order.name;
-    newOrder.customer = order.customer;
-    newOrder.billing_address = order.billing_address;
-  
-     newOrder.order_number = order.order_number;
-    newOrder.shipping_address = order.shipping_address;
-    newOrder.financial_status = order.financial_status;
-   newOrder.payment_terms = order.payment_terms;
-   newOrder.created_at = order.created_at;
+  //newOrder.tax_lines = updated_tax_lines;
+  newOrder.line_items = order.line_items;
+  if (order.tags) {
+    newOrder.tags = order.tags;
+  }
+  newOrder.number = order.number;
+  newOrder.name = order.name;
+  newOrder.customer = order.customer;
+  newOrder.billing_address = order.billing_address;
+
+  newOrder.order_number = order.order_number;
+  newOrder.shipping_address = order.shipping_address;
+  newOrder.financial_status = order.financial_status;
+  newOrder.payment_terms = order.payment_terms;
+  newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
   //for notes
   newOrder.note = order.note;
@@ -127,7 +122,6 @@ router.get("/taxLines/:id", async (req, res) => {
 
   newOrder.note_attributes = order.note_attributes;
 
-  
   newOrder.order_status_url = order.order_status_url;
   newOrder.original_total_duties_set = order.original_total_duties_set;
 
@@ -154,11 +148,11 @@ router.get("/taxLines/:id", async (req, res) => {
   newOrder.current_total_price_set = order.current_total_price_set;
   newOrder.current_total_tax = order.current_total_tax;
   newOrder.current_total_tax_set = order.current_total_tax_set;
-  
+
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
-  newOrder.email = order.email;
-    /*
+  // newOrder.email = order.email;
+  /*
     
   order.shipping_lines=  [
     {
@@ -178,27 +172,23 @@ order.tax_lines =  [
     }
   ]
   */
-  
-    try {
-        
-       await newOrder.save({
-        update: true,
-      });
-      
-      
-      await shopify.api.rest.Order.delete({
-        session: res.locals.shopify.session,
-        id: req.params["id"],
-      });
-      
-      
-    } catch (e) {
-      status = 500;
-      error = e.message;
-      console.log(e);
-    }
-    console.log("=====", status, error);
-    res.status(status).send({ success: status === 200, error });
-  });
 
-  export default router;
+  try {
+    await newOrder.save({
+      update: true,
+    });
+
+    await shopify.api.rest.Order.delete({
+      session: res.locals.shopify.session,
+      id: req.params["id"],
+    });
+  } catch (e) {
+    status = 500;
+    error = e.message;
+    console.log(e);
+  }
+  console.log("=====", status, error);
+  res.status(status).send({ success: status === 200, error });
+});
+
+export default router;
