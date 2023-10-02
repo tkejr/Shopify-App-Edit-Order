@@ -154,48 +154,32 @@ export default {
         capped_amount: payload.app_subscription.capped_amount,
       });
 
-      if (payload.app_subscription.status == "ACTIVE") {
+      console.log("======= IN UPDATE SUBSCRIPTION ========= ");
+      console.log(payload.app_subscription.status);
+
+      if (payload.app_subscription.status === "ACTIVE") {
         try {
           console.log("======= ADDING USER ==============");
-          user = await addUser(shop, "temp_access");
-
-          //If added successfully means new user so send an email to user and owners
-
-          const shopDetails = await shopify.api.rest.Shop.all({
-            session: sess,
-          });
-
-          const shopEmail = "" + shopDetails[0].email;
-          const msg = await emailHelper(shopEmail);
-
-          sgMail
-            .send(msg)
-            .then(() => {
-              console.log("Email sent");
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-
-          //send email to us
-          const Installmsg = {
-            to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-            from: "editifyshopify@gmail.com", // Change to your verified sender
-            subject: `LFG Ka-ching-$$  ${payload.app_subscription.name}`,
-            text: `An Installation was made by ${shop} `,
-          };
-
-          sgMail
-            .send(Installmsg)
-            .then(() => {
-              console.log("Email sent to owners");
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        } catch {
-          console.log("User already Exists");
+          const user = await addUser(shop, "temp_access");
+        } catch (e) {
+          console.log(e);
         }
+        //send email to us
+        const Installmsg = {
+          to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+          from: "editifyshopify@gmail.com", // Change to your verified sender
+          subject: `LFG Ka-ching-$$  ${payload.app_subscription.name}`,
+          text: `An Installation was made by ${shop} `,
+        };
+
+        sgMail
+          .send(Installmsg)
+          .then(() => {
+            console.log("Email sent to owners");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
 
         //changing the plan in db
         const uid = await getUserIdByUrl(shop);

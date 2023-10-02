@@ -8,15 +8,21 @@ import {
   getUser,
 } from "./db.js";
 
-const getFreeTrialDays = async (shopEmail) => {
+const getFreeTrialDays = async (shop) => {
+  if (
+    shop == "audittesting.myshopify.com" ||
+    shop == "systemsdirect-com.myshopify.com"
+  ) {
+    return 3;
+  }
   var user;
   try {
-    user = await getUser(shopEmail);
+    user = await getUser(shop);
   } catch {
     return 3;
   }
   //remove after getting the tag
-  if (shopEmail == "audittesting.myshopify.com") {
+  if (shop == "audittesting.myshopify.com") {
     return 3;
   }
 
