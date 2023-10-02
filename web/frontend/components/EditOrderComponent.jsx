@@ -23,7 +23,9 @@ import { TitleBar, ResourcePicker } from "@shopify/app-bridge-react";
 import { primaryAction } from "@shopify/app-bridge/actions/Toast";
 import { useSelector, useDispatch } from "react-redux";
 import ErrorBanner from "../components/ErrorBanner";
-
+import {
+  DeleteMajor
+} from '@shopify/polaris-icons';
 export function EditOrderComponent(props) {
   const fetch = useAuthenticatedFetch();
   const orderId = useSelector((state) => state.orderId);
@@ -37,6 +39,8 @@ export function EditOrderComponent(props) {
   const [error, setError] = useState(false);
   const [billingDetails, setBillingDetails] = useState(null);
   const [shippingDetails, setShippingDetails] = useState(null);
+  const [shippingCostDetails, setShippingCostDetails] = useState(null);
+  const [taxLines, setTaxLines] = useState(null);
   const [updateButton, setUpdateButton] = useState('Update');
   const handleFieldChange = (fieldName, value) => {
     setBillingDetails({
@@ -50,7 +54,42 @@ export function EditOrderComponent(props) {
       [fieldName]: value,
     });
   };
-
+  const handleTaxLines = ( fieldName, value, index) => {
+    let newState
+    if(fieldName === "title"){
+      newState = taxLines.map((obj, index2) => {
+        if (index2 === index) {
+          return {...obj, title: value};
+        }
+        return obj;
+      });  
+    }
+    else{
+      newState = taxLines.map((obj, index2) => {
+        if (index2 === index) {
+          return {...obj, rate: value};
+        }
+        return obj;
+      });  
+    }
+    
+    setTaxLines(
+      newState
+    );
+  
+  };
+  const handleShippingLines = ( fieldName, value, index) => {
+    let update = [...shippingCostDetails]; 
+    if(fieldName === "price"){
+      update[0].price = value
+    }else{
+      update[0].title = value
+    }
+    
+    setShippingCostDetails(update);
+   
+  
+  };
   const handleError = () => {
     setError(!error);
   };
@@ -63,6 +102,8 @@ export function EditOrderComponent(props) {
       getLineItems();
       getOrderBilling();
       getOrderShipping();
+      getOrderShippingCost();
+      getOrderTaxLines();
     }
   }, [props.orderId, reload]);
 
@@ -175,7 +216,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setBillingDetails(json);
-        console.log('here isn fsf ')
+        
       });
   };
   const getOrderShipping = async () => {
@@ -183,6 +224,23 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setShippingDetails(json);
+        
+      });
+  };
+  const getOrderShippingCost = async () => {
+    fetch("/api/shipping/" + orderId)
+      .then((response) => response.json())
+      .then((json) => {
+        setShippingCostDetails(json);
+        
+      });
+  };
+  const getOrderTaxLines = async () => {
+    fetch("/api/shipping/taxLines/" + orderId)
+      .then((response) => response.json())
+      .then((json) => {
+        setTaxLines(json);
+        console.log(json)
       });
   };
 
@@ -246,6 +304,36 @@ export function EditOrderComponent(props) {
     props.setReloadComp(!props.reloadComp);
     setActiveShipping(false);
   };
+  const updateOrderShippingCosts = async () => {
+    setUpdateButton("Loading...")
+    const data = {shippingCostDetails : shippingCostDetails, taxLines : taxLines}; 
+    try {
+      const response = await fetch(`/api/shipping/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update shipping details");
+      }
+      
+      setToastProps({ content: "Shipping details updated successfully" });
+    } catch (error) {
+      // Handle error, e.g., show an error message
+      console.error("Error updating shipping details:", error);
+      props.setErrorContent(
+        "There was an error updating the shipping details to the order. See the reasons why that may be the case here: "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      props.handleError();
+    }
+    setUpdateButton('Update')
+    props.setReloadComp(!props.reloadComp);
+    setActiveShippingCosts(false);
+  };
   const getLineItems = async () => {
     setStatus("loading");
     setProduct([]);
@@ -282,6 +370,11 @@ export function EditOrderComponent(props) {
     () => setActiveShipping(!activeShipping),
     [activeShipping]
   );
+  const [activeShippingCosts, setActiveShippingCosts] = useState(false);
+  const handleChangeShippingCosts= useCallback(
+    () => setActiveShippingCosts(!activeShippingCosts),
+    [activeShippingCosts]
+  );
   const [activeQuantity, setActiveQuantity] = useState(false);
   const handleChangeQuantity = useCallback(
     () => setActiveQuantity(!activeQuantity),
@@ -314,6 +407,64 @@ export function EditOrderComponent(props) {
     setProductId("");
     setShowProducts(false);
   };
+  const shippingLines = shippingCostDetails?.map(
+    (shippingDetail, index) => (
+      <FormLayout.Group>
+         <TextField
+                  type="text"
+                  label="Title"
+                  value={shippingDetail.title || ""}
+                  onChange={(value) => handleShippingLines("title", value, index)}
+                />
+                <TextField
+                  type="text"
+                  label="Price"
+                  value={shippingDetail.price || ""}
+                  onChange={(value) => handleShippingLines("price", value, index)}
+                />
+                  
+              </FormLayout.Group>
+    )
+  );
+  const [expanded, setExpanded] = useState(false);
+  const taxLinesArray = taxLines?.map(
+    (tax, index) => (
+      <FormLayout.Group>
+        <div style={{display:'flex'}}>
+         <TextField
+                  type="text"
+                  label="Name"
+                  value={tax.title || ""}
+                  onChange={(value) => handleTaxLines( "title",value, index)}
+                />
+              
+                 <TextField
+                  type="text"
+                  label="Rate"
+                  value={tax.rate || ""}
+                  onChange={(value) => handleTaxLines("rate", value, index)}
+                />
+                <Button plain destructive onClick={()=>deleteTaxLine(tax)}> <div style={{marginTop:"20px"}}><Icon source={DeleteMajor} color="critical" /> </div></Button>
+                </div>
+              </FormLayout.Group>
+    )
+  );
+  const addTaxLine = () => {
+        const userInput = {
+            title: "", rate: 0.00
+        };
+        const updatedTaxLines = [...taxLines];
+        updatedTaxLines.push(userInput);
+        setTaxLines(
+            updatedTaxLines  
+        );
+}
+const deleteTaxLine = (value) => {
+  
+  setTaxLines(oldValues => {
+    return oldValues.filter(tax => tax !== value)
+  })
+}
 
   return (
     <Frame>
@@ -333,6 +484,10 @@ export function EditOrderComponent(props) {
                   Shipping Address
                 </Button>
                <Button onClick={()=>handleChangeBilling()}>Billing Address</Button>
+               <Button onClick={() => handleChangeShippingCosts()}>
+                  Shipping Costs
+                </Button>
+               
               </ButtonGroup>
             </div>
           ) : (
@@ -674,6 +829,43 @@ export function EditOrderComponent(props) {
                   onChange={(value) => handleFieldChangeShipping("zip", value)}
                 />
               </FormLayout.Group>
+            </FormLayout>
+          </Modal.Section>
+        )}
+      </Modal>
+      <Modal
+        //Billing
+        // activator={activator}
+        open={activeShippingCosts}
+        onClose={handleChangeShippingCosts}
+        title="Shipping Costs"
+        primaryAction={{
+          content: updateButton,
+          onAction: updateOrderShippingCosts,
+        }}
+      >
+        {shippingCostDetails && (
+          <Modal.Section>
+            <FormLayout>
+              
+                {shippingLines}
+                <div style={{ padding: "10px" }}>
+                  <Button
+                  plain
+                  disclosure={expanded ? "up" : "down"}
+                  onClick={() => {
+                  setExpanded(!expanded);
+                  }}
+                  >
+                  {expanded ? "Close" : "Shipping Taxes"}
+              </Button>
+                </div>
+                {expanded && (
+                  <>
+                    <Button onClick={()=> addTaxLine()}>Add Tax Line</Button>
+                    {taxLinesArray}
+                    </>
+                  )}
             </FormLayout>
           </Modal.Section>
         )}
