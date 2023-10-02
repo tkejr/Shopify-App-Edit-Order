@@ -332,6 +332,7 @@ export function EditOrderComponent(props) {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: null });
+    setLineItems([]);
   };
   const getLineItems = async () => {
     setStatus("loading");
