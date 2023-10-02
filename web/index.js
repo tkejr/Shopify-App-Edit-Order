@@ -145,7 +145,10 @@ app.get("/api/check", async (req, res) => {
   const url = sess.shop;
 
   //harcoding for review stores
-  if (url == "momiji-kids.myshopify.com") {
+  if (
+    url == "momiji-kids.myshopify.com" ||
+    url == "pekoe-petals.myshopify.com"
+  ) {
     res.json({ hasPayment: "pro" });
     return;
   }
