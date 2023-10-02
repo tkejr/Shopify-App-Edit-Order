@@ -219,6 +219,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setShippingDetails(json);
+        console.log("========",json);
       });
   };
   const getOrderShippingCost = async () => {
@@ -226,7 +227,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setShippingCostDetails(json);
-        console.log(json);
+        
       });
   };
   const getOrderTaxLines = async () => {
@@ -288,7 +289,7 @@ export function EditOrderComponent(props) {
       // Handle error, e.g., show an error message
       console.error("Error updating billing details:", error);
       props.setErrorContent(
-        "There was an error updating the billing details to the order. See the reasons why that may be the case here: "
+        "There was an error updating the shipping details to the order. If adding a shipping address, add the correct fields. For US, Province is State. See the reasons why that may be the case here: "
       );
       props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
@@ -331,7 +332,7 @@ export function EditOrderComponent(props) {
     setActiveShippingCosts(false);
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
-    dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: null });
+    dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
     setLineItems([]);
   };
   const getLineItems = async () => {
@@ -394,14 +395,7 @@ export function EditOrderComponent(props) {
   const [inputValue, setInputValue] = useState("");
   const [originalQuantity, setOriginalQuantity] = useState("");
   //const [options, setOptions] = useState(deselectedOptions);
-  const [loading, setLoading] = useState(false);
-  const testingEmail = () => {
-    fetch("/api/email")
-      .then((response) => response.json())
-      .then((json) => {
-        console.log("flkkk");
-      });
-  };
+  
   const removeProduct = () => {
     setProduct([]);
     setProductId("");
@@ -451,6 +445,32 @@ export function EditOrderComponent(props) {
   ));
   const addShipping = () => {
     setShippingCostDetails([{ title: "", price: "" }]);
+  };
+  const addShippingAddress = () => {
+    setShippingDetails({
+      first_name: '', 
+      last_name:'', 
+      address1: '', 
+      address2: '', 
+      phone: '', 
+      province:'',
+      city: '',
+      zip: '',
+
+       });
+  };
+  const addBillingAddress = () => {
+    setBillingDetails({
+      first_name: '', 
+      last_name:'', 
+      address1: '', 
+      address2: '', 
+      phone: '', 
+      province:'',
+      city: '',
+      zip: '',
+
+       });
   };
   const addTaxLine = () => {
     const userInput = {
@@ -651,20 +671,22 @@ export function EditOrderComponent(props) {
           onAction: updateOrderBilling,
         }}
       >
-        {billingDetails && (
+      
           <Modal.Section>
             <FormLayout>
+            {billingDetails?.status === 'none' ? (<Button onClick={()=> addBillingAddress()}> Add Billing Address</Button>) : (
+              <>
               <FormLayout.Group>
                 <TextField
                   type="text"
                   label="Address 1"
-                  value={billingDetails.address1}
+                  value={billingDetails?.address1}
                   onChange={(value) => handleFieldChange("address1", value)}
                 />
                 <TextField
                   type="text"
                   label="Address 2"
-                  value={billingDetails.address2 || ""}
+                  value={billingDetails?.address2 || ""}
                   onChange={(value) => handleFieldChange("address2", value)}
                 />
               </FormLayout.Group>
@@ -672,13 +694,13 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="City"
-                  value={billingDetails.city}
+                  value={billingDetails?.city}
                   onChange={(value) => handleFieldChange("city", value)}
                 />
                 <TextField
                   type="text"
                   label="Country"
-                  value={billingDetails.country}
+                  value={billingDetails?.country}
                   onChange={(value) => handleFieldChange("country", value)}
                 />
               </FormLayout.Group>
@@ -686,13 +708,13 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="First Name"
-                  value={billingDetails.first_name || ""}
+                  value={billingDetails?.first_name || ""}
                   onChange={(value) => handleFieldChange("first_name", value)}
                 />
                 <TextField
                   type="text"
                   label="Last Name"
-                  value={billingDetails.last_name}
+                  value={billingDetails?.last_name}
                   onChange={(value) => handleFieldChange("last_name", value)}
                 />
               </FormLayout.Group>
@@ -709,13 +731,13 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="Phone"
-                  value={billingDetails.phone || ""}
+                  value={billingDetails?.phone || ""}
                   onChange={(value) => handleFieldChange("phone", value)}
                 />
                 <TextField
                   type="text"
                   label="Province"
-                  value={billingDetails.province}
+                  value={billingDetails?.province}
                   onChange={(value) => handleFieldChange("province", value)}
                 />
               </FormLayout.Group>
@@ -729,18 +751,18 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="ZIP"
-                  value={billingDetails.zip}
+                  value={billingDetails?.zip}
                   onChange={(value) => handleFieldChange("zip", value)}
                 />
               </FormLayout.Group>
+              </>)}
             </FormLayout>
           </Modal.Section>
-        )}
+        
       </Modal>
 
       <Modal
-        //Billing
-        // activator={activator}
+        
         open={activeShipping}
         onClose={handleChangeShipping}
         title="Order Shipping Address"
@@ -749,14 +771,17 @@ export function EditOrderComponent(props) {
           onAction: updateOrderShipping,
         }}
       >
-        {shippingDetails && (
+        
           <Modal.Section>
             <FormLayout>
+              {shippingDetails?.status === 'none' ? (<Button onClick={()=> addShippingAddress()}> Add Shipping Address</Button>) : (
+                <>
               <FormLayout.Group>
+
                 <TextField
                   type="text"
                   label="Address 1"
-                  value={shippingDetails.address1}
+                  value={shippingDetails?.address1}
                   onChange={(value) =>
                     handleFieldChangeShipping("address1", value)
                   }
@@ -764,7 +789,7 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="Address 2"
-                  value={shippingDetails.address2 || ""}
+                  value={shippingDetails?.address2 || ""}
                   onChange={(value) =>
                     handleFieldChangeShipping("address2", value)
                   }
@@ -774,13 +799,13 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="City"
-                  value={shippingDetails.city}
+                  value={shippingDetails?.city}
                   onChange={(value) => handleFieldChangeShipping("city", value)}
                 />
                 <TextField
                   type="text"
                   label="Country"
-                  value={shippingDetails.country}
+                  value={shippingDetails?.country}
                   onChange={(value) =>
                     handleFieldChangeShipping("country", value)
                   }
@@ -790,7 +815,7 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="First Name"
-                  value={shippingDetails.first_name || ""}
+                  value={shippingDetails?.first_name || ""}
                   onChange={(value) =>
                     handleFieldChangeShipping("first_name", value)
                   }
@@ -798,7 +823,7 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="Last Name"
-                  value={shippingDetails.last_name}
+                  value={shippingDetails?.last_name}
                   onChange={(value) =>
                     handleFieldChangeShipping("last_name", value)
                   }
@@ -817,7 +842,7 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="Phone"
-                  value={shippingDetails.phone || ""}
+                  value={shippingDetails?.phone || ""}
                   onChange={(value) =>
                     handleFieldChangeShipping("phone", value)
                   }
@@ -825,7 +850,7 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="Province"
-                  value={shippingDetails.province}
+                  value={shippingDetails?.province}
                   onChange={(value) =>
                     handleFieldChangeShipping("province", value)
                   }
@@ -841,13 +866,15 @@ export function EditOrderComponent(props) {
                 <TextField
                   type="text"
                   label="ZIP"
-                  value={shippingDetails.zip}
+                  value={shippingDetails?.zip}
                   onChange={(value) => handleFieldChangeShipping("zip", value)}
                 />
               </FormLayout.Group>
+              </>
+              )}
             </FormLayout>
           </Modal.Section>
-        )}
+        
       </Modal>
       <Modal
         //Billing

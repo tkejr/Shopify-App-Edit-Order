@@ -73,6 +73,7 @@ router.put("/:id", async (req, res) => {
       price: "" + updated_shipping_lines[0].price,
     },
   ];
+  
   if (order.financial_status === "paid") {
     newOrder.transactions = [
       {
@@ -81,10 +82,20 @@ router.put("/:id", async (req, res) => {
         amount: parseFloat(order.total_price - order.total_discounts),
       },
     ];
+  }else{
+    
+    newOrder.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: parseFloat( order.total_price - order.total_outstanding),
+      },
+    ];
   }
 
   //newOrder.tax_lines = updated_tax_lines;
   newOrder.line_items = order.line_items;
+  
   if (order.tags) {
     newOrder.tags = order.tags;
   }
@@ -95,8 +106,8 @@ router.put("/:id", async (req, res) => {
 
   newOrder.order_number = order.order_number;
   newOrder.shipping_address = order.shipping_address;
-  newOrder.financial_status = order.financial_status;
-  newOrder.payment_terms = order.payment_terms;
+  newOrder.financial_status = 'partially_paid';
+  //newOrder.payment_terms = order.payment_terms;
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
   //for notes
@@ -108,11 +119,11 @@ router.put("/:id", async (req, res) => {
   newOrder.total_discounts_set = order.total_discounts_set;
   newOrder.total_line_items_price = order.total_line_items_price;
   newOrder.total_line_items_price_set = order.total_line_items_price_set;
-  newOrder.total_outstanding = order.total_outstanding;
-  newOrder.total_price = order.total_price;
+  //newOrder.total_outstanding = order.total_outstanding;
+  //newOrder.total_price = order.total_price;
 
-  newOrder.total_price_set = order.total_price_set;
-  newOrder.total_shipping_price_set = order.total_shipping_price_set;
+  //newOrder.total_price_set = order.total_price_set;
+ // newOrder.total_shipping_price_set = order.total_shipping_price_set;
   newOrder.total_tax = order.total_tax;
   newOrder.total_tax_set = order.total_tax_set;
   newOrder.total_tip_received = order.total_tip_received;
@@ -131,14 +142,15 @@ router.put("/:id", async (req, res) => {
   newOrder.processing_method = order.processing_method;
   newOrder.referring_site = order.referring_site;
   newOrder.refunds = order.refunds;
-  newOrder.subtotal_price = order.subtotal_price;
-  newOrder.subtotal_price_set = order.subtotal_price_set;
+  //newOrder.subtotal_price = order.subtotal_price;
+  //newOrder.subtotal_price_set = order.subtotal_price_set;
 
   newOrder.cart_token = order.cart_token;
   newOrder.checkout_token = order.checkout_token;
   newOrder.client_details = order.client_details;
   newOrder.closed_at = order.closed_at;
   newOrder.company = order.company;
+  /*
   newOrder.current_subtotal_price = order.current_subtotal_price;
   newOrder.current_subtotal_price_set = order.current_subtotal_price_set;
   newOrder.current_total_discounts = order.current_total_discounts;
@@ -146,12 +158,16 @@ router.put("/:id", async (req, res) => {
   newOrder.current_total_duties_set = order.current_total_duties_set;
   newOrder.current_total_price = order.current_total_price;
   newOrder.current_total_price_set = order.current_total_price_set;
-  newOrder.current_total_tax = order.current_total_tax;
-  newOrder.current_total_tax_set = order.current_total_tax_set;
-
+   
+*/
+ newOrder.current_total_tax = order.current_total_tax;
+  newOrder.current_total_tax_set = order.current_total_tax_set; 
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
-  // newOrder.email = order.email;
+  if(order.email !== ''){
+    newOrder.email = order.email;
+  }
+ 
   /*
     
   order.shipping_lines=  [
