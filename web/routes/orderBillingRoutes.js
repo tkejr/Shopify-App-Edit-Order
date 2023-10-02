@@ -13,14 +13,20 @@ const router = express.Router();
 router.get("/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  console.log("========== In Update Billing =============");
+  console.log("========== In get Billing =============");
   const orderData = await shopify.api.rest.Order.find({
     session: session,
     id: req.params["id"],
     fields: "billing_address",
   });
-
-  res.json(orderData.billing_address);
+  let returnObj = orderData.billing_address
+  console.log("======== shiping addy", orderData);
+ if(!orderData.billing_address){
+   console.log('here, there is no billing addresss');
+   returnObj = {status: 'none'}
+   
+ }
+  res.json(returnObj);
 });
 
 router.put("/:id", async (req, res) => {
@@ -64,6 +70,16 @@ router.put("/:id", async (req, res) => {
       },
     ];
   }
+  else{
+    
+    newOrder.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: parseFloat( order.total_price - order.total_outstanding),
+      },
+    ];
+  }
 
   newOrder.financial_status = order.financial_status;
   newOrder.payment_terms = order.payment_terms;
@@ -78,7 +94,7 @@ router.put("/:id", async (req, res) => {
   newOrder.note = order.note;
   newOrder.total_tax = order.total_tax;
   newOrder.currency = order.currency;
-
+/*
   newOrder.total_discounts = order.total_discounts;
   newOrder.total_discounts_set = order.total_discounts_set;
   newOrder.total_line_items_price = order.total_line_items_price;
@@ -88,7 +104,8 @@ router.put("/:id", async (req, res) => {
 
   newOrder.total_price_set = order.total_price_set;
   newOrder.total_shipping_price_set = order.total_shipping_price_set;
-  newOrder.total_tax = order.total_tax;
+  */
+  
   newOrder.total_tax_set = order.total_tax_set;
   newOrder.total_tip_received = order.total_tip_received;
   newOrder.total_weight = order.total_weight;
@@ -97,28 +114,30 @@ router.put("/:id", async (req, res) => {
 
   newOrder.payment_details = order.payment_details;
 
-  newOrder.subtotal_price = order.subtotal_price;
-  newOrder.subtotal_price_set = order.subtotal_price_set;
+ //newOrder.subtotal_price = order.subtotal_price;
+  //newOrder.subtotal_price_set = order.subtotal_price_set;
 
   newOrder.cart_token = order.cart_token;
   newOrder.checkout_token = order.checkout_token;
   newOrder.client_details = order.client_details;
   newOrder.closed_at = order.closed_at;
   newOrder.company = order.company;
-  newOrder.current_subtotal_price = order.current_subtotal_price;
-  newOrder.current_subtotal_price_set = order.current_subtotal_price_set;
+  
   newOrder.current_total_discounts = order.current_total_discounts;
   newOrder.current_total_discounts_set = order.current_total_discounts_set;
   newOrder.current_total_duties_set = order.current_total_duties_set;
+  /*
   newOrder.current_total_price = order.current_total_price;
   newOrder.current_total_price_set = order.current_total_price_set;
   newOrder.current_total_tax = order.current_total_tax;
   newOrder.current_total_tax_set = order.current_total_tax_set;
-
+*/
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
 
-  // newOrder.email = order.email;
+  if(order.email !== '') {
+    newOrder.email = order.email;
+  }
   newOrder.estimated_taxes = order.estimated_taxes;
   newOrder.gateway = order.gateway;
   newOrder.landing_site = order.landing_site;
@@ -168,14 +187,20 @@ router.put("/:id", async (req, res) => {
 router.get("/shipping/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  console.log("========== In Update Shipping =============");
+  console.log("========== In get Shipping =============");
   const orderData = await shopify.api.rest.Order.find({
     session: session,
     id: req.params["id"],
     fields: "shipping_address",
   });
-
-  res.json(orderData.shipping_address);
+  let returnObj = orderData.shipping_address
+   console.log("======== shiping addy", orderData);
+  if(!orderData.shipping_address){
+    console.log('here, there is no shipping addresss');
+    returnObj = {status: 'none'}
+    
+  }
+  res.json(returnObj);
 });
 
 router.put("/shipping/:id", async (req, res) => {
@@ -197,7 +222,7 @@ router.put("/shipping/:id", async (req, res) => {
     const updateOrder = await order.save({
       update: true,
     });
-    console.log(updateOrder);
+   
   } catch (e) {
     status = 500;
     error = e.message;
@@ -210,13 +235,13 @@ router.put("/shipping/:id", async (req, res) => {
 router.get("/email/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  console.log("========== In Update Billing =============");
+  
   const orderData = await shopify.api.rest.Order.find({
     session: session,
     id: req.params["id"],
     fields: "email",
   });
-  console.log(orderData);
+  
   res.json(orderData);
 });
 
