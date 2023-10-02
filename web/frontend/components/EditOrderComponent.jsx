@@ -42,6 +42,7 @@ export function EditOrderComponent(props) {
   const [shippingCostDetails, setShippingCostDetails] = useState(null);
   const [taxLines, setTaxLines] = useState(null);
   const [updateButton, setUpdateButton] = useState("Update");
+  const dispatch = useDispatch();
   const handleFieldChange = (fieldName, value) => {
     setBillingDetails({
       ...billingDetails,
@@ -328,6 +329,9 @@ export function EditOrderComponent(props) {
     setUpdateButton("Update");
     props.setReloadComp(!props.reloadComp);
     setActiveShippingCosts(false);
+    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+    dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
   };
   const getLineItems = async () => {
     setStatus("loading");

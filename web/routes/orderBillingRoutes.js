@@ -216,7 +216,6 @@ router.get("/email/:id", async (req, res) => {
     id: req.params["id"],
     fields: "email",
   });
-  console.log("======= IN EMAIL ========");
   console.log(orderData);
   res.json(orderData);
 });
