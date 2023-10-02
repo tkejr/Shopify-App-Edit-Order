@@ -18,7 +18,8 @@ router.post("/", async (req, res) => {
     });
     const session = res.locals.shopify.session;
     const emailData = req.body.email;
-    console.log(emailData);
+    const orderId = req.body.orderId;
+
     const client = new shopify.api.clients.Graphql({ session });
 
     var data = await client.query({
@@ -35,7 +36,7 @@ router.post("/", async (req, res) => {
                     }
                 }`,
         variables: {
-          orderId: "gid://shopify/Order/5537587298622",
+          orderId: `gid://shopify/Order/${orderId}`,
           email: {
             to: emailData.to,
             from: emailData.from,

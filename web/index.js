@@ -22,6 +22,7 @@ import preferenceRoutes from "./routes/preferenceRoutes.js";
 import cPortalRoutes from "./routes/cPortalRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import orderBillingRoutes from "./routes/orderBillingRoutes.js";
+import shippingRoutes from "./routes/shippingRoutes.js";
 import sendInvoice from "./routes/sendInvoice.js";
 
 //new for billing
@@ -769,6 +770,9 @@ app.use("/api/orderBilling", orderBillingRoutes);
 
 //customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
+
+//customer portal preferences
+app.use("/api/shipping", shippingRoutes);
 
 //misc cportal routes
 app.use("/api", cPortalRoutes);

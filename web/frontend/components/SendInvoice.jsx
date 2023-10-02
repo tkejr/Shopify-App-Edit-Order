@@ -16,7 +16,7 @@ import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
 
-export default function InvoiceModal() {
+export default function InvoiceModal({ orderId }) {
   const [active, setActive] = useState(false);
   const [emailTo, setEmailTo] = useState("");
   const [emailFrom, setEmailFrom] = useState("");
@@ -25,6 +25,22 @@ export default function InvoiceModal() {
   const fetch = useAuthenticatedFetch();
 
   const handleChange = useCallback(() => setActive(!active), [active]);
+
+  const getOrderEmail = async () => {
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      //body: JSON.stringify({ date: newDate }),
+    };
+    fetch(`/api/orderBilling/email/${orderId}`, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setEmailTo(data.email);
+      });
+  };
+  useEffect(async () => {
+    getOrderEmail();
+  }, [orderId]);
 
   const handleSendInvoice = async () => {
     // Here, make a POST request to your server with the form data
@@ -41,6 +57,7 @@ export default function InvoiceModal() {
             subject,
             customMessage,
           },
+          orderId: orderId,
         }),
       });
 
@@ -54,6 +71,11 @@ export default function InvoiceModal() {
     } catch (error) {
       console.error("Error:", error);
     }
+    setEmailTo("");
+    setEmailFrom("");
+    setSubject("");
+    setCustomMessage("");
+    handleChange();
   };
 
   return (
