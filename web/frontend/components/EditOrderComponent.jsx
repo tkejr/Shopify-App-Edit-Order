@@ -232,7 +232,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setShippingCostDetails(json);
-        
+        console.log(json)
       });
   };
   const getOrderTaxLines = async () => {
@@ -240,7 +240,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setTaxLines(json);
-        console.log(json)
+        //console.log(json)
       });
   };
 
@@ -449,6 +449,9 @@ export function EditOrderComponent(props) {
               </FormLayout.Group>
     )
   );
+  const addShipping = () =>{
+    setShippingCostDetails([{title: '', price: ''}])
+  }
   const addTaxLine = () => {
         const userInput = {
             title: "", rate: 0.00
@@ -844,11 +847,13 @@ const deleteTaxLine = (value) => {
           onAction: updateOrderShippingCosts,
         }}
       >
-        {shippingCostDetails && (
+        {
           <Modal.Section>
             <FormLayout>
               
-                {shippingLines}
+                
+            { (shippingCostDetails == false) ? (<Button  onClick={()=> addShipping()}>Add Shipping</Button>) : (
+                <>{shippingLines}</>)}
                 <div style={{ padding: "10px" }}>
                   <Button
                   plain
@@ -866,9 +871,10 @@ const deleteTaxLine = (value) => {
                     {taxLinesArray}
                     </>
                   )}
+                  
             </FormLayout>
           </Modal.Section>
-        )}
+        }
       </Modal>
       {toastMarkup}
     </Frame>

@@ -2,7 +2,7 @@
 
 name = "editify-dev"
 client_id = "8198bc4d24cec22808ae47b0504bc324"
-application_url = "https://casey-centres-an-serum.trycloudflare.com"
+application_url = "https://drum-satisfaction-mess-regard.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://casey-centres-an-serum.trycloudflare.com/auth/callback",
-  "https://casey-centres-an-serum.trycloudflare.com/auth/shopify/callback",
-  "https://casey-centres-an-serum.trycloudflare.com/api/auth/callback"
+  "https://drum-satisfaction-mess-regard.trycloudflare.com/auth/callback",
+  "https://drum-satisfaction-mess-regard.trycloudflare.com/auth/shopify/callback",
+  "https://drum-satisfaction-mess-regard.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
