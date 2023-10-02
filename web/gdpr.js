@@ -154,6 +154,9 @@ export default {
         capped_amount: payload.app_subscription.capped_amount,
       });
 
+      console.log("======= IN UPDATE SUBSCRIPTION ========= ");
+      console.log(payload.app_subscription.status);
+
       if (payload.app_subscription.status == "ACTIVE") {
         try {
           console.log("======= ADDING USER ==============");
