@@ -160,7 +160,7 @@ export default {
       if (payload.app_subscription.status == "ACTIVE") {
         try {
           console.log("======= ADDING USER ==============");
-          user = await addUser(shop, "temp_access");
+          const user = await addUser(shop, "temp_access");
 
           //If added successfully means new user so send an email to user and owners
 
