@@ -114,11 +114,11 @@ router.put("/:id", async (req, res) => {
   newOrder.current_total_price_set = order.current_total_price_set;
   newOrder.current_total_tax = order.current_total_tax;
   newOrder.current_total_tax_set = order.current_total_tax_set;
-  newOrder.customer = order.customer;
+
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
 
-  newOrder.email = order.email;
+  // newOrder.email = order.email;
   newOrder.estimated_taxes = order.estimated_taxes;
   newOrder.gateway = order.gateway;
   newOrder.landing_site = order.landing_site;
@@ -127,7 +127,6 @@ router.put("/:id", async (req, res) => {
 
   newOrder.note_attributes = order.note_attributes;
 
-  newOrder.order_number = order.order_number; //
   newOrder.order_status_url = order.order_status_url;
   newOrder.original_total_duties_set = order.original_total_duties_set;
 
@@ -206,6 +205,19 @@ router.put("/shipping/:id", async (req, res) => {
   }
   console.log("=====", status, error);
   res.status(status).send({ success: status === 200, error });
+});
+
+router.get("/email/:id", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  console.log("========== In Update Billing =============");
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "email",
+  });
+  console.log(orderData);
+  res.json(orderData);
 });
 
 export default router;

@@ -3,9 +3,9 @@ import { createStore } from "redux";
 const initialState = {
   isPremiumUser: false,
   orderId: false,
-  orderName: false, 
+  orderName: false,
   line_items: [],
-  planName: ""
+  planName: "",
 };
 
 const reducer = (state = initialState, action) => {
@@ -15,11 +15,11 @@ const reducer = (state = initialState, action) => {
     case "SET_PROPS_ORDER_ID":
       return { ...state, orderId: action.payload };
     case "SET_PROPS_ORDER_NAME":
-        return { ...state, orderName: action.payload };
+      return { ...state, orderName: action.payload };
     case "SET_PROPS_LINE_ITEMS":
-        return { ...state, line_items: action.payload };
+      return { ...state, line_items: action.payload };
     case "SET_PLAN_NAME":
-        return { ...state, planName: action.payload };
+      return { ...state, planName: action.payload };
     default:
       return state;
   }
