@@ -378,14 +378,23 @@ app.put("/api/orders/:id", async (_req, res) => {
         ),
       },
     ];
+  }else{
+    
+    order2.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: parseFloat( orderTesting.total_price - orderTesting.total_outstanding),
+      },
+    ];
   }
 
   order2.financial_status = orderTesting.financial_status;
-  order2.payment_terms = orderTesting.payment_terms;
+ ///order2.payment_terms = orderTesting.payment_terms;
 
   order2.total_tax = orderTesting?.total_tax;
   order2.billing_address = orderTesting?.billing_address;
-  order2.app_id = orderTesting?.app_id;
+  //order2.app_id = orderTesting?.app_id;
   order2.cancel_reason = orderTesting?.cancel_reason;
   order2.buyer_accepts_marketing = orderTesting?.buyer_accepts_marketing;
   order2.cancelled_at = orderTesting?.cancelled_at;
@@ -397,14 +406,16 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.client_details = orderTesting?.client_details;
   order2.closed_at = orderTesting?.closed_at;
   order2.company = orderTesting?.company;
+  /*
   order2.current_subtotal_price = orderTesting?.current_subtotal_price;
   order2.current_subtotal_price_set = orderTesting?.current_subtotal_price_set;
+  */
   order2.current_total_discounts = orderTesting?.current_total_discounts;
   order2.current_total_discounts_set =
     orderTesting?.current_total_discounts_set;
-  order2.current_total_duties_set = orderTesting?.current_total_duties_set;
-  order2.current_total_price = orderTesting?.current_total_price;
-  order2.current_total_price_set = orderTesting?.current_total_price_set;
+  //order2.current_total_duties_set = orderTesting?.current_total_duties_set;
+  //order2.current_total_price = orderTesting?.current_total_price;
+  //order2.current_total_price_set = orderTesting?.current_total_price_set;
   order2.current_total_tax = orderTesting?.current_total_tax;
   order2.current_total_tax_set = orderTesting?.current_total_tax_set;
   order2.customer = orderTesting?.customer;
@@ -413,7 +424,9 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   //order2.discount_codes = orderTesting?.discount_codes;
 
-  order2.email = orderTesting?.email;
+  if(orderTesting.email){
+    order2.email = orderTesting?.email;
+  }
   order2.estimated_taxes = orderTesting?.estimated_taxes;
 
   order2.gateway = orderTesting?.gateway;
@@ -425,11 +438,14 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.note_attributes = orderTesting?.note_attributes;
   order2.number = orderTesting?.number; //
   order2.order_number = orderTesting?.order_number; //
-  order2.order_status_url = orderTesting?.order_status_url;
+  //order2.order_status_url = orderTesting?.order_status_url;
   order2.original_total_duties_set = orderTesting?.original_total_duties_set;
-  order2.payment_details = orderTesting?.payment_details;
+  if(orderTesting.payment_details){
+    order2.payment_details = orderTesting?.payment_details;
+  }
+  
   order2.payment_gateway_names = orderTesting?.payment_gateway_names;
-  order2.payment_terms = orderTesting?.payment_terms;
+  //order2.payment_terms = orderTesting?.payment_terms;
   order2.phone = orderTesting?.phone;
 
   //order2.presentment_currency = orderTesting?.presentment_currency;
@@ -445,8 +461,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.source_name = orderTesting?.source_name;
   //order2.source_url = orderTesting?.source_url; //
 
-  order2.subtotal_price = orderTesting?.subtotal_price;
-  order2.subtotal_price_set = orderTesting?.subtotal_price_set;
+ // order2.subtotal_price = orderTesting?.subtotal_price;
+  //order2.subtotal_price_set = orderTesting?.subtotal_price_set;
 
   if (orderTesting.tags) {
     order2.tags = orderTesting?.tags;
@@ -464,9 +480,9 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_line_items_price = orderTesting?.total_line_items_price;
   order2.total_line_items_price_set = orderTesting?.total_line_items_price_set;
   order2.total_outstanding = orderTesting?.total_outstanding;
-  order2.total_price = orderTesting?.total_price;
+  //order2.total_price = orderTesting?.total_price;
 
-  order2.total_price_set = orderTesting?.total_price_set;
+ // order2.total_price_set = orderTesting?.total_price_set;
   order2.total_shipping_price_set = orderTesting?.total_shipping_price_set;
   order2.total_tax = orderTesting?.total_tax;
   order2.total_tax_set = orderTesting?.total_tax_set;
@@ -474,10 +490,12 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_weight = orderTesting?.total_weight;
   order2.updated_at = orderTesting?.updated_at; //
   order2.user_id = orderTesting?.user_id; //
-
+  
+  
   try {
     //saving the newly created order here
     // @ts-ignore
+    
     await order2.save({
       update: true,
     });
@@ -487,6 +505,7 @@ app.put("/api/orders/:id", async (_req, res) => {
       session: res.locals.shopify.session,
       id: _req.params["id"],
     });
+    
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
@@ -506,8 +525,8 @@ app.put("/api/orders/:id", async (_req, res) => {
     });
   }
 
-  console.log("========= Order id ==========");
-  console.log(order2);
+  //console.log("========= Order id ==========");
+  //console.log(order2);
   res.status(status).send({ success: status === 200, error });
 });
 

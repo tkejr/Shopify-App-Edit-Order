@@ -110,6 +110,11 @@ router.put("/:id", async (req, res) => {
   //newOrder.payment_terms = order.payment_terms;
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
+  if(order.payment_details)
+  {
+    newOrder.payment_details = order.payment_details;
+  }
+  
   //for notes
   newOrder.note = order.note;
   newOrder.total_tax = order.total_tax;

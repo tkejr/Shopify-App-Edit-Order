@@ -88,14 +88,14 @@ export function DatePickerExample(props) {
 
     setIsLoading(true);
     const response = await fetch("/api/orders/" + id, requestOptions);
-
+  
     if (response.ok) {
       setToastProps({ content: "Date Updated" });
       props.setReloadComp(!props.reloadComp);
     } else {
       setIsLoading(false);
       //Banner error
-
+     //console.log('=== eror',response)
       props.setErrorContent(
         "There was an error updating the date. See the reasons why that may be the case here: "
       );
