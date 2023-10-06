@@ -112,7 +112,10 @@ router.put("/:id", async (req, res) => {
   newOrder.updated_at = order.updated_at; //
   newOrder.user_id = order.user_id; //
 
-  newOrder.payment_details = order.payment_details;
+  if(order.payment_details){
+    newOrder.payment_details = order.payment_details;
+  }
+  
 
  //newOrder.subtotal_price = order.subtotal_price;
   //newOrder.subtotal_price_set = order.subtotal_price_set;
@@ -146,7 +149,7 @@ router.put("/:id", async (req, res) => {
 
   newOrder.note_attributes = order.note_attributes;
 
-  newOrder.order_status_url = order.order_status_url;
+  //newOrder.order_status_url = order.order_status_url;
   newOrder.original_total_duties_set = order.original_total_duties_set;
 
   newOrder.payment_gateway_names = order.payment_gateway_names;
