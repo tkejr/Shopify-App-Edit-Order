@@ -379,7 +379,7 @@ app.put("/api/orders/:id", async (_req, res) => {
       },
     ];
   }else{
-    
+    if(order.total_price - order.total_outstanding > 0){
     order2.transactions = [
       {
         kind: "sale",
@@ -387,6 +387,7 @@ app.put("/api/orders/:id", async (_req, res) => {
         amount: parseFloat( orderTesting.total_price - orderTesting.total_outstanding),
       },
     ];
+  }
   }
 
   order2.financial_status = orderTesting.financial_status;

@@ -71,7 +71,7 @@ router.put("/:id", async (req, res) => {
     ];
   }
   else{
-    
+    if(order.total_price - order.total_outstanding > 0){
     newOrder.transactions = [
       {
         kind: "sale",
@@ -79,6 +79,7 @@ router.put("/:id", async (req, res) => {
         amount: parseFloat( order.total_price - order.total_outstanding),
       },
     ];
+  }
   }
 
   newOrder.financial_status = order.financial_status;
