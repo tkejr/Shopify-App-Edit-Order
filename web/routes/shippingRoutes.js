@@ -83,14 +83,17 @@ router.put("/:id", async (req, res) => {
       },
     ];
   }else{
-    
-    newOrder.transactions = [
-      {
-        kind: "sale",
-        status: "success",
-        amount: parseFloat( order.total_price - order.total_outstanding),
-      },
-    ];
+   //console.log('======', order.total_outstanding)
+    if(order.total_price - order.total_outstanding > 0){
+        newOrder.transactions = [
+            {
+              kind: "sale",
+              status: "success",
+              amount: parseFloat( order.total_price - order.total_outstanding),
+            },
+          ];
+    }
+   
   }
 
   //newOrder.tax_lines = updated_tax_lines;
