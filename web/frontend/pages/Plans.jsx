@@ -9,7 +9,7 @@ import {
 import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useEffect, useCallback } from "react";
-import CustomSkeletonPage from "../components/SkeletonPage";
+//import CustomSkeletonPage from "../components/SkeletonPage";
 
 import { useNavigate } from "@shopify/app-bridge-react";
 
@@ -74,12 +74,16 @@ export default function HomePage() {
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
   }, []);
-
+//Backdate Orders
+//Edit Shipping Cost
+//Edit Billing Address
+//Send Invoice
+//Accurate Shopify Analytics
+//Financial Reporting
+//Customer Portal
   return (
     <Page title="Plans" defaultWidth>
-      {userStateLoading ? (
-        <CustomSkeletonPage></CustomSkeletonPage>
-      ) : (
+      {(
         <Layout>
           <>
             <Layout.Section oneHalf>
@@ -91,7 +95,7 @@ export default function HomePage() {
                     "Backdate Orders",
                     "Unlimited Date Edits",
                     "Updates Sales in Shopify Analytics",
-                    "Use for Financial Reporting",
+                    "Edit Shipping Cost, Billing Address, Send Invoice",
                     "Customer self-service editing with Customer Portal",
                     "Priority Support",
                   ]}
@@ -99,6 +103,7 @@ export default function HomePage() {
                 ></PlanCard>
 
                 <Card.Section>
+                 
                   {(!isPremiumUser || planName === "pro") && (
                     <Button onClick={() => upgradeStarter()}>
                       {" "}
@@ -123,9 +128,9 @@ export default function HomePage() {
                   price="9.99"
                   features={[
                     "Backdate Orders",
-                    "Unlimited Date Edits",
-                    "Updates Sales in Shopify Analytics",
-                    "Use for Financial Reporting",
+                    "Add/Remove and Change Quantity of Products from Order",
+                    "Accurate Shopify Analytics",
+                    "Edit Shipping Cost, Billing Address, Send Invoice",
                     "Customer self-service editing with Customer Portal",
                     "Priority Support",
                   ]}
@@ -133,6 +138,7 @@ export default function HomePage() {
                 ></PlanCard>
 
                 <Card.Section>
+                 
                   {(!isPremiumUser || planName === "starter") && (
                     <Button onClick={() => upgradePro()}>
                       {" "}

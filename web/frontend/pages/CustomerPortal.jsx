@@ -24,7 +24,7 @@ import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
-import CustomSkeletonPage from "../components/SkeletonPage";
+//import CustomSkeletonPage from "../components/SkeletonPage";
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
@@ -303,9 +303,7 @@ export default function CustomerPortal() {
   return (
     <Frame>
       {planName === "pro" && isPremiumUser ? (
-        userStateLoading ? (
-          <CustomSkeletonPage></CustomSkeletonPage>
-        ) : (
+         (
           <Page
             backAction={{ content: "Products", url: "#" }}
             title="Customer Portal"

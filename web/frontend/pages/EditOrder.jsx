@@ -9,7 +9,7 @@ import {
 import React from "react";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import CustomSkeletonPage from "../components/SkeletonPage";
+//import CustomSkeletonPage from "../components/SkeletonPage";
 import { useAuthenticatedFetch } from "../hooks";
 import {
   TitleBar,
@@ -123,9 +123,7 @@ const PageExample = () => {
           buttonText={"Learn More"}
         ></ErrorBanner>
       }
-      {userStateLoading ? (
-        <CustomSkeletonPage></CustomSkeletonPage>
-      ) : (
+      {(
         <Layout>
           {planName === "pro" && isPremiumUser ? (
             <>
