@@ -20,7 +20,7 @@ import {
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
-import CustomSkeletonPage from "../components/SkeletonPage";
+//import CustomSkeletonPage from "../components/SkeletonPage";
 import { onCLS, onFID, onLCP } from "web-vitals";
 
 export default function HomePage() {
@@ -94,9 +94,7 @@ export default function HomePage() {
 
   return (
     <>
-      {loader ? (
-        <CustomSkeletonPage></CustomSkeletonPage>
-      ) : (
+      {(
         <Frame>
           <Page
             title="Editify"

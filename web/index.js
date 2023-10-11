@@ -389,7 +389,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     ];
   }
   }
-
+   
   order2.financial_status = orderTesting.financial_status;
  ///order2.payment_terms = orderTesting.payment_terms;
 

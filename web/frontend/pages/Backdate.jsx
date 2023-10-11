@@ -8,7 +8,7 @@ import {
 } from "@shopify/polaris";
 
 import React, { useState, useEffect, useCallback } from "react";
-import CustomSkeletonPage from "../components/SkeletonPage";
+//import CustomSkeletonPage from "../components/SkeletonPage";
 import ErrorBanner from "../components/ErrorBanner";
 
 import { useNavigate } from "@shopify/app-bridge-react";
@@ -178,9 +178,7 @@ export default function Backdate() {
           buttonText={buttonText}
         ></ErrorBanner>
       }
-      {userStateLoading ? (
-        <CustomSkeletonPage></CustomSkeletonPage>
-      ) : (
+      { (
         <Layout>
           {(planName === "pro" || planName === "starter") && isPremiumUser ? (
             <>
