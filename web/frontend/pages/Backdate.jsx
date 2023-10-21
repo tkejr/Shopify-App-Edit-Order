@@ -4,7 +4,8 @@ import {
   TextContainer,
   Modal,
   Frame,
-  MediaCard,
+  Card,
+  Button
 } from "@shopify/polaris";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -95,27 +96,19 @@ export default function Backdate() {
   const checkPremiumUserContent = () => {
     return (
       <Frame>
-        <MediaCard
-          title="Discover how Editify can help you"
-          description="Upgrade to any plan to Backdate/Postdate any order"
-          primaryAction={{
-            content: "Go to Plans",
-            onAction: () => {
-              navigate("/Plans");
-            },
-          }}
-        >
-          <img
-            alt=""
-            width="100%"
-            height="100%"
-            style={{
-              objectFit: "cover",
-              objectPosition: "center",
-            }}
-            src={edit_paywall}
-          />
-        </MediaCard>
+         <Card title="Welcome to Editify">
+              <Card.Section>
+                <TextContainer>
+                  <p>
+                    Backdate/Postdate Orders and have them accurately reflected in your analytics. Go to Plans and select any plan to get this functionality
+                  </p>
+                </TextContainer>
+                
+              </Card.Section>
+              <Card.Section>
+              <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+              </Card.Section>
+          </Card>
       </Frame>
     );
   };

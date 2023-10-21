@@ -211,7 +211,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setBillingDetails(json);
-        console.log("here isn fsf ");
+        //console.log("here isn fsf ");
       });
   };
   const getOrderShipping = async () => {
@@ -219,7 +219,7 @@ export function EditOrderComponent(props) {
       .then((response) => response.json())
       .then((json) => {
         setShippingDetails(json);
-        console.log("========",json);
+        //console.log("========",json);
       });
   };
   const getOrderShippingCost = async () => {
@@ -487,6 +487,36 @@ export function EditOrderComponent(props) {
     });
   };
 
+  const addDiscount = async (id, quantity) =>{
+    console.log(id, quantity, orderId)
+   
+      setStatus("loading");
+      const requestOptions = {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        //body: JSON.stringify({ date: newDate }),
+      };
+      const response = await fetch(
+        "/api/discount/" + orderId + "/" + id + "/" + quantity,
+        requestOptions
+      );
+      console.log(response)
+      if (response.ok) {
+        setToastProps({ content: "Discount added" });
+        props.setReloadComp(!props.reloadComp);
+      } else {
+        //banner error
+        props.setErrorContent(
+          "There was an error updating the quantity. For more information on why this could have happened, click the button below: "
+        );
+        props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+        props.handleError();
+      }
+      handleChangeQuantity();
+      setReload(!reload);
+      setStatus("success");
+    
+  }
   return (
     <Frame>
       <Card
@@ -560,7 +590,15 @@ export function EditOrderComponent(props) {
                     >
                       Adjust Quantity
                     </Button>
-
+                    <br></br>
+                    {/*
+                    <Button
+                      plain
+                      onClick={() => addDiscount(id, fulfillable_quantity)}
+                    >
+                      Add Discount
+                    </Button>
+                */}
                     <br></br>
                   </ResourceList.Item>
                 );

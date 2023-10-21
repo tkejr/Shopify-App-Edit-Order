@@ -41,6 +41,8 @@ export default function CustomerPortal() {
   const [statusUrl, setStatusUrl] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
   const [error, setError] = useState(false);
+  //new
+  const [loading, setLoading] = useState(false);
   const [userStateLoading, setUserStateLoading] = useState(true);
   const [copiedContent, setCopiedContent] =
     useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
@@ -119,7 +121,7 @@ export default function CustomerPortal() {
   //api functions
   const updatePreference = async (requestBody) => {
     handleToggle();
-
+    setLoading(true)
     try {
       const response = await fetch("/api/preferences", {
         method: "PUT",
@@ -128,12 +130,12 @@ export default function CustomerPortal() {
         },
         body: JSON.stringify(requestBody),
       });
-
+     
       if (response.ok) {
         const data = await response.json();
         setIsError(false);
         setToastContent("Updated Successfully");
-
+        
         toggleActive();
       } else {
         setToastContent("Some Problem Occurred With API");
@@ -144,6 +146,7 @@ export default function CustomerPortal() {
       setToastContent("Some Problem Occurred With API" + response);
       handleError();
     }
+    setLoading(false)
   };
 
   const getOrder = async () => {
@@ -163,13 +166,13 @@ export default function CustomerPortal() {
 
       if (response.ok) {
         const data = await response.json();
-        // setIsError(false);
+         setIsError(false);
         // setToastContent("Order Fetched un");
         console.log("DEBUG");
         console.log(data.data[0]);
-        // setStatusUrl(data.data[0].order_status_url);
-        // window.open(data.data[0].order_status_url, "_blank");
-        toggleActive();
+        setStatusUrl(data.data[0].order_status_url);
+        window.open(data.data[0].order_status_url, "_blank");
+        //toggleActive();
       } else {
         setToastContent("Some Problem Occurred With API");
         handleError();
@@ -187,7 +190,8 @@ export default function CustomerPortal() {
   const handleCopyClick = () => {
     // Copy the content to the clipboard
     setToastContent("Copied Successfully");
-    handleError();
+    toggleActive()
+    //handleError();
     navigator.clipboard.writeText(copiedContent);
   };
 
@@ -275,31 +279,25 @@ export default function CustomerPortal() {
   const checkPremiumUserContent = () => {
     return (
       <Page title="Customer Portal" defaultWidth>
-        <MediaCard
-          title="Discover how the Customer Portal can help you"
-          description="Upgrade to Pro to let customers be able to edit orders and reduce returns"
-          primaryAction={{
-            content: "Go to Plans",
-            onAction: () => {
-              navigate("/Plans");
-            },
-          }}
-        >
-          <img
-            alt=""
-            width="100%"
-            height="100%"
-            style={{
-              objectFit: "cover",
-              objectPosition: "center",
-            }}
-            src={edit_paywall}
-          />
-        </MediaCard>
+         <Card title="Discover how the Customer Portal can help you">
+              <Card.Section>
+                <TextContainer>
+                  <p>
+                  Upgrade to Pro to let customers be able to edit orders without contacting you. This helps reduce returns and saves you money. Go to the plans page a select the Pro plan
+                  </p>
+                </TextContainer>
+                
+              </Card.Section>
+              <Card.Section>
+              <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+              </Card.Section>
+        </Card>
+       
       </Page>
     );
   };
-
+  //new
+  const preferenceText = loading ? "Loading..." : "Save"; 
   return (
     <Frame>
       {planName === "pro" && isPremiumUser ? (
@@ -317,6 +315,7 @@ export default function CustomerPortal() {
               },
             }}
           >
+
             <Card title="About">
               <Card.Section>
                 <p>
@@ -361,7 +360,7 @@ export default function CustomerPortal() {
                 />
                 <br></br>
                 <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
-                {toastMarkup}
+                
               </Card.Section>
               <Card.Section title="Step 2: Add to your order status page">
                 <h1>
@@ -383,8 +382,7 @@ export default function CustomerPortal() {
               <Card.Section title="Step 3: View Order">
                 <h1>
                   Click on View Order to see the checkout page and see the
-                  customer portal box embedded onto that page like showed in the
-                  photo below
+                  customer portal box embedded onto that page
                 </h1>
                 <br></br>
                 {/* <img
@@ -403,7 +401,7 @@ export default function CustomerPortal() {
             <Card
               title="Customer editing"
               primaryFooterAction={{
-                content: "Save",
+                content: preferenceText,
                 onAction: () => {
                   // setToastContent(selected);
                   // toggleActive();
@@ -430,6 +428,7 @@ export default function CustomerPortal() {
               onClose={handleError}
               content={toastContent}
             />
+            {toastMarkup}
           </Page>
         )
       ) : (
