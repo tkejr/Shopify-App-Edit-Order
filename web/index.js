@@ -23,6 +23,7 @@ import cPortalRoutes from "./routes/cPortalRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import orderBillingRoutes from "./routes/orderBillingRoutes.js";
 import shippingRoutes from "./routes/shippingRoutes.js";
+import discountRoutes from "./routes/discountRoutes.js";
 import sendInvoice from "./routes/sendInvoice.js";
 
 //new for billing
@@ -804,8 +805,10 @@ app.use("/api", cPortalRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 //send Invoice
-
 app.use("/api/sendInvoice", sendInvoice);
+
+//Order discount routes
+app.use("/api/discount", discountRoutes);
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 

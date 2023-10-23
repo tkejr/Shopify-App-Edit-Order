@@ -85,8 +85,8 @@ export default function HomePage() {
           setLoader(false);
         });
     };
-    getAnalytics();
-    fetchRecurringCharges();
+    //getAnalytics();
+    //fetchRecurringCharges();
   }, []);
   function handlePrimaryActionClick() {
     navigate("/Backdate");
@@ -98,7 +98,7 @@ export default function HomePage() {
         <Frame>
           <Page
             title="Editify"
-            titleMetadata="Tracking Since 09/10/23"
+            //titleMetadata="Tracking Since 09/10/23"
             defaultWidth
           >
             <Card title="Welcome to Editify">
@@ -134,7 +134,9 @@ export default function HomePage() {
             </Card>
 
             <br></br>
+            {/*
             <Layout>
+            
               <Layout.Section oneThird>
                 <Card title="Backdated Orders">
                   <Card.Section>
@@ -171,7 +173,9 @@ export default function HomePage() {
                   </Card.Section>
                 </Card>
               </Layout.Section>
+
             </Layout>
+              */}
             <br></br>
             <Layout>
               <Layout.Section>

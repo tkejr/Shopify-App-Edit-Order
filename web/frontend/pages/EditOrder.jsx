@@ -1,10 +1,12 @@
 import {
   Page,
   
-  MediaCard,
+ 
   Frame,
   Layout,
-  
+  Card,
+  TextContainer,
+  Button
 } from "@shopify/polaris";
 import React from "react";
 
@@ -74,27 +76,21 @@ const PageExample = () => {
   const checkPremiumUserContent = () => {
     return (
       <Frame>
-        <MediaCard
-          title="Edit any order"
-          description="Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select the Pro plan."
-          primaryAction={{
-            content: "Go to Plans",
-            onAction: () => {
-              navigate("/Plans");
-            },
-          }}
-        >
-          <img
-            alt=""
-            width="100%"
-            height="100%"
-            style={{
-              objectFit: "cover",
-              objectPosition: "center",
-            }}
-            src={edit_paywall}
-          />
-        </MediaCard>
+        <Card title="Edit any Order how you need it">
+              <Card.Section>
+                <TextContainer>
+                  <p>
+                  Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select the Pro plan.
+                  If you think we missed anything, contact us and we will work on adding that functionality right away. 
+                  </p>
+                </TextContainer>
+                
+              </Card.Section>
+              <Card.Section>
+              <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+              </Card.Section>
+        </Card>
+       
       </Frame>
     );
   };
