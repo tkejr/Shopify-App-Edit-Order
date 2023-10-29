@@ -20,10 +20,12 @@ import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
 import { Link, Scroll } from "react-scroll";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "@shopify/app-bridge-react";
 
 export function OrderTableEditOrder(props) {
   let orders = [];
   const fetch = useAuthenticatedFetch();
+  const navigate = useNavigate();
   /*
     const { data, status } = useAppQuery({
       url: `/api/orders`,
@@ -100,14 +102,15 @@ export function OrderTableEditOrder(props) {
   const orderClicked = (id, name, line_items) => {
     // scroll.scrollToBottom(options);
 
-    props.toggleShow();
-    props.setOrderId(id);
-    props.setName(name);
-    props.setLineItems(line_items);
+    //props.toggleShow();
+    //props.setOrderId(id);
+    //props.setName(name);
+    //props.setLineItems(line_items);
 
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: id });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: name });
     dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: line_items });
+    navigate("/EditOrderPanel")
   };
   //advanced search
 
@@ -171,7 +174,7 @@ export function OrderTableEditOrder(props) {
       >
         <IndexTable.Cell>
           <Button
-            plain
+            variant="plain"
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name, line_items);

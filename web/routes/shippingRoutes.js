@@ -38,9 +38,11 @@ router.get("/taxLines/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  const shipping_and_tax_info = req.body;
-  const updated_shipping_lines = shipping_and_tax_info.shippingCostDetails;
-
+  const shipping_and_discount_info = req.body;
+  const updated_shipping_lines = shipping_and_discount_info.shippingCostDetails;
+  const discountCodes = shipping_and_discount_info.discount_codes; 
+  
+  console.log('=====', discountCodes, updated_shipping_lines)
   //console.log("========",updated_shipping_lines, shipping_and_tax_info)
   //const updated_tax_lines  = shipping_and_tax_info.taxLines;
   //console.log('==========',updated_tax_lines)
@@ -65,14 +67,33 @@ router.put("/:id", async (req, res) => {
     session: session,
     id: req.params["id"],
   });
+  //console.log(order)
   const newOrder = new shopify.api.rest.Order({ session: session });
   //newOrder.shipping_lines = updated_shipping_lines;
-  newOrder.shipping_lines = [
-    {
-      title: "" + updated_shipping_lines[0].title,
-      price: "" + updated_shipping_lines[0].price,
-    },
-  ];
+  //set the values 
+  if(updated_shipping_lines.length > 0){
+    console.log('hetwds =====', updated_shipping_lines)
+    newOrder.shipping_lines = [
+        {
+          title: "" + updated_shipping_lines[0]?.title,
+          price: "" + updated_shipping_lines[0]?.price,
+        },
+      ];
+  }
+  else
+  {
+    console.log('here in klkllkklkl')
+    newOrder.shipping_lines = order?.shipping_lines
+  }
+  if(discountCodes){
+    newOrder.discount_codes = discountCodes; 
+  }
+  else{
+    if(order?.discount_codes){
+        newOrder.discount_codes= order?.discount_codes;
+
+    }
+  }
   
   if (order.financial_status === "paid") {
     newOrder.transactions = [
@@ -85,12 +106,21 @@ router.put("/:id", async (req, res) => {
   }else{
    //console.log('======', order.total_outstanding)
     if(order.total_price - order.total_outstanding > 0){
+        /*
         newOrder.transactions = [
             {
               kind: "sale",
               status: "success",
               amount: parseFloat( order.total_price - order.total_outstanding),
             },
+          ];
+          */
+          newOrder.transactions = [
+            {
+              "kind": "authorization",
+              "status": "success",
+              "amount": parseFloat( order.total_price - order.total_outstanding)
+            }
           ];
     }
    
@@ -109,7 +139,9 @@ router.put("/:id", async (req, res) => {
 
   newOrder.order_number = order.order_number;
   newOrder.shipping_address = order.shipping_address;
-  newOrder.financial_status = 'partially_paid';
+ newOrder.financial_status = 'partially_paid';
+ //newOrder.financial_status = 'pending';
+  
   //newOrder.payment_terms = order.payment_terms;
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
@@ -122,9 +154,9 @@ router.put("/:id", async (req, res) => {
   newOrder.note = order.note;
   newOrder.total_tax = order.total_tax;
   newOrder.currency = order.currency;
-
-  newOrder.total_discounts = order.total_discounts;
-  newOrder.total_discounts_set = order.total_discounts_set;
+   
+ //newOrder.total_discounts = order.total_discounts;
+ // newOrder.total_discounts_set = order.total_discounts_set;
   newOrder.total_line_items_price = order.total_line_items_price;
   newOrder.total_line_items_price_set = order.total_line_items_price_set;
   //newOrder.total_outstanding = order.total_outstanding;

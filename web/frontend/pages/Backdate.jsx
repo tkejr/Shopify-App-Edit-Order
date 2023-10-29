@@ -4,8 +4,9 @@ import {
   TextContainer,
   Modal,
   Frame,
-  Card,
-  Button
+  LegacyCard,
+  Button,
+  Text
 } from "@shopify/polaris";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -96,19 +97,21 @@ export default function Backdate() {
   const checkPremiumUserContent = () => {
     return (
       <Frame>
-         <Card title="Welcome to Editify">
-              <Card.Section>
+         <LegacyCard title="Welcome to Editify">
+              <LegacyCard.Section>
+                {
                 <TextContainer>
                   <p>
                     Backdate/Postdate Orders and have them accurately reflected in your analytics. Go to Plans and select any plan to get this functionality
                   </p>
                 </TextContainer>
+    }
                 
-              </Card.Section>
-              <Card.Section>
+              </LegacyCard.Section>
+              <LegacyCard.Section>
               <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
-              </Card.Section>
-          </Card>
+              </LegacyCard.Section>
+          </LegacyCard>
       </Frame>
     );
   };
@@ -134,12 +137,14 @@ export default function Backdate() {
         }}
       >
         <Modal.Section>
+          {
           <TextContainer>
             <p>
               Install this app to compress your store's images and upload from
               anywhere! You can upload from Instagram, Google Drive, and more!
             </p>
           </TextContainer>
+      }
         </Modal.Section>
       </Modal>
 
@@ -154,11 +159,13 @@ export default function Backdate() {
         }}
       >
         <Modal.Section>
+          {
           <TextContainer>
             <p>
               Leave us a review on the Shopify app store and get one month free!
             </p>
           </TextContainer>
+    }
         </Modal.Section>
       </Modal>
 
@@ -175,7 +182,8 @@ export default function Backdate() {
         <Layout>
           {(planName === "pro" || planName === "starter") && isPremiumUser ? (
             <>
-              <Layout.Section oneHalf>
+              <Layout.Section variant="oneHalf">
+                
                 {
                   <OrderTable
                     toggleShow={toggleShow}
@@ -183,9 +191,10 @@ export default function Backdate() {
                     setName={setName}
                     reloadComp={reloadComp}
                   />
-                }
+           }
               </Layout.Section>
-              <Layout.Section oneHalf>
+              <Layout.Section  variant="oneHalf">
+                {
                 <DatePickerExample
                   orderId={orderId}
                   orderName={orderName}
@@ -196,13 +205,15 @@ export default function Backdate() {
                   setUrl={setUrl}
                   handleError={handleError}
                 />
+              }
               </Layout.Section>
+             
             </>
           ) : (
             checkPremiumUserContent()
           )}
         </Layout>
-      )}
+          )}
     </Page>
   );
 }

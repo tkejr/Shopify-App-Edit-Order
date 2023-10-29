@@ -3,7 +3,7 @@ import {
   TextField,
   Toast,
   Frame,
-  Card,
+  LegacyCard,
   PageActions,
   Layout,
   Button,
@@ -519,12 +519,12 @@ export function EditOrderComponent(props) {
   }
   return (
     <Frame>
-      <Card
+      <LegacyCard
         title={
           orderName ? `Order Details for Order ${orderName}` : "Pick an Order"
         }
       >
-        <Card.Section>
+        <LegacyCard.Section>
           {orderId ? (
             <div style={{ display: "flex", justifyContent: "center" }}>
               <ButtonGroup>
@@ -547,9 +547,9 @@ export function EditOrderComponent(props) {
               Pick an Order
             </Button>
           )}
-        </Card.Section>
+        </LegacyCard.Section>
 
-        <Card.Section title="Items">
+        <LegacyCard.Section title="Items">
           {status !== "success" ? (
             <Spinner accessibilityLabel="Spinner example" size="large" />
           ) : (
@@ -591,23 +591,23 @@ export function EditOrderComponent(props) {
                       Adjust Quantity
                     </Button>
                     <br></br>
-                    {/*
+                    {
                     <Button
                       plain
                       onClick={() => addDiscount(id, fulfillable_quantity)}
                     >
                       Add Discount
                     </Button>
-                */}
+                }
                     <br></br>
                   </ResourceList.Item>
                 );
               }}
             />
           )}
-        </Card.Section>
+        </LegacyCard.Section>
         {showProducts && (
-          <Card.Section title="Product to be Added">
+          <LegacyCard.Section title="Product to be Added">
             <ResourceList
               resourceName={{ singular: "product", plural: "products" }}
               items={product}
@@ -643,16 +643,16 @@ export function EditOrderComponent(props) {
                 );
               }}
             />
-          </Card.Section>
+          </LegacyCard.Section>
         )}
         {productId && (
-          <Card.Section>
+          <LegacyCard.Section>
             <Button primary onClick={() => addProductVariant()}>
               Confirm
             </Button>
-          </Card.Section>
+          </LegacyCard.Section>
         )}
-      </Card>
+      </LegacyCard>
 
       <ResourcePicker
         resourceType="Product"

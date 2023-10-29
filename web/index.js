@@ -380,13 +380,23 @@ app.put("/api/orders/:id", async (_req, res) => {
       },
     ];
   }else{
-    if(order.total_price - order.total_outstanding > 0){
+    if(orderTesting.total_price - orderTesting.total_outstanding != 0){
+      /*
     order2.transactions = [
       {
         kind: "sale",
         status: "success",
         amount: parseFloat( orderTesting.total_price - orderTesting.total_outstanding),
       },
+    ];
+    */
+   //console.log(orderTesting)
+    order2.transactions = [
+      {
+        "kind": "sale",
+        "status": "success",
+        "amount": parseFloat( orderTesting?.total_price - orderTesting?.total_outstanding)
+      }
     ];
   }
   }
@@ -415,6 +425,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.current_total_discounts = orderTesting?.current_total_discounts;
   order2.current_total_discounts_set =
     orderTesting?.current_total_discounts_set;
+  
   //order2.current_total_duties_set = orderTesting?.current_total_duties_set;
   //order2.current_total_price = orderTesting?.current_total_price;
   //order2.current_total_price_set = orderTesting?.current_total_price_set;
@@ -424,8 +435,10 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.customer_locale = orderTesting?.customer_locale;
   order2.discount_applications = orderTesting?.discount_applications;
 
-  //order2.discount_codes = orderTesting?.discount_codes;
-
+  if(orderTesting?.discount_codes){
+    order2.discount_codes = orderTesting?.discount_codes;
+  }
+ 
   if(orderTesting.email){
     order2.email = orderTesting?.email;
   }
@@ -501,7 +514,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     await order2.save({
       update: true,
     });
-
+    
     // deleting the old order with the old date
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,

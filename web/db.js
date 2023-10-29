@@ -15,7 +15,7 @@ const getUserPreferences = async (userId) => {
 };
 
 const updateUserPreference = async (userId, data) => {
-  console.log(userId, data);
+  console.log("in update user preference", userId, data);
   try {
     return await prisma.custom_preferences.updateMany({
       where: { user_id: userId },

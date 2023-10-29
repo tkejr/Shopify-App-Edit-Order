@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Modal,
@@ -6,31 +8,36 @@ import {
   Button,
   Link,
   Icon,
-  Card,
-  Stack,
+  
+  BlockStack
 } from "@shopify/polaris";
 import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
 function PlanCard({ features, price, planName, upgrade }) {
   return (
-    <Stack vertical spacing="loose">
+    <BlockStack align="center">
       <div style={styles.header}>
         <div style={styles.planName}>{planName}</div>
         <div style={styles.price}>${price}</div>
       </div>
       {features.map((feature, index) => (
-        <div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {planName === "Starter Plan" && index > 2 ? (
-              <Icon source={CircleCancelMajor} color="critical" backdrop />
-            ) : (
-              <Icon source={CircleTickMajor} color="success" backdrop />
-            )}
-
-            <div style={{ marginLeft: "10px" }}>
+        <BlockStack >
+          <div style={{ display: "flex", marginBottom:'10px' }}>
+          <div style={{  float:'left' }}>
               <p>{feature} </p>
             </div>
+            {planName === "Starter Plan" && index > 2 ? (
+              <BlockStack inlineAlign="end">
+              <Icon source={CircleCancelMajor} tone="critical" backdrop />
+              </BlockStack>
+            ) : (
+              <div style={{float:'right'}}>
+              <Icon source={CircleTickMajor} tone="success" backdrop />
+              </div>
+            )}
+
+           
           </div>
-        </div>
+        </BlockStack>
       ))}
 
       {/*<div style={styles.buttonContainer}>
@@ -39,7 +46,7 @@ function PlanCard({ features, price, planName, upgrade }) {
             </Button>
             </div>
           */}
-    </Stack>
+    </BlockStack>
   );
 }
 

@@ -1,6 +1,6 @@
 import {
   IndexTable,
-  Card,
+  LegacyCard,
   Button,
   useIndexResourceState,
   Filters,

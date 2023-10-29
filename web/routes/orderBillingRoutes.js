@@ -138,7 +138,10 @@ router.put("/:id", async (req, res) => {
 */
   newOrder.customer_locale = order.customer_locale;
   newOrder.discount_applications = order.discount_applications;
-
+  if(order.discount_codes){
+    newOrder.discount_codes = order.discount_codes; 
+  }
+  
   if(order.email !== '') {
     newOrder.email = order.email;
   }

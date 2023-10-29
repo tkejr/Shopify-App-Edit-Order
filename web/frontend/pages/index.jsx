@@ -1,5 +1,5 @@
 import {
-  Card,
+  LegacyCard,
   Page,
   Layout,
   Icon,
@@ -101,8 +101,8 @@ export default function HomePage() {
             //titleMetadata="Tracking Since 09/10/23"
             defaultWidth
           >
-            <Card title="Welcome to Editify">
-              <Card.Section>
+            <LegacyCard title="Welcome to Editify">
+              <LegacyCard.Section>
                 <TextContainer>
                   <p>
                     Backdate Orders, Edit Orders, Customer Self Service Editing
@@ -130,48 +130,48 @@ export default function HomePage() {
                     src="https://cdn.pixabay.com/photo/2013/07/13/12/50/pencil-160443_1280.png"
                   />
                 </div> */}
-              </Card.Section>
-            </Card>
+              </LegacyCard.Section>
+            </LegacyCard>
 
             <br></br>
             {/*
             <Layout>
             
               <Layout.Section oneThird>
-                <Card title="Backdated Orders">
-                  <Card.Section>
+                <LegacyCard title="Backdated Orders">
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <Icon source={OrdersMajor} color="primary" backdrop />
                       <div style={{ marginLeft: "10px" }}>
                         {shopDeets?.no_back_orders}
                       </div>
                     </div>{" "}
-                  </Card.Section>
-                </Card>
+                  </LegacyCard.Section>
+                </LegacyCard>
               </Layout.Section>
               <Layout.Section oneThird>
-                <Card title="Edited Orders">
-                  <Card.Section>
+                <LegacyCard title="Edited Orders">
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <Icon source={EditMajor} color="primary" backdrop />
                       <div style={{ marginLeft: "10px" }}>
                         {shopDeets?.no_edit_orders}
                       </div>
                     </div>{" "}
-                  </Card.Section>
-                </Card>
+                  </LegacyCard.Section>
+                </LegacyCard>
               </Layout.Section>
               <Layout.Section oneThird>
-                <Card title="Customer Edited Orders">
-                  <Card.Section>
+                <LegacyCard title="Customer Edited Orders">
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <Icon source={CustomersMajor} color="primary" backdrop />
                       <div style={{ marginLeft: "10px" }}>
                         {shopDeets?.no_cust_edit_orders}
                       </div>
                     </div>{" "}
-                  </Card.Section>
-                </Card>
+                  </LegacyCard.Section>
+                </LegacyCard>
               </Layout.Section>
 
             </Layout>
@@ -179,8 +179,8 @@ export default function HomePage() {
             <br></br>
             <Layout>
               <Layout.Section>
-                <Card title="Setup Guide">
-                  <Card.Section>
+                <LegacyCard title="Setup Guide">
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {planIcon}
                       <div style={{ marginLeft: "10px" }}>
@@ -199,8 +199,8 @@ export default function HomePage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Section>
-                  <Card.Section title="Steps to Backdate">
+                  </LegacyCard.Section>
+                  <LegacyCard.Section title="Steps to Backdate">
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <div style={{ marginLeft: "10px" }}>
                         <List type="bullet">
@@ -210,23 +210,23 @@ export default function HomePage() {
                         </List>
                       </div>
                     </div>
-                  </Card.Section>
-                  {/* <Card.Section>
+                  </LegacyCard.Section>
+                  {/* <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <div style={{ marginLeft: "10px" }}>
                         <p>2. Select Date</p>
                       </div>
                     </div>
-                  </Card.Section>
-                  <Card.Section>
+                  </LegacyCard.Section>
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <div style={{ marginLeft: "10px" }}>
                         <p>3 . Click Submit</p>
                       </div>
                     </div>
-                  </Card.Section> */}
+                  </LegacyCard.Section> */}
 
-                  <Card.Section>
+                  <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {editedIcon}
                       <div style={{ marginLeft: "10px" }}>
@@ -244,8 +244,8 @@ export default function HomePage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Section>
-                </Card>
+                  </LegacyCard.Section>
+                </LegacyCard>
               </Layout.Section>
               <Layout.Section oneHalf></Layout.Section>
             </Layout>
