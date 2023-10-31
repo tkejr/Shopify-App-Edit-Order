@@ -20,8 +20,8 @@ const navigate = useNavigate();
 const orderId = useSelector((state) => state.orderId);
 const [updateButton, setUpdateButton] = useState("Update");
   //you can have addShippingAddy here
-  const addShippingAddress = () => {
-    props.setShippingDetails({
+  const addBillingAddress = () => {
+    props.setBillingDetails({
       first_name: '', 
       last_name:'', 
       address1: '', 
@@ -41,7 +41,7 @@ const [updateButton, setUpdateButton] = useState("Update");
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(props.shippingDetails),
+        body: JSON.stringify(props.billingDetails),
       });
 
       if (!response.ok) {
@@ -66,8 +66,8 @@ const [updateButton, setUpdateButton] = useState("Update");
   
   return (
     <Modal
-    open={props.activeShipping}
-    onClose={props.handleChangeShipping}
+    open={props.activeBilling}
+    onClose={props.handleChangeBilling}
     title="Order Billing Address"
     primaryAction={{
       content: updateButton,
@@ -78,24 +78,24 @@ const [updateButton, setUpdateButton] = useState("Update");
     
       <Modal.Section>
         <FormLayout>
-          {props.shippingDetails?.status === 'none' ? (<Button onClick={()=> addShippingAddress()}> Add Billing Address</Button>) : (
+          {props.billingDetails?.status === 'none' ? (<Button onClick={()=> addBillingAddress()}> Add Billing Address</Button>) : (
             <>
           <FormLayout.Group>
 
             <TextField
               type="text"
               label="Address 1"
-              value={props.shippingDetails?.address1}
+              value={props.billingDetails?.address1}
               onChange={(value) =>
-                props.handleFieldChangeShipping("address1", value)
+                props.handleFieldChangeBilling("address1", value)
               }
             />
             <TextField
               type="text"
               label="Address 2"
-              value={props.shippingDetails?.address2 || ""}
+              value={props.billingDetails?.address2 || ""}
               onChange={(value) =>
-                props.handleFieldChangeShipping("address2", value)
+                props.handleFieldChangeBilling("address2", value)
               }
             />
           </FormLayout.Group>
@@ -103,15 +103,15 @@ const [updateButton, setUpdateButton] = useState("Update");
             <TextField
               type="text"
               label="City"
-              value={props.shippingDetails?.city}
-              onChange={(value) => props.handleFieldChangeShipping("city", value)}
+              value={props.billingDetails?.city}
+              onChange={(value) => props.handleFieldChangeBilling("city", value)}
             />
             <TextField
               type="text"
               label="Country"
-              value={props.shippingDetails?.country}
+              value={props.billingDetails?.country}
               onChange={(value) =>
-                props.handleFieldChangeShipping("country", value)
+                props.handleFieldChangeBilling("country", value)
               }
             />
           </FormLayout.Group>
@@ -119,17 +119,17 @@ const [updateButton, setUpdateButton] = useState("Update");
             <TextField
               type="text"
               label="First Name"
-              value={props.shippingDetails?.first_name || ""}
+              value={props.billingDetails?.first_name || ""}
               onChange={(value) =>
-                props.handleFieldChangeShipping("first_name", value)
+                props.handleFieldChangeBilling("first_name", value)
               }
             />
             <TextField
               type="text"
               label="Last Name"
-              value={props.shippingDetails?.last_name}
+              value={props.billingDetails?.last_name}
               onChange={(value) =>
-                props.handleFieldChangeShipping("last_name", value)
+                props.handleFieldChangeBilling("last_name", value)
               }
             />
           </FormLayout.Group>
@@ -146,17 +146,17 @@ const [updateButton, setUpdateButton] = useState("Update");
             <TextField
               type="text"
               label="Phone"
-              value={props.shippingDetails?.phone || ""}
+              value={props.billingDetails?.phone || ""}
               onChange={(value) =>
-                props.handleFieldChangeShipping("phone", value)
+                props.handleFieldChangeBilling("phone", value)
               }
             />
             <TextField
               type="text"
               label="Province"
-              value={props.shippingDetails?.province}
+              value={props.billingDetails?.province}
               onChange={(value) =>
-                props.handleFieldChangeShipping("province", value)
+                props.handleFieldChangeBilling("province", value)
               }
             />
           </FormLayout.Group>
@@ -170,8 +170,8 @@ const [updateButton, setUpdateButton] = useState("Update");
             <TextField
               type="text"
               label="ZIP"
-              value={props.shippingDetails?.zip}
-              onChange={(value) => props.handleFieldChangeShipping("zip", value)}
+              value={props.billingDetails?.zip}
+              onChange={(value) => props.handleFieldChangeBilling("zip", value)}
             />
           </FormLayout.Group>
           </>

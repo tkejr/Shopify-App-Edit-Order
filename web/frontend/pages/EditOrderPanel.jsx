@@ -44,6 +44,10 @@ const ResourceDetailsLayout = () => {
     {label: 'Simple Mode', value: 'Simple Mode'},
     {label: 'Advanced Mode', value: 'Advanced Mode'},
     ];
+    // send invoice modal
+    const [openInvoice, setOpenInvoice] = useState(false);
+    const [emailTo, setEmailTo] = useState('');
+    const handleInvoiceModal = useCallback(() => setOpenInvoice(!openInvoice), [openInvoice]);
     //toast
     const emptyToastProps = { content: null };
     const [toastProps, setToastProps] = useState(emptyToastProps);
@@ -137,11 +141,18 @@ const ResourceDetailsLayout = () => {
       };
 
     //billing address stuff
+    const [billingDetails, setBillingDetails] = useState(null);
     const [activeBilling, setActiveBilling] = useState(false);
     const handleChangeBilling = useCallback(
       () => setActiveBilling(!activeBilling),
       [activeBilling]
     );
+    const handleFieldChangeBilling = (fieldName, value) => {
+        setBillingDetails({
+          ...billingDetails,
+          [fieldName]: value,
+        });
+      };
     //shipping cost
     const [shippingCostDetails, setShippingCostDetails] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -218,15 +229,18 @@ const ResourceDetailsLayout = () => {
         if(!orderId){
             navigate("/EditOrder")
         }
+        
         if (orderId && orderName && selected === "Simple Mode") {
           getLineItems();
           getOrderShipping();
+          getOrderEmail();
         }
         else if(orderId && orderName && selected === "Advanced Mode"){
             
             getOrderShippingCost();
             getOrderBilling();
             getOrderDiscounts();
+            getOrderEmail();
         }
       }, [reload, selected]);
       const getLineItems = async () => {
@@ -265,7 +279,7 @@ const ResourceDetailsLayout = () => {
         fetch("/api/orderBilling/" + orderId)
           .then((response) => response.json())
           .then((json) => {
-            setShippingDetails(json);
+            setBillingDetails(json);
             //console.log("here isn fsf ");
           });
       };
@@ -274,18 +288,29 @@ const ResourceDetailsLayout = () => {
           .then((response) => response.json())
           .then((json) => {
             setDiscounts(json);
-            console.log(json)
+            //console.log(json)
           });
       };
-      
+      const getOrderEmail = async () => {
+        const requestOptions = {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          //body: JSON.stringify({ date: newDate }),
+        };
+        fetch(`/api/orderBilling/email/${orderId}`, requestOptions)
+          .then((response) => response.json())
+          .then((data) => {
+            setEmailTo(data.email);
+          });
+      };
     return (
     <Frame>
-       
+        
       <Page
         //backAction={{content: 'Orders', url: '#'}}
         //backAction={<Button onClick={() => console.log('dfnsjfjk')}>dsfdsf</Button>}
         title={orderName}
-        primaryAction={showSave && <Button variant="primary" loading={loading} onClick={()=> updateOrderShippingCosts()}>Save</Button>}
+        primaryAction={showSave && (selected !== "Simple Mode") && <Button variant="primary" loading={loading} onClick={()=> updateOrderShippingCosts()}>Save</Button>}
         secondaryActions={[
           {
             content: "Back to Orders",
@@ -297,7 +322,7 @@ const ResourceDetailsLayout = () => {
             content: "Send Invoice",
             icon: SendMajor,
             accessibilityLabel: "Secondary action label",
-            onAction: () => alert("Archive action"),
+            onAction: () => handleInvoiceModal(),
           },
           
         ]}
@@ -391,7 +416,10 @@ const ResourceDetailsLayout = () => {
         </Layout.Section>
             
         </Layout>
-       
+       <InvoiceModal openInvoice={openInvoice} handleInvoiceModal={handleInvoiceModal} emailTo = {emailTo} setEmailTo={setEmailTo} handleError={handleError}
+        setErrorContent={setErrorContent}
+        setUrl={setUrl}
+        setToastProps={setToastProps} />
         <ResourcePicker
         resourceType="Product"
         actionVerb="select"
@@ -409,8 +437,8 @@ const ResourceDetailsLayout = () => {
         originalQuantity={originalQuantity}
         lineItemId={lineItemId}
         handleError={handleError}
-        errorContent={errorContent}
-        url={url}
+        setErrorContent={setErrorContent}
+        setUrl={setUrl}
         setReload={setReload}
         reload={reload}
         setToastProps={setToastProps}/>
@@ -426,11 +454,11 @@ const ResourceDetailsLayout = () => {
         setToastProps={setToastProps}
         />
         <UpdateBillingAddress 
-        activeShipping={activeBilling}
-        handleChangeShipping={handleChangeBilling}
-        shippingDetails={shippingDetails}
-        setShippingDetails={setShippingDetails}
-        handleFieldChangeShipping={handleFieldChangeShipping}
+        activeBilling={activeBilling}
+        handleChangeBilling={handleChangeBilling}
+        billingDetails={billingDetails}
+        setBillingDetails={setBillingDetails}
+        handleFieldChangeBilling={handleFieldChangeBilling}
         handleError={handleError}
         setErrorContent={setErrorContent}
         setUrl={setUrl}

@@ -341,10 +341,11 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
 app.put("/api/orders/:id", async (_req, res) => {
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
-
+/*
   const order = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
   });
+  */
   //old way to get order above, now we find the specific order by the id and use that to copy all of the contents over
   const orderTesting = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
@@ -352,7 +353,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   });
 
   //here is the new order we are creating, appropro named order2
-  let order2 = new shopify.api.rest.Order({
+  const order2 = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
   });
   //@ts-ignore
@@ -367,7 +368,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.created_at = newDate;
   order2.processed_at = newDate;
   ///
-  order2.line_items = orderTesting?.line_items;
+  
 
   if (orderTesting?.financial_status === "paid") {
     order2.transactions = [
@@ -380,7 +381,7 @@ app.put("/api/orders/:id", async (_req, res) => {
       },
     ];
   }else{
-    if(orderTesting.total_price - orderTesting.total_outstanding != 0){
+    if(orderTesting.total_price - orderTesting.total_outstanding > 0){
       /*
     order2.transactions = [
       {
@@ -393,18 +394,46 @@ app.put("/api/orders/:id", async (_req, res) => {
    //console.log(orderTesting)
     order2.transactions = [
       {
-        "kind": "sale",
+        "kind": "authorization",
         "status": "success",
-        "amount": parseFloat( orderTesting?.total_price - orderTesting?.total_outstanding)
+        "amount": parseFloat( orderTesting.total_price - orderTesting.total_outstanding)
       }
     ];
   }
   }
-   
+  order2.line_items = orderTesting?.line_items;
+
   order2.financial_status = orderTesting.financial_status;
+ 
+  order2.discount_codes = orderTesting?.discount_codes; 
+  order2.billing_address = orderTesting?.billing_address;
+  order2.shipping_address = orderTesting?.shipping_address;
+  order2.shipping_lines = orderTesting?.shipping_lines;
+  order2.customer = orderTesting?.customer;
+  if (orderTesting.tags) {
+    order2.tags = orderTesting?.tags;
+  }
+  if(orderTesting.email){
+    order2.email = orderTesting?.email;
+  }
+  //number
+  order2.name = orderTesting?.name;
+  order2.note = orderTesting?.note;
+  order2.note_attributes = orderTesting?.note_attributes;
+  order2.number = orderTesting?.number; //
+  order2.order_number = orderTesting?.order_number;
+
+  //misc
+  order2.refunds = orderTesting?.refunds;
+  order2.cancel_reason = orderTesting?.cancel_reason;
+  order2.buyer_accepts_marketing = orderTesting?.buyer_accepts_marketing;
+  order2.cancelled_at = orderTesting?.cancelled_at;
+  order2.total_weight = orderTesting?.total_weight;
+  /*
+  
  ///order2.payment_terms = orderTesting.payment_terms;
 
-  order2.total_tax = orderTesting?.total_tax;
+  //order2.total_tax = orderTesting?.total_tax;
   order2.billing_address = orderTesting?.billing_address;
   //order2.app_id = orderTesting?.app_id;
   order2.cancel_reason = orderTesting?.cancel_reason;
@@ -418,26 +447,28 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.client_details = orderTesting?.client_details;
   order2.closed_at = orderTesting?.closed_at;
   order2.company = orderTesting?.company;
-  /*
+  
   order2.current_subtotal_price = orderTesting?.current_subtotal_price;
   order2.current_subtotal_price_set = orderTesting?.current_subtotal_price_set;
-  */
-  order2.current_total_discounts = orderTesting?.current_total_discounts;
-  order2.current_total_discounts_set =
-    orderTesting?.current_total_discounts_set;
   
-  //order2.current_total_duties_set = orderTesting?.current_total_duties_set;
-  //order2.current_total_price = orderTesting?.current_total_price;
+  order2.current_total_discounts = orderTesting?.current_total_discounts;
+  order2.current_total_discounts_set = orderTesting?.current_total_discounts_set;
+  
+  order2.current_total_duties_set = orderTesting?.current_total_duties_set;
+  order2.current_total_price = orderTesting?.current_total_price;
   //order2.current_total_price_set = orderTesting?.current_total_price_set;
   order2.current_total_tax = orderTesting?.current_total_tax;
   order2.current_total_tax_set = orderTesting?.current_total_tax_set;
   order2.customer = orderTesting?.customer;
   order2.customer_locale = orderTesting?.customer_locale;
-  order2.discount_applications = orderTesting?.discount_applications;
-
+  //order2.total_discounts = orderTesting?.total_discounts;
+  //order2.total_discounts_set = orderTesting?.total_discounts_set;
+  //order2.discount_applications = orderTesting?.discount_applications;
+  console.log(orderTesting?.discount_codes, "======", orderTesting?.discount_applications, "=====", orderTesting?.total_discounts)
   if(orderTesting?.discount_codes){
     order2.discount_codes = orderTesting?.discount_codes;
   }
+  //order2.discount_codes = {code:orderTesting}
  
   if(orderTesting.email){
     order2.email = orderTesting?.email;
@@ -463,7 +494,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.payment_terms = orderTesting?.payment_terms;
   order2.phone = orderTesting?.phone;
 
-  //order2.presentment_currency = orderTesting?.presentment_currency;
+  order2.presentment_currency = orderTesting?.presentment_currency;
 
   order2.processing_method = orderTesting?.processing_method;
   order2.referring_site = orderTesting?.referring_site;
@@ -490,8 +521,9 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   //order2.token = orderTesting?.token; //
 
-  order2.total_discounts = orderTesting?.total_discounts;
-  order2.total_discounts_set = orderTesting?.total_discounts_set;
+  
+  
+  
   order2.total_line_items_price = orderTesting?.total_line_items_price;
   order2.total_line_items_price_set = orderTesting?.total_line_items_price_set;
   order2.total_outstanding = orderTesting?.total_outstanding;
@@ -506,7 +538,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.updated_at = orderTesting?.updated_at; //
   order2.user_id = orderTesting?.user_id; //
   
-  
+  */
   try {
     //saving the newly created order here
     // @ts-ignore

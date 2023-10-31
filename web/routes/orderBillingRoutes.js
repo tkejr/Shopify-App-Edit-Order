@@ -49,12 +49,17 @@ router.put("/:id", async (req, res) => {
 
   edited_billing.name =
     edited_billing.first_name + " " + edited_billing.last_name;
-  newOrder.billing_address = edited_billing;
-  //console.log(newOrder.billing_address)
-  newOrder.order_number = order.order_number;
+  //need an if around this perhaps
+  if(edited_billing){
+    newOrder.billing_address = edited_billing;
+  }
+  
+  
+ 
   newOrder.shipping_address = order.shipping_address;
 
   //for same number
+  newOrder.order_number = order.order_number;
   newOrder.number = order.number;
   newOrder.name = order.name;
   newOrder.customer = order.customer;
@@ -74,9 +79,10 @@ router.put("/:id", async (req, res) => {
     if(order.total_price - order.total_outstanding > 0){
     newOrder.transactions = [
       {
-        kind: "sale",
+        kind: "authorization",
         status: "success",
         amount: parseFloat( order.total_price - order.total_outstanding),
+        //amount: parseFloat( order.total_outstanding),
       },
     ];
   }
@@ -95,6 +101,8 @@ router.put("/:id", async (req, res) => {
   newOrder.note = order.note;
   newOrder.total_tax = order.total_tax;
   newOrder.currency = order.currency;
+
+  
 /*
   newOrder.total_discounts = order.total_discounts;
   newOrder.total_discounts_set = order.total_discounts_set;
@@ -106,7 +114,7 @@ router.put("/:id", async (req, res) => {
   newOrder.total_price_set = order.total_price_set;
   newOrder.total_shipping_price_set = order.total_shipping_price_set;
   */
-  
+  /*
   newOrder.total_tax_set = order.total_tax_set;
   newOrder.total_tip_received = order.total_tip_received;
   newOrder.total_weight = order.total_weight;
@@ -117,27 +125,27 @@ router.put("/:id", async (req, res) => {
     newOrder.payment_details = order.payment_details;
   }
   
-
+*/
  //newOrder.subtotal_price = order.subtotal_price;
   //newOrder.subtotal_price_set = order.subtotal_price_set;
 
+  newOrder.total_weight = order.total_weight;
   newOrder.cart_token = order.cart_token;
   newOrder.checkout_token = order.checkout_token;
   newOrder.client_details = order.client_details;
   newOrder.closed_at = order.closed_at;
   newOrder.company = order.company;
+
   
-  newOrder.current_total_discounts = order.current_total_discounts;
-  newOrder.current_total_discounts_set = order.current_total_discounts_set;
-  newOrder.current_total_duties_set = order.current_total_duties_set;
+ 
+  
   /*
   newOrder.current_total_price = order.current_total_price;
   newOrder.current_total_price_set = order.current_total_price_set;
   newOrder.current_total_tax = order.current_total_tax;
   newOrder.current_total_tax_set = order.current_total_tax_set;
 */
-  newOrder.customer_locale = order.customer_locale;
-  newOrder.discount_applications = order.discount_applications;
+  
   if(order.discount_codes){
     newOrder.discount_codes = order.discount_codes; 
   }
@@ -145,12 +153,13 @@ router.put("/:id", async (req, res) => {
   if(order.email !== '') {
     newOrder.email = order.email;
   }
+  /*
   newOrder.estimated_taxes = order.estimated_taxes;
   newOrder.gateway = order.gateway;
   newOrder.landing_site = order.landing_site;
   newOrder.location_id = order.location_id;
   newOrder.merchant_of_record_app_id = order.merchant_of_record_app_id;
-
+*/
   newOrder.note_attributes = order.note_attributes;
 
   //newOrder.order_status_url = order.order_status_url;
@@ -163,8 +172,8 @@ router.put("/:id", async (req, res) => {
   newOrder.referring_site = order.referring_site;
   newOrder.refunds = order.refunds;
 
-  newOrder.shipping_lines = order.shipping_lines;
-  newOrder.source_identifier = order.source_identifier;
+  newOrder.shipping_lines = order.shipping_lines; //need this
+ // newOrder.source_identifier = order.source_identifier;
   //
 
   //console.log(newOrder)
