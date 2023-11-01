@@ -58,11 +58,6 @@ router.put("/:id", async (req, res) => {
  
   newOrder.shipping_address = order.shipping_address;
 
-  //for same number
-  newOrder.order_number = order.order_number;
-  newOrder.number = order.number;
-  newOrder.name = order.name;
-  newOrder.customer = order.customer;
 
   //this is the list of financial status
   // authorized expired paid partially_paid partially_refunded pending refunded unpaid voided
@@ -89,10 +84,27 @@ router.put("/:id", async (req, res) => {
   }
 
   newOrder.financial_status = order.financial_status;
-  newOrder.payment_terms = order.payment_terms;
+  //newOrder.payment_terms = order.payment_terms;
+
+
+  //for same number
+  newOrder.order_number = order.order_number;
+  newOrder.number = order.number;
+  newOrder.name = order.name;
+  newOrder.customer = order.customer;
 
   if (order.tags) {
     newOrder.tags = order.tags;
+  }
+  if(order.discount_codes){
+    newOrder.discount_codes = order.discount_codes; 
+  }
+  
+  if(order.email !== '') {
+    newOrder.email = order.email;
+  }
+  if(order.payment_details){
+    newOrder.payment_details = order.payment_details;
   }
 
   newOrder.created_at = order.created_at;
@@ -101,7 +113,24 @@ router.put("/:id", async (req, res) => {
   newOrder.note = order.note;
   newOrder.total_tax = order.total_tax;
   newOrder.currency = order.currency;
+  newOrder.note_attributes = order.note_attributes;
 
+  newOrder.total_weight = order.total_weight;
+  newOrder.cart_token = order.cart_token;
+  newOrder.checkout_token = order.checkout_token;
+  newOrder.client_details = order.client_details;
+  newOrder.cancelled_at = order.cancelled_at;
+  newOrder.cancel_reason = order.cancel_reason;
+  newOrder.closed_at = order.closed_at;
+  newOrder.company = order.company;
+  newOrder.payment_gateway_names = order.payment_gateway_names;
+  newOrder.phone = order.phone;
+  newOrder.processing_method = order.processing_method;
+  newOrder.referring_site = order.referring_site;
+  newOrder.refunds = order.refunds;
+  newOrder.total_tip_received = order.total_tip_received;
+
+  newOrder.shipping_lines = order.shipping_lines; //need this
   
 /*
   newOrder.total_discounts = order.total_discounts;
@@ -121,20 +150,13 @@ router.put("/:id", async (req, res) => {
   newOrder.updated_at = order.updated_at; //
   newOrder.user_id = order.user_id; //
 
-  if(order.payment_details){
-    newOrder.payment_details = order.payment_details;
-  }
+  
   
 */
  //newOrder.subtotal_price = order.subtotal_price;
   //newOrder.subtotal_price_set = order.subtotal_price_set;
 
-  newOrder.total_weight = order.total_weight;
-  newOrder.cart_token = order.cart_token;
-  newOrder.checkout_token = order.checkout_token;
-  newOrder.client_details = order.client_details;
-  newOrder.closed_at = order.closed_at;
-  newOrder.company = order.company;
+  
 
   
  
@@ -146,13 +168,7 @@ router.put("/:id", async (req, res) => {
   newOrder.current_total_tax_set = order.current_total_tax_set;
 */
   
-  if(order.discount_codes){
-    newOrder.discount_codes = order.discount_codes; 
-  }
-  
-  if(order.email !== '') {
-    newOrder.email = order.email;
-  }
+ 
   /*
   newOrder.estimated_taxes = order.estimated_taxes;
   newOrder.gateway = order.gateway;
@@ -160,19 +176,11 @@ router.put("/:id", async (req, res) => {
   newOrder.location_id = order.location_id;
   newOrder.merchant_of_record_app_id = order.merchant_of_record_app_id;
 */
-  newOrder.note_attributes = order.note_attributes;
+  
 
   //newOrder.order_status_url = order.order_status_url;
-  newOrder.original_total_duties_set = order.original_total_duties_set;
+  //newOrder.original_total_duties_set = order.original_total_duties_set;
 
-  newOrder.payment_gateway_names = order.payment_gateway_names;
-
-  newOrder.phone = order.phone;
-  newOrder.processing_method = order.processing_method;
-  newOrder.referring_site = order.referring_site;
-  newOrder.refunds = order.refunds;
-
-  newOrder.shipping_lines = order.shipping_lines; //need this
  // newOrder.source_identifier = order.source_identifier;
   //
 
@@ -184,8 +192,6 @@ router.put("/:id", async (req, res) => {
       update: true,
     });
 
-    //console.log(newOrder, newOrder.line_items[0].price_set, newOrder.payment_details)
-    // deleting the old order with the old date
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],

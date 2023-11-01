@@ -86,8 +86,16 @@ router.put("/:id", async (req, res) => {
     newOrder.shipping_lines = order?.shipping_lines
   }
   //console.log("======", discountCodes)
-  if(discountCodes){
-    newOrder.discount_codes = discountCodes; 
+  if(discountCodes !== []){
+    if(order?.discount_codes){
+        //newOrder.discount_codes= order?.discount_codes;
+       // console.log('========{{{{{}}}}}}}', newOrder.discount_codes, discountCodes)
+       // newOrder.discount_codes.push(discountCodes[0]) ;
+       newOrder.discount_codes = discountCodes;
+        //console.log(newOrder.discount_codes)
+
+    } 
+     
   }
   else{
     //console.log("====== here in the discountCodes dont exist", discountCodes)
@@ -130,6 +138,10 @@ router.put("/:id", async (req, res) => {
   if(order.email !== ''){
     newOrder.email = order.email;
   }
+  if(order.payment_details)
+  {
+    newOrder.payment_details = order.payment_details;
+  }
   
   newOrder.customer = order.customer;
   newOrder.billing_address = order.billing_address;
@@ -141,18 +153,14 @@ router.put("/:id", async (req, res) => {
  
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
-  if(order.payment_details)
-  {
-    newOrder.payment_details = order.payment_details;
-  }
+  
   
   
   newOrder.note = order.note;
-  newOrder.total_tax = order.total_tax;
+  newOrder.note_attributes = order.note_attributes;
+  //newOrder.total_tax = order.total_tax;
  //misc
   newOrder.total_weight = order.total_weight;
-
-  newOrder.note_attributes = order.note_attributes;
   newOrder.payment_gateway_names = order.payment_gateway_names;
   newOrder.phone = order.phone;
   newOrder.processing_method = order.processing_method;
@@ -161,9 +169,15 @@ router.put("/:id", async (req, res) => {
   newOrder.cart_token = order.cart_token;
   newOrder.checkout_token = order.checkout_token;
   newOrder.client_details = order.client_details;
+  newOrder.cancel_reason = order.cancel_reason;
+  newOrder.cancelled_at = order.cancelled_at;
   newOrder.closed_at = order.closed_at;
   newOrder.company = order.company;
   newOrder.total_tip_received = order.total_tip_received;
+
+  newOrder.taxes_included = order.taxes_included;
+  newOrder.total_tax = order.total_tax;
+
  //newOrder.total_discounts = order.total_discounts;
  // newOrder.total_discounts_set = order.total_discounts_set;
  

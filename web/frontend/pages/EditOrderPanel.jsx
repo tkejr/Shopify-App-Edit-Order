@@ -184,6 +184,11 @@ const ResourceDetailsLayout = () => {
       const updateOrderShippingCosts = async () => {
         //setUpdateButton("Loading...");
         setLoading(true);
+        if(!discountsChanged){
+            //alert("here, discounts did not change")
+            //console.log(discounts)
+            setDiscounts([])
+        }
         const data = {
           shippingCostDetails: shippingCostDetails,
           discount_codes: discounts,
@@ -225,6 +230,7 @@ const ResourceDetailsLayout = () => {
       //
      
       const [showSave, setShowSave] = useState(false);
+      const [discountsChanged, setDiscountsChanged] = useState(false);
     useEffect(() => {
         if(!orderId){
             navigate("/EditOrder")
@@ -395,7 +401,9 @@ const ResourceDetailsLayout = () => {
           discounts={discounts}
           handleDiscounts={handleDiscounts}
           setDiscounts={setDiscounts}
-          setShowSave={setShowSave}/>)  
+          setShowSave={setShowSave}
+          setDiscountsChanged={setDiscountsChanged}/>
+          )  
 }
         </Layout.Section>
         <Layout.Section variant="oneThird">

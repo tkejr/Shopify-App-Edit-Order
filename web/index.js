@@ -404,8 +404,11 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.line_items = orderTesting?.line_items;
 
   order2.financial_status = orderTesting.financial_status;
- 
-  order2.discount_codes = orderTesting?.discount_codes; 
+
+  order2.taxes_included = orderTesting?.taxes_included;
+  order2.total_tax = orderTesting?.total_tax;
+
+  
   order2.billing_address = orderTesting?.billing_address;
   order2.shipping_address = orderTesting?.shipping_address;
   order2.shipping_lines = orderTesting?.shipping_lines;
@@ -416,6 +419,13 @@ app.put("/api/orders/:id", async (_req, res) => {
   if(orderTesting.email){
     order2.email = orderTesting?.email;
   }
+  if(orderTesting?.discount_codes){
+    order2.discount_codes = orderTesting?.discount_codes;
+  }
+  if(orderTesting.payment_details){
+    order2.payment_details = orderTesting?.payment_details;
+  }
+  
   //number
   order2.name = orderTesting?.name;
   order2.note = orderTesting?.note;
@@ -426,9 +436,15 @@ app.put("/api/orders/:id", async (_req, res) => {
   //misc
   order2.refunds = orderTesting?.refunds;
   order2.cancel_reason = orderTesting?.cancel_reason;
+  order2.client_details = orderTesting?.client_details;
   order2.buyer_accepts_marketing = orderTesting?.buyer_accepts_marketing;
   order2.cancelled_at = orderTesting?.cancelled_at;
+  order2.closed_at = orderTesting?.closed_at;
   order2.total_weight = orderTesting?.total_weight;
+  order2.payment_gateway_names = orderTesting.payment_gateway_names;
+
+  order2.phone = orderTesting.phone;
+  order2.processing_method = orderTesting.processing_method;
   /*
   
  ///order2.payment_terms = orderTesting.payment_terms;

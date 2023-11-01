@@ -38,7 +38,7 @@ const AdvancedEditingPanel = (props)  =>{
   };
   const addDiscount = () => {
     props.setDiscounts([{ code: "", amount: "" , type: ""}]);
-    props.setShowSave(true)
+    //props.setShowSave(true)
   };
   const shippingLines = props.shippingCostDetails?.map((shippingDetail, index) => (
     <FormLayout.Group>
@@ -65,17 +65,17 @@ const AdvancedEditingPanel = (props)  =>{
         type="text"
         label="Name"
         value={discount.code || ""}
-        onChange={(value) => {props.handleDiscounts("code", value, index); props.setShowSave(true);}}
+        onChange={(value) => {props.handleDiscounts("code", value, index); props.setShowSave(true);props.setDiscountsChanged(true)}}
       />
       <TextField
         type="text"
         label="Amount"
         value={discount.amount || ""}
-        onChange={(value) => {props.handleDiscounts("amount", value, index);props.setShowSave(true)}}
+        onChange={(value) => {props.handleDiscounts("amount", value, index);props.setShowSave(true);props.setDiscountsChanged(true)}}
       />
       <ButtonGroup variant="segmented">
-      <Button pressed={discount.type === "percentage"} onClick={()=> props.handleDiscounts("type", "percentage", index)} > Percentage </Button>
-      <Button pressed={discount.type === "fixed_amount"} onClick={()=> props.handleDiscounts("type", "fixed_amount", index)}>Fixed amount</Button>
+      <Button pressed={discount.type === "percentage"} onClick={()=> {props.handleDiscounts("type", "percentage", index);props.setShowSave(true);props.setDiscountsChanged(true)}} > Percentage </Button>
+      <Button pressed={discount.type === "fixed_amount"} onClick={()=> {props.handleDiscounts("type", "fixed_amount", index);props.setShowSave(true);props.setDiscountsChanged(true)}}>Fixed amount</Button>
     </ButtonGroup>
     </FormLayout.Group>
   ))
