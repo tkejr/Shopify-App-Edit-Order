@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 
-scopes = "read_orders, read_customers, write_customers, write_orders, read_products, write_order_edits"
+scopes = "read_all_orders, read_orders, read_customers, write_customers, write_orders, read_products, write_order_edits"
 
 
 
