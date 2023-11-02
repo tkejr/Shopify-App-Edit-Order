@@ -111,7 +111,7 @@ router.put("/:id", async (req, res) => {
       {
         kind: "sale",
         status: "success",
-        amount: parseFloat(order.total_price - order.total_discounts),
+        amount: parseFloat(order.total_price),
       },
     ];
   }else{

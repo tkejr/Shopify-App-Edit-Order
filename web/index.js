@@ -369,17 +369,21 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.processed_at = newDate;
   ///
   
-
+ 
   if (orderTesting?.financial_status === "paid") {
-    order2.transactions = [
-      {
-        kind: "sale",
-        status: "success",
-        amount: parseFloat(
-          orderTesting?.total_price - orderTesting?.total_discounts
-        ),
-      },
-    ];
+    //if(orderTesting?.total_price - orderTesting?.total_discounts > 0){
+      order2.transactions = [
+        {
+          kind: "sale",
+          status: "success",
+          amount: parseFloat(
+            //orderTesting?.total_line_items_price + orderTesting?.total_shipping_price_set + orderTesting?.total_tax - orderTesting?.total_discounts
+            orderTesting?.total_price
+          ),
+        },
+      ];
+    //}
+    
   }else{
     if(orderTesting.total_price - orderTesting.total_outstanding > 0){
       /*
@@ -408,7 +412,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
 
-  
+
   order2.billing_address = orderTesting?.billing_address;
   order2.shipping_address = orderTesting?.shipping_address;
   order2.shipping_lines = orderTesting?.shipping_lines;
