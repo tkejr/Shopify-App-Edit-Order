@@ -38,9 +38,11 @@ router.get("/taxLines/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  const shipping_and_tax_info = req.body;
-  const updated_shipping_lines = shipping_and_tax_info.shippingCostDetails;
-
+  const shipping_and_discount_info = req.body;
+  const updated_shipping_lines = shipping_and_discount_info.shippingCostDetails;
+  const discountCodes = shipping_and_discount_info.discount_codes; 
+  
+  console.log('=====', discountCodes, updated_shipping_lines)
   //console.log("========",updated_shipping_lines, shipping_and_tax_info)
   //const updated_tax_lines  = shipping_and_tax_info.taxLines;
   //console.log('==========',updated_tax_lines)
@@ -65,32 +67,63 @@ router.put("/:id", async (req, res) => {
     session: session,
     id: req.params["id"],
   });
+  //console.log(order)
   const newOrder = new shopify.api.rest.Order({ session: session });
   //newOrder.shipping_lines = updated_shipping_lines;
-  newOrder.shipping_lines = [
-    {
-      title: "" + updated_shipping_lines[0].title,
-      price: "" + updated_shipping_lines[0].price,
-    },
-  ];
+  //set the values 
+  if(updated_shipping_lines.length > 0){
+    console.log('hetwds =====', updated_shipping_lines)
+    newOrder.shipping_lines = [
+        {
+          title: "" + updated_shipping_lines[0]?.title,
+          price: "" + updated_shipping_lines[0]?.price,
+        },
+      ];
+  }
+  else
+  {
+    //console.log('here in klkllkklkl')
+    newOrder.shipping_lines = order?.shipping_lines
+  }
+  //console.log("======", discountCodes)
+  if(discountCodes !== []){
+    if(order?.discount_codes){
+        //newOrder.discount_codes= order?.discount_codes;
+       // console.log('========{{{{{}}}}}}}', newOrder.discount_codes, discountCodes)
+       // newOrder.discount_codes.push(discountCodes[0]) ;
+       newOrder.discount_codes = discountCodes;
+        //console.log(newOrder.discount_codes)
+
+    } 
+     
+  }
+  else{
+    //console.log("====== here in the discountCodes dont exist", discountCodes)
+
+    if(order?.discount_codes){
+        newOrder.discount_codes= order?.discount_codes;
+
+    }
+  }
   
   if (order.financial_status === "paid") {
     newOrder.transactions = [
       {
         kind: "sale",
         status: "success",
-        amount: parseFloat(order.total_price - order.total_discounts),
+        amount: parseFloat(order.total_price),
       },
     ];
   }else{
-   //console.log('======', order.total_outstanding)
+  
     if(order.total_price - order.total_outstanding > 0){
-        newOrder.transactions = [
+       
+          newOrder.transactions = [
             {
-              kind: "sale",
-              status: "success",
-              amount: parseFloat( order.total_price - order.total_outstanding),
-            },
+              "kind": "authorization",
+              "status": "success",
+              "amount": parseFloat( order.total_price - order.total_outstanding)
+            }
           ];
     }
    
@@ -102,79 +135,68 @@ router.put("/:id", async (req, res) => {
   if (order.tags) {
     newOrder.tags = order.tags;
   }
-  newOrder.number = order.number;
-  newOrder.name = order.name;
-  newOrder.customer = order.customer;
-  newOrder.billing_address = order.billing_address;
-
-  newOrder.order_number = order.order_number;
-  newOrder.shipping_address = order.shipping_address;
-  newOrder.financial_status = 'partially_paid';
-  //newOrder.payment_terms = order.payment_terms;
-  newOrder.created_at = order.created_at;
-  newOrder.processed_at = order.processed_at;
+  if(order.email !== ''){
+    newOrder.email = order.email;
+  }
   if(order.payment_details)
   {
     newOrder.payment_details = order.payment_details;
   }
   
-  //for notes
+  newOrder.customer = order.customer;
+  newOrder.billing_address = order.billing_address;
+  newOrder.shipping_address = order.shipping_address;
+  newOrder.order_number = order.order_number;
+  newOrder.number = order.number;
+  newOrder.name = order.name;
+  newOrder.financial_status = 'partially_paid';
+ 
+  newOrder.created_at = order.created_at;
+  newOrder.processed_at = order.processed_at;
+  
+  
+  
   newOrder.note = order.note;
-  newOrder.total_tax = order.total_tax;
-  newOrder.currency = order.currency;
+  newOrder.note_attributes = order.note_attributes;
+  //newOrder.total_tax = order.total_tax;
+ //misc
+  newOrder.total_weight = order.total_weight;
+  newOrder.payment_gateway_names = order.payment_gateway_names;
+  newOrder.phone = order.phone;
+  newOrder.processing_method = order.processing_method;
+  newOrder.referring_site = order.referring_site;
+  newOrder.refunds = order.refunds;
+  newOrder.cart_token = order.cart_token;
+  newOrder.checkout_token = order.checkout_token;
+  newOrder.client_details = order.client_details;
+  newOrder.cancel_reason = order.cancel_reason;
+  newOrder.cancelled_at = order.cancelled_at;
+  newOrder.closed_at = order.closed_at;
+  newOrder.company = order.company;
+  newOrder.total_tip_received = order.total_tip_received;
 
-  newOrder.total_discounts = order.total_discounts;
-  newOrder.total_discounts_set = order.total_discounts_set;
-  newOrder.total_line_items_price = order.total_line_items_price;
-  newOrder.total_line_items_price_set = order.total_line_items_price_set;
+  newOrder.taxes_included = order.taxes_included;
+  newOrder.total_tax = order.total_tax;
+
+ //newOrder.total_discounts = order.total_discounts;
+ // newOrder.total_discounts_set = order.total_discounts_set;
+ 
   //newOrder.total_outstanding = order.total_outstanding;
   //newOrder.total_price = order.total_price;
 
   //newOrder.total_price_set = order.total_price_set;
  // newOrder.total_shipping_price_set = order.total_shipping_price_set;
-  newOrder.total_tax = order.total_tax;
-  newOrder.total_tax_set = order.total_tax_set;
-  newOrder.total_tip_received = order.total_tip_received;
-  newOrder.total_weight = order.total_weight;
-  newOrder.updated_at = order.updated_at; //
-  newOrder.user_id = order.user_id; //
+ 
+ // newOrder.total_tax_set = order.total_tax_set;
+  
+  
+ // newOrder.updated_at = order.updated_at; //
+  //newOrder.user_id = order.user_id; //
 
-  newOrder.note_attributes = order.note_attributes;
-
-  newOrder.order_status_url = order.order_status_url;
-  newOrder.original_total_duties_set = order.original_total_duties_set;
-
-  newOrder.payment_gateway_names = order.payment_gateway_names;
-
-  newOrder.phone = order.phone;
-  newOrder.processing_method = order.processing_method;
-  newOrder.referring_site = order.referring_site;
-  newOrder.refunds = order.refunds;
-  //newOrder.subtotal_price = order.subtotal_price;
-  //newOrder.subtotal_price_set = order.subtotal_price_set;
-
-  newOrder.cart_token = order.cart_token;
-  newOrder.checkout_token = order.checkout_token;
-  newOrder.client_details = order.client_details;
-  newOrder.closed_at = order.closed_at;
-  newOrder.company = order.company;
-  /*
-  newOrder.current_subtotal_price = order.current_subtotal_price;
-  newOrder.current_subtotal_price_set = order.current_subtotal_price_set;
-  newOrder.current_total_discounts = order.current_total_discounts;
-  newOrder.current_total_discounts_set = order.current_total_discounts_set;
-  newOrder.current_total_duties_set = order.current_total_duties_set;
-  newOrder.current_total_price = order.current_total_price;
-  newOrder.current_total_price_set = order.current_total_price_set;
-   
-*/
- newOrder.current_total_tax = order.current_total_tax;
-  newOrder.current_total_tax_set = order.current_total_tax_set; 
-  newOrder.customer_locale = order.customer_locale;
-  newOrder.discount_applications = order.discount_applications;
-  if(order.email !== ''){
-    newOrder.email = order.email;
-  }
+  
+  
+ 
+  
  
   /*
     

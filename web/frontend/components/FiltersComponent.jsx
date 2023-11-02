@@ -1,9 +1,8 @@
 import {
-  ChoiceList,
-  TextField,
-  Card,
+  
+  LegacyCard,
   Filters,
-  DataTable,
+
 } from "@shopify/polaris";
 import React, { useState, useCallback } from "react";
 
@@ -20,17 +19,16 @@ const DataTableFiltersExample = ({ onSearch }) => {
   const appliedFilters = [];
 
   return (
-    <Card>
-      <Card.Section>
+    
         <Filters
           queryValue={queryValue}
           filters={filters}
+          queryPlaceholder="Search for a specific order"
           appliedFilters={appliedFilters}
           onQueryChange={handleFiltersQueryChange}
           onQueryClear={handleQueryValueRemove}
         />
-      </Card.Section>
-    </Card>
+     
   );
 };
 

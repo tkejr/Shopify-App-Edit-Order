@@ -1,7 +1,7 @@
 
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Card, Pagination } from '@shopify/polaris'
+import { LegacyCard, Pagination } from '@shopify/polaris'
 
 const PaginationComponent = ({
     total,
@@ -21,8 +21,8 @@ const PaginationComponent = ({
     if (totalPages === 0) return null;
     
     return (
-        <Card >
-          <Card.Section >
+        <LegacyCard >
+          <LegacyCard.Section >
         <Pagination
     hasPrevious
     onPrevious={() => {if(currentPage > 1)
@@ -31,8 +31,8 @@ const PaginationComponent = ({
     onNext={() => {if(currentPage < totalPages) 
         {onPageChange(currentPage + 1)}}}
   />
-        </Card.Section>
-        </Card>
+        </LegacyCard.Section>
+        </LegacyCard>
     
     );
 };

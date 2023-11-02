@@ -1,4 +1,4 @@
-import { Card, EmptyState, Page } from "@shopify/polaris";
+import { LegacyCard, EmptyState, Page } from "@shopify/polaris";
 import {
   Form,
   FormLayout,
@@ -69,8 +69,8 @@ export default function Help() {
     <Frame>
       <Page title="Help and Support" defaultWidth>
         {" "}
-        <Card title="Feedback">
-          <Card.Section>
+        <LegacyCard title="Feedback">
+          <LegacyCard.Section>
             <Form onSubmit={handleSubmit}>
               <FormLayout>
                 <TextField
@@ -106,8 +106,8 @@ export default function Help() {
                 </div>
               </FormLayout>
             </Form>
-          </Card.Section>
-        </Card>
+          </LegacyCard.Section>
+        </LegacyCard>
         <FooterHelp>
           For More Support{" "}
           <Link url="https://www.editify.kejrtech.com">Email Us</Link>

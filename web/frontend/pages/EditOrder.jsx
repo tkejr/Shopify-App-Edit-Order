@@ -4,7 +4,7 @@ import {
  
   Frame,
   Layout,
-  Card,
+  LegacyCard,
   TextContainer,
   Button
 } from "@shopify/polaris";
@@ -76,8 +76,8 @@ const PageExample = () => {
   const checkPremiumUserContent = () => {
     return (
       <Frame>
-        <Card title="Edit any Order how you need it">
-              <Card.Section>
+        <LegacyCard title="Edit any Order how you need it">
+              <LegacyCard.Section>
                 <TextContainer>
                   <p>
                   Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select the Pro plan.
@@ -85,11 +85,11 @@ const PageExample = () => {
                   </p>
                 </TextContainer>
                 
-              </Card.Section>
-              <Card.Section>
+              </LegacyCard.Section>
+              <LegacyCard.Section>
               <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
-              </Card.Section>
-        </Card>
+              </LegacyCard.Section>
+        </LegacyCard>
        
       </Frame>
     );
@@ -135,6 +135,7 @@ const PageExample = () => {
                 }
               </Layout.Section>
               <Layout.Section oneHalf>
+                {/*
                 <EditOrderComponent
                   orderId={orderId}
                   orderName={orderName}
@@ -145,6 +146,7 @@ const PageExample = () => {
                   setUrl={setUrl}
                   handleError={handleError}
                 />
+              */}
               </Layout.Section>
             </>
           ) : (

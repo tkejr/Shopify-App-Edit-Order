@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import {
-  Card,
+  LegacyCard,
   EmptyState,
   Page,
   CalloutCard,
@@ -14,7 +14,7 @@ import {
   Banner,
   Link,
   Modal,
-  TextContainer,
+  //TextContainer,
 } from "@shopify/polaris";
 import { cust1, edit_paywall } from "../assets";
 import { cust2 } from "../assets";
@@ -121,7 +121,7 @@ export default function CustomerPortal() {
   //api functions
   const updatePreference = async (requestBody) => {
     handleToggle();
-    setLoading(true)
+    //setLoading(true)
     try {
       const response = await fetch("/api/preferences", {
         method: "PUT",
@@ -132,7 +132,7 @@ export default function CustomerPortal() {
       });
      
       if (response.ok) {
-        const data = await response.json();
+        //const data = await response.json();
         setIsError(false);
         setToastContent("Updated Successfully");
         
@@ -146,7 +146,7 @@ export default function CustomerPortal() {
       setToastContent("Some Problem Occurred With API" + response);
       handleError();
     }
-    setLoading(false)
+    //setLoading(false)
   };
 
   const getOrder = async () => {
@@ -279,19 +279,20 @@ export default function CustomerPortal() {
   const checkPremiumUserContent = () => {
     return (
       <Page title="Customer Portal" defaultWidth>
-         <Card title="Discover how the Customer Portal can help you">
-              <Card.Section>
+         <LegacyCard title="Discover how the Customer Portal can help you">
+              <LegacyCard.Section>
+                {/*
                 <TextContainer>
                   <p>
                   Upgrade to Pro to let customers be able to edit orders without contacting you. This helps reduce returns and saves you money. Go to the plans page a select the Pro plan
                   </p>
                 </TextContainer>
-                
-              </Card.Section>
-              <Card.Section>
+    */}
+              </LegacyCard.Section>
+              <LegacyCard.Section>
               <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
-              </Card.Section>
-        </Card>
+              </LegacyCard.Section>
+        </LegacyCard>
        
       </Page>
     );
@@ -303,7 +304,7 @@ export default function CustomerPortal() {
       {planName === "pro" && isPremiumUser ? (
          (
           <Page
-            backAction={{ content: "Products", url: "#" }}
+            //backAction={{ content: "Products", url: "#" }}
             title="Customer Portal"
             titleMetadata={settingStatusMarkup}
             primaryAction={{
@@ -316,8 +317,8 @@ export default function CustomerPortal() {
             }}
           >
 
-            <Card title="About">
-              <Card.Section>
+            <LegacyCard title="About">
+              <LegacyCard.Section>
                 <p>
                   Allow Customers to manage and edit their orders through their
                   customer order status page. To use Order Editor's Customer
@@ -332,10 +333,10 @@ export default function CustomerPortal() {
                 src={cust1} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
               />{" "} */}
-              </Card.Section>
-            </Card>
-            <Card title="Install Customer Portal">
-              <Card.Section>
+              </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Install Customer Portal">
+              <LegacyCard.Section>
                 {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
                 <p>
                   Add the Customer Portal snippet to the additional scripts in
@@ -344,8 +345,8 @@ export default function CustomerPortal() {
                   customer accounts enabled
                 </p>
                 <br></br>
-              </Card.Section>
-              <Card.Section title="Step 1: Copy the install snippet">
+              </LegacyCard.Section>
+              <LegacyCard.Section title="Step 1: Copy the install snippet">
                 <TextField
                   value={copiedContent}
                   multiline={4}
@@ -361,8 +362,8 @@ export default function CustomerPortal() {
                 <br></br>
                 <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
                 
-              </Card.Section>
-              <Card.Section title="Step 2: Add to your order status page">
+              </LegacyCard.Section>
+              <LegacyCard.Section title="Step 2: Add to your order status page">
                 <h1>
                   Add the snippet to the additional scripts in your{" "}
                   <a href={dynamicLink} target="_blank">
@@ -378,8 +379,8 @@ export default function CustomerPortal() {
                   src={cust2} // Make sure cust1 contains a valid image URL
                   alt="Customer Image"
                 />{" "}
-              </Card.Section>
-              <Card.Section title="Step 3: View Order">
+              </LegacyCard.Section>
+              <LegacyCard.Section title="Step 3: View Order">
                 <h1>
                   Click on View Order to see the checkout page and see the
                   customer portal box embedded onto that page
@@ -396,9 +397,9 @@ export default function CustomerPortal() {
                 <br></br>
                 <br></br>
                 <Button onClick={getOrder}>View Order Status</Button>
-              </Card.Section>
-            </Card>
-            <Card
+              </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard
               title="Customer editing"
               primaryFooterAction={{
                 content: preferenceText,
@@ -411,9 +412,9 @@ export default function CustomerPortal() {
                 },
               }}
             >
-              {/* Content of the card */}
+              {/* Content of the LegacyCard */}
 
-              <Card.Section>
+              <LegacyCard.Section>
                 <h1>Adjust when customers can edit their orders.</h1>
                 <br></br>
                 <Select
@@ -421,8 +422,8 @@ export default function CustomerPortal() {
                   onChange={handleSelectChange}
                   value={selected}
                 />
-              </Card.Section>
-            </Card>
+              </LegacyCard.Section>
+            </LegacyCard>
             <ErrorBanner
               open={error}
               onClose={handleError}

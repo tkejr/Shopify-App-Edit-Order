@@ -1,23 +1,20 @@
 import {
   IndexTable,
-  Card,
+  LegacyCard,
   Button,
   useIndexResourceState,
-  Filters,
-  Select,
-  TextField,
-  Modal,
+  Card,
   DatePicker,
-  Page,
+  
   ButtonGroup,
+  Spinner
 } from "@shopify/polaris";
-import { useAppQuery } from "../hooks";
+//import { useAppQuery } from "../hooks";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
-import { Spinner } from "@shopify/polaris";
+
 import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
-import { Link, Scroll } from "react-scroll";
 import { useSelector, useDispatch } from "react-redux";
 
 export function OrderTable(props) {
@@ -161,7 +158,7 @@ export function OrderTable(props) {
       >
         <IndexTable.Cell>
           <Button
-            plain
+            variant="plain"
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);
@@ -182,12 +179,14 @@ export function OrderTable(props) {
 
   return (
     <Card>
+      {
       <FiltersComponent
         onSearch={(value) => {
           setSearch(value);
           setCurrentPage(1);
         }}
       />
+      }
       <div style={{ padding: "10px" }}>
         <Button
           plain
@@ -238,6 +237,7 @@ export function OrderTable(props) {
       {status !== "success" ? (
         <Spinner accessibilityLabel="Spinner example" size="large" />
       ) : (
+        
         <IndexTable
           resourceName={resourceName}
           itemCount={orderData.length}
@@ -250,16 +250,21 @@ export function OrderTable(props) {
             { title: "Amount spent" },
           ]}
         >
+
           {rowMarkup}
         </IndexTable>
+        
+      
       )}
 
+{
       <Paginate
         total={totalItems}
         itemsPerPage={ITEMS_PER_PAGE}
         currentPage={currentPage}
         onPageChange={(page) => setCurrentPage(page)}
       />
+        }
     </Card>
   );
 }

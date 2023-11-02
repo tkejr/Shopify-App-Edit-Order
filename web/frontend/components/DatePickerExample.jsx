@@ -1,8 +1,8 @@
 import {
   DatePicker,
   TextContainer,
-  TextStyle,
-  Card,
+ 
+  LegacyCard,
   Toast,
   Frame,
   Page,
@@ -106,7 +106,7 @@ export function DatePickerExample(props) {
 
   return (
     <Frame>
-      <Card title={title} sectioned>
+      <LegacyCard title={title} sectioned>
         <TextContainer spacing="loose" id="section-1">
           <p>
             You can Backdate an order by selecting a date from the calendar
@@ -126,13 +126,13 @@ export function DatePickerExample(props) {
         <Button
           disabled={!orderId}
           onClick={() => submitDate()}
-          primary={orderId}
+          variant="primary"
           fullWidth={true}
         >
           {orderId ? "Submit" : "Pick an Order"}
         </Button>
         {toastMarkup}
-      </Card>
+      </LegacyCard>
     </Frame>
   );
 }

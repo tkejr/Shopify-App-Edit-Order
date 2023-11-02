@@ -50,7 +50,8 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
           "price": 74.99,
           "grams": "1300",
           "quantity": 3,
-        
+          //"applied_discount": { "value_type": 'fixed_amount', "value": '100' },
+          "discount_codes":[{"code":"FAKE30","amount":"9.00","type":"percentage"}],
           "tax_lines": [
             {
               "price": 13.5,
@@ -60,8 +61,33 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
           ]
         }
       ];
-      
-     
+      newOrder.transactions = [
+        {
+          "kind": "sale",
+          "status": "success",
+          "amount": 50.0
+        }
+      ];
+      newOrder.financial_status = "paid";
+      newOrder.discount_codes = [
+        {
+          "code": "FAKE30",
+          "amount": "9.00",
+          "type": "percentage"
+        }
+      ];
+      /*
+     newOrder.discount_applications =  [ {
+        "title": "CHRISMAS",
+        "description": "Promotional item for blackfriday.",
+        "code":"CHRISMAS10",
+        "amount":"141",
+        "value_type":"fixed_amount",
+        "non_applicable_reason": null,
+        "applicable": true,
+        "application_type": "automatic"
+      }]
+      */
       /*
       newOrder.discount_applications = [
             {
@@ -71,11 +97,11 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
             value_type: 'fixed_amount',
             allocation_method: 'across',
            target_selection: 'all',
-         title: 'bnbnbn',
+         title: 'TRhis is weird',
              description: 'bnbnbn'
            }
           ];
-          */
+          
         newOrder.total_discounts_set = {
             shop_money : {
                 amount: '5.00', currency_code: 'INR' 
@@ -85,8 +111,11 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
             }
         
         }
-    newOrder.total_discounts = '5.00';
+        */
+        
+    //newOrder.total_discounts = '5.00';
 
+    /*
     newOrder.line_items[0].discount_allocations = [{
         amount:'7.00',
         amount_set:{
@@ -97,8 +126,10 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
                 amount: '7.00', currency_code: 'INR' 
             }
         },
-        discount_application_index: 0
+        discount_application_index: 0,
+        title:'Custome sfdsf'
     }]
+    */
     //newOrder.line_items = order.line_items
     //newOrder.line_items[1].total_discount = '3.00';
     //newOrder.line_items[1].total_discount_set.presentment_money.amount = '3.00';
@@ -114,7 +145,7 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
     const quantity = parseInt(req.params["quantity"]);
     try {
         await newOrder.save({
-            update: true,
+          update: true,
           });
         /*
       const openOrder = await client.query({
@@ -203,7 +234,24 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
     res.status(status).send({ success: status === 200, error });
   });
 
-
+  router.get("/:id", async (req, res) => {
+    const session = res.locals.shopify.session;
+    const shopUrl = session.shop;
+    console.log("========== In get discount routes =============");
+    const orderData = await shopify.api.rest.Order.find({
+      session: session,
+      id: req.params["id"],
+      fields: "discount_codes",
+    });
+    let returnObj = orderData.discount_codes
+    console.log("======== shiping addy", orderData);
+   if(!orderData.discount_codes){
+     console.log('here, there is no billing addresss');
+     returnObj = {status: 'none'}
+     
+   }
+    res.json(returnObj);
+  });
 
 
 export default router;

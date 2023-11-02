@@ -1,31 +1,31 @@
 import {
   IndexTable,
-  Card,
+  LegacyCard,
   Button,
   useIndexResourceState,
   Filters,
   Select,
   TextField,
   Modal,
-  DatePicker,
-  Page,
-  ButtonGroup,
+  Banner
 } from "@shopify/polaris";
 import { useAppQuery } from "../hooks";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { Spinner } from "@shopify/polaris";
+import { useSelector, useDispatch } from "react-redux";
 
-export default function InvoiceModal({ orderId }) {
+const InvoiceModal = (props) => {
   const [active, setActive] = useState(false);
-  const [emailTo, setEmailTo] = useState("");
+  const [loading, setLoading] = useState(false);
+  //const [emailTo, setEmailTo] = useState("");
   const [emailFrom, setEmailFrom] = useState("");
   const [subject, setSubject] = useState("");
   const [customMessage, setCustomMessage] = useState("");
   const fetch = useAuthenticatedFetch();
-
+  const orderId = useSelector((state) => state.orderId);
   const handleChange = useCallback(() => setActive(!active), [active]);
-
+/*
   const getOrderEmail = async () => {
     const requestOptions = {
       method: "GET",
@@ -39,11 +39,15 @@ export default function InvoiceModal({ orderId }) {
       });
   };
   useEffect(async () => {
-    getOrderEmail();
+    if(orderId){
+      getOrderEmail();
+    }
+    
   }, [orderId]);
-
+*/
   const handleSendInvoice = async () => {
     // Here, make a POST request to your server with the form data
+    setLoading(true)
     try {
       const response = await fetch("/api/sendInvoice", {
         method: "POST",
@@ -52,7 +56,7 @@ export default function InvoiceModal({ orderId }) {
         },
         body: JSON.stringify({
           email: {
-            to: emailTo,
+            to: props.emailTo,
             from: emailFrom,
             subject,
             customMessage,
@@ -65,35 +69,46 @@ export default function InvoiceModal({ orderId }) {
       if (data.success) {
         // Handle success scenario
         console.log(data);
+        props.setToastProps({ content: "Invoice sent" });
       } else {
         // Handle errors
+        props.setErrorContent(
+          "There was an error sending the invoice, double check that everything is correct "
+        );
+        props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+        props.handleError();
       }
     } catch (error) {
-      console.error("Error:", error);
+      props.setErrorContent(
+        "There was an error sending the invoice, double check that everything is correct "
+      );
+      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      props.handleError();
     }
-    setEmailTo("");
+    //setEmailTo("");
+    setLoading(false); 
     setEmailFrom("");
     setSubject("");
     setCustomMessage("");
-    handleChange();
+    props.handleInvoiceModal();
   };
 
   return (
     <div>
-      <Button onClick={handleChange}>Send Invoice</Button>
+     
       <Modal
-        open={active}
-        onClose={handleChange}
+        open={props.openInvoice}
+        onClose={props.handleInvoiceModal}
         title="Send Invoice"
         primaryAction={{
-          content: "Send",
+          content: (loading) ? "Loading..." : "Save",
           onAction: handleSendInvoice,
         }}
       >
         <Modal.Section>
           <TextField
-            value={emailTo}
-            onChange={setEmailTo}
+            value={props.emailTo}
+            onChange={props.setEmailTo}
             label="To"
             type="email"
           />
@@ -111,7 +126,20 @@ export default function InvoiceModal({ orderId }) {
             multiline={4}
           />
         </Modal.Section>
+
+        { props.emailTo === "" &&
+        <Modal.Section>
+        <Banner onDismiss={() => {}}>
+            <p>
+              Make sure there is a customer to this order before sending an invoice{' '}
+         
+            </p>
+        </Banner>
+      </Modal.Section>
+}
       </Modal>
     </div>
   );
 }
+
+export default InvoiceModal; 

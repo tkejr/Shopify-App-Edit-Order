@@ -1,5 +1,5 @@
 import {
-  Card,
+  LegacyCard,
   Page,
   Layout,
   Link,
@@ -86,8 +86,8 @@ export default function HomePage() {
       {(
         <Layout>
           <>
-            <Layout.Section oneHalf>
-              <Card sectioned>
+            <Layout.Section variant="oneHalf">
+              <LegacyCard sectioned>
                 <PlanCard
                   planName="Starter Plan"
                   price="4.99"
@@ -102,27 +102,27 @@ export default function HomePage() {
                   upgrade={upgradeStarter}
                 ></PlanCard>
 
-                <Card.Section>
+                <LegacyCard.Section>
                  
                   {(!isPremiumUser || planName === "pro") && (
-                    <Button onClick={() => upgradeStarter()}>
+                    <Button variant="primary" onClick={() => upgradeStarter()}>
                       {" "}
                       {loadingStarter ? "Loading..." : "Get Starter Plan"}
                     </Button>
                   )}
                   {planName === "starter" && (
-                    <div style={{ padding: "6px" }}>
-                      <Badge progress="complete" status="success">
+                    <div style={{ padding: "4px" }}>
+                      <Badge progress="complete" tone="success">
                         {" "}
                         Active
                       </Badge>
                     </div>
                   )}
-                </Card.Section>
-              </Card>
+                </LegacyCard.Section>
+              </LegacyCard>
             </Layout.Section>
-            <Layout.Section oneHalf>
-              <Card sectioned>
+            <Layout.Section variant="oneHalf">
+              <LegacyCard sectioned>
                 <PlanCard
                   planName="Pro Plan"
                   price="9.99"
@@ -137,29 +137,29 @@ export default function HomePage() {
                   upgrade={upgradePro}
                 ></PlanCard>
 
-                <Card.Section>
+                <LegacyCard.Section>
                  
                   {(!isPremiumUser || planName === "starter") && (
-                    <Button onClick={() => upgradePro()}>
+                    <Button variant="primary" onClick={() => upgradePro()}>
                       {" "}
                       {loading ? "Loading..." : "Get Pro Plan"}
                     </Button>
                   )}
                   {planName === "pro" && (
-                    <div style={{ padding: "8px" }}>
-                      <Badge progress="complete" status="success">
+                    <div style={{ padding: "4px" }}>
+                      <Badge progress="complete" tone="success">
                         {" "}
                         Active
                       </Badge>
                     </div>
                   )}
                   {"    "}
-                </Card.Section>
-              </Card>
+                </LegacyCard.Section>
+              </LegacyCard>
             </Layout.Section>
             <Layout.Section full>
-              <Card title="Partner Apps & Reviews">
-                <Card.Section>
+              <LegacyCard title="Partner Apps & Reviews">
+                <LegacyCard.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img
                       src={editify_logo}
@@ -179,8 +179,8 @@ export default function HomePage() {
                       </Link>
                     </p>
                   </div>
-                </Card.Section>
-                <Card.Section>
+                </LegacyCard.Section>
+                <LegacyCard.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img
                       src={resizify_logo}
@@ -199,8 +199,8 @@ export default function HomePage() {
                       </Link>
                     </p>
                   </div>
-                </Card.Section>
-                <Card.Section>
+                </LegacyCard.Section>
+                <LegacyCard.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img
                       src={chatify_logo}
@@ -219,8 +219,8 @@ export default function HomePage() {
                       </Link>
                     </p>
                   </div>
-                </Card.Section>
-              </Card>
+                </LegacyCard.Section>
+              </LegacyCard>
               <br></br>
 
               <div style={{ height: "30px" }}></div>

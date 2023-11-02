@@ -1,3 +1,5 @@
+/*
+
 import React, { useState } from "react";
 import { Card, TextContainer, TextStyle } from "@shopify/polaris";
 import { Toast } from "@shopify/app-bridge-react";
@@ -69,3 +71,4 @@ export function ProductsCard() {
     </>
   );
 }
+*/
