@@ -422,7 +422,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   if(orderTesting.shipping_lines){
     order2.shipping_lines = orderTesting?.shipping_lines;
   }
-  if(order2.customer){
+  if(orderTesting.customer){
     order2.customer = orderTesting?.customer;
   }
   
@@ -605,7 +605,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   
   */
  //payment terms, fulfillments, discount applications,    what is landing site
- console.log(order2)
+ //console.log(order2)
   try {
     //saving the newly created order here
     // @ts-ignore
