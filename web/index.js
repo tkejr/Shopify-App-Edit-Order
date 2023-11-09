@@ -407,28 +407,69 @@ app.put("/api/orders/:id", async (_req, res) => {
   }
   order2.line_items = orderTesting?.line_items;
 
-  order2.financial_status = orderTesting.financial_status;
+  order2.financial_status = orderTesting?.financial_status;
 
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
-
-
+  //new
+// order2.fulfillment_status = orderTesting?.fulfillment_status;
+//order2.discount_applications = orderTesting?.discount_applications;
+//order2.fulfillments = []
+ //
   order2.billing_address = orderTesting?.billing_address;
   order2.shipping_address = orderTesting?.shipping_address;
-  order2.shipping_lines = orderTesting?.shipping_lines;
-  order2.customer = orderTesting?.customer;
+  //console.log(orderTesting)
+  if(orderTesting.shipping_lines){
+    order2.shipping_lines = orderTesting?.shipping_lines;
+  }
+  if(order2.customer){
+    order2.customer = orderTesting?.customer;
+  }
+  
   if (orderTesting.tags) {
     order2.tags = orderTesting?.tags;
   }
   if(orderTesting.email){
     order2.email = orderTesting?.email;
   }
-  if(orderTesting?.discount_codes){
-    order2.discount_codes = orderTesting?.discount_codes;
+  //console.log(orderTesting?.discount_codes[0].amount, orderTesting?.discount_codes)
+  //console.log(orderTesting?.discount_codes)
+  if(orderTesting?.discount_codes?.length === 1){
+    if(orderTesting?.discount_codes[0].type === 'percentage'){
+      
+      let code = '';
+      if(orderTesting.discount_codes[0].code === ''){
+        code = 'Custom Discount'
+      }
+      else{
+        code = orderTesting.discount_codes[0].code
+      }
+      let discount_code = [{code: code , amount: orderTesting.discount_codes[0].amount, type:'fixed_amount'}]
+      
+      order2.discount_codes = discount_code;
+      
+    } 
+    else{
+      let code = '';
+      if(orderTesting.discount_codes[0].code === ''){
+        code = 'Custom Discount'
+      }
+      else{
+        code = orderTesting.discount_codes[0].code
+      }
+      let discount_code = [{code: code , amount: orderTesting.discount_codes[0].amount, type:'fixed_amount'}]
+      
+      order2.discount_codes = discount_code;
+      //order2.discount_codes = orderTesting?.discount_codes;
+    }
+    
+    
   }
+  
   if(orderTesting.payment_details){
     order2.payment_details = orderTesting?.payment_details;
   }
+  
   
   //number
   order2.name = orderTesting?.name;
@@ -445,10 +486,14 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.cancelled_at = orderTesting?.cancelled_at;
   order2.closed_at = orderTesting?.closed_at;
   order2.total_weight = orderTesting?.total_weight;
-  order2.payment_gateway_names = orderTesting.payment_gateway_names;
+  order2.payment_gateway_names = orderTesting?.payment_gateway_names;
 
-  order2.phone = orderTesting.phone;
-  order2.processing_method = orderTesting.processing_method;
+  order2.phone = orderTesting?.phone;
+  order2.processing_method = orderTesting?.processing_method;
+
+  //
+  //order2.landing_site = orderTesting?.landing_site;
+  //order2.location_id = orderTesting?.location_id;
   /*
   
  ///order2.payment_terms = orderTesting.payment_terms;
@@ -559,6 +604,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.user_id = orderTesting?.user_id; //
   
   */
+ //payment terms, fulfillments, discount applications,    what is landing site
+ console.log(order2)
   try {
     //saving the newly created order here
     // @ts-ignore
