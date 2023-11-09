@@ -99,11 +99,44 @@ router.put("/:id", async (req, res) => {
   }
   else{
     //console.log("====== here in the discountCodes dont exist", discountCodes)
-
+/*
     if(order?.discount_codes){
         newOrder.discount_codes= order?.discount_codes;
 
     }
+    */
+   ////new logic
+   if(order?.discount_codes?.length === 1){
+    if(order?.discount_codes[0].type === 'percentage'){
+      
+      let code = '';
+      if(order.discount_codes[0].code === ''){
+        code = 'Custom Discount'
+      }
+      else{
+        code = order.discount_codes[0].code
+      }
+      let discount_code = [{code: code , amount: order.discount_codes[0].amount, type:'fixed_amount'}]
+      
+      newOrder.discount_codes = discount_code;
+      
+    } 
+    else{
+      let code = '';
+      if(order.discount_codes[0].code === ''){
+        code = 'Custom Discount'
+      }
+      else{
+        code = order.discount_codes[0].code
+      }
+      let discount_code = [{code: code , amount: order.discount_codes[0].amount, type:'fixed_amount'}]
+      
+      order.discount_codes = discount_code;
+      //order2.discount_codes = orderTesting?.discount_codes;
+    }
+    
+    
+  }
   }
   
   if (order.financial_status === "paid") {
