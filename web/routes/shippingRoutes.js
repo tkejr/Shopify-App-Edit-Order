@@ -131,12 +131,20 @@ router.put("/:id", async (req, res) => {
       }
       let discount_code = [{code: code , amount: order.discount_codes[0].amount, type:'fixed_amount'}]
       
-      order.discount_codes = discount_code;
+      newOrder.discount_codes = discount_code;
       //order2.discount_codes = orderTesting?.discount_codes;
     }
     
     
   }
+  else{
+    newOrder.current_total_discounts = order?.current_total_discounts;
+    newOrder.current_total_discounts_set = order?.current_total_discounts_set;
+    newOrder.discount_applications = order?.discount_applications; 
+    newOrder.total_discounts = order?.total_discounts;
+    newOrder.total_discounts_set = order?.total_discounts_set;
+  }
+  
   }
   
   if (order.financial_status === "paid") {
