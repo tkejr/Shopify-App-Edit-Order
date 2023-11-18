@@ -428,6 +428,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   }
   //console.log(orderTesting?.discount_codes[0].amount, orderTesting?.discount_codes)
   //console.log(orderTesting?.discount_codes)
+
   if (orderTesting?.discount_codes?.length === 1) {
     if (orderTesting?.discount_codes[0].type === "percentage") {
       let code = "";
@@ -463,6 +464,13 @@ app.put("/api/orders/:id", async (_req, res) => {
       order2.discount_codes = discount_code;
       //order2.discount_codes = orderTesting?.discount_codes;
     }
+  } else {
+    order2.current_total_discounts = orderTesting?.current_total_discounts;
+    order2.current_total_discounts_set =
+      orderTesting?.current_total_discounts_set;
+    order2.discount_applications = orderTesting?.discount_applications;
+    order2.total_discounts = orderTesting?.total_discounts;
+    order2.total_discounts_set = orderTesting?.total_discounts_set;
   }
 
   if (orderTesting.payment_details) {
@@ -602,9 +610,11 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.user_id = orderTesting?.user_id; //
   
   */
+
   //payment terms, fulfillments, discount applications,    what is landing site
   //console.log(order2)
   try {
+    // console.log(orderTesting)
     //saving the newly created order here
     // @ts-ignore
 
