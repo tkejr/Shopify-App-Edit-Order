@@ -14,7 +14,7 @@
   "dependencies": {
     "@shopify/app": "^3.49.3",
     "@shopify/checkout-ui-extensions-react": "^0.24.0",
-    "@shopify/cli": "^3.49.3",
+    "@shopify/cli": "^3.51.0",
     "@shopify/polaris": "^11.19.0",
     "@shopify/ui-extensions": "2023.7.x",
     "@shopify/ui-extensions-react": "2023.7.x",
