@@ -333,8 +333,12 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
   res.status(200).json(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
+
+  /*
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
+
+  */
   /*
   const order = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
@@ -650,7 +654,23 @@ app.put("/api/orders/:id", async (_req, res) => {
   //console.log(order2);
   res.status(status).send({ success: status === 200, error });
 });
-
+app.get("/api/orderName/:id", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "name",  
+  });
+  let returnObj = orderData.name;
+  console.log("======== shiping addy", orderData);
+  if(!orderData.name){
+   console.log('here, there is no order name');
+   returnObj = "none"
+   
+  } 
+  res.json(returnObj);
+});
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
   if (prod) {

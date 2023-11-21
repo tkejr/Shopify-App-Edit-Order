@@ -246,7 +246,7 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
     let returnObj = orderData.discount_codes
     console.log("======== shiping addy", orderData);
    if(!orderData.discount_codes){
-     console.log('here, there is no billing addresss');
+     console.log('here, there is no discount codes');
      returnObj = {status: 'none'}
      
    }

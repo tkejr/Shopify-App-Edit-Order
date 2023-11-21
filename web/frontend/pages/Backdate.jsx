@@ -8,7 +8,7 @@ import {
   Button,
   Text
 } from "@shopify/polaris";
-
+import { getLCP } from "web-vitals";
 import React, { useState, useEffect, useCallback } from "react";
 //import CustomSkeletonPage from "../components/SkeletonPage";
 import ErrorBanner from "../components/ErrorBanner";
@@ -18,11 +18,14 @@ import {  OrderTable, DatePickerExample } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
 import { edit_paywall } from "../assets";
+import { sendToAnalytics } from "../../lcp-helper";
+
 
 
 export default function Backdate() {
+  
   const fetch = useAuthenticatedFetch();
-
+  
   //using random
 
   const [activeResizify, setActiveResizify] = useState(
@@ -90,9 +93,14 @@ export default function Backdate() {
   useEffect(() => {
     fetchRecurringCharges().catch((error) => console.error(error));
     //new
-    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
-    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+    //dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+    //dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Backdate Page")
+    }
+    getLCP(handleLCP);
+    
   }, []);
   const checkPremiumUserContent = () => {
     return (

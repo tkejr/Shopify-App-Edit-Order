@@ -136,12 +136,13 @@ export function OrderTable(props) {
     setHasDates(false);
   };
   //dates
-  const [{ month, year }, setDate] = useState({ month: 8, year: 2023 });
+  const newDate = new Date()
+  const [{ month, year }, setDate] = useState({ month: newDate.getMonth(), year: newDate.getFullYear()});
   const [selectedDates, setSelectedDates] = useState({
     //start: new Date('Sat Sep 09 2023 00:00:00 GMT-0500 (EST)'),
     //end: new Date('Sat Sep 16 2023 00:00:00 GMT-0500 (EST)'),
-    start: new Date(),
-    end: new Date(),
+    start: newDate,
+    end: newDate,
   });
 
   const handleMonthChange = useCallback(

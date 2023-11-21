@@ -15,7 +15,10 @@ import { useNavigate } from "@shopify/app-bridge-react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
-import {chatify_logo, editify_logo, resizify_logo} from '../assets'
+import {chatify_logo, editify_logo, resizify_logo} from '../assets';
+import { sendToAnalytics } from "../../lcp-helper";
+import { getLCP } from "web-vitals";
+
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
 
@@ -73,6 +76,10 @@ export default function HomePage() {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Plans Page")
+    }
+    getLCP(handleLCP);
   }, []);
 //Backdate Orders
 //Edit Shipping Cost

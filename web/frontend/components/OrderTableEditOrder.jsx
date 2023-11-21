@@ -148,10 +148,11 @@ export function OrderTableEditOrder(props) {
     setHasDates(false);
   };
   //dates
-  const [{ month, year }, setDate] = useState({ month: 8, year: 2023 });
+  const newDate = new Date()
+  const [{ month, year }, setDate] = useState({ month: newDate.getMonth(), year: newDate.getFullYear() });
   const [selectedDates, setSelectedDates] = useState({
-    start: new Date(),
-    end: new Date(),
+    start:newDate,
+    end: newDate,
   });
 
   const handleMonthChange = useCallback(

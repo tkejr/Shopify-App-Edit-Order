@@ -17,22 +17,49 @@ import ErrorBanner from "../components/ErrorBanner";
 export function DatePickerExample(props) {
   const emptyToastProps = { content: null };
   const [active, setActive] = useState(false);
+  const [orderNameNative, setOrderNameNative] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
 
   const [error, setError] = useState(false);
-  ////new code
-  const orderId = useSelector((state) => state.orderId);
+  
+  const orderId =  useSelector((state) => state.orderId);
+  console.log("-=======", orderId)
   const orderName = useSelector((state) => state.orderName);
   const dispatch = useDispatch();
 
+  //newCode
+  const getOrderName = async () => {
+   
+    
+      fetch("/api/orderName/" + orderId)
+      .then((response) => response.json())
+      .then((json) => {
+        setOrderNameNative(json);
+        console.log("=======",json)
+      });
+    
+    
+  };
   const handleError = () => {
     setError(!error);
   };
   var title = "Please  Click on Order Number";
+  
+  /*
   if (orderName) {
     title = "Please Select a Date for " + orderName;
   }
+  */
+ console.log("======dfdfdf",orderNameNative)
+  if(orderNameNative !== "none" && orderNameNative !== undefined){
+
+    title = "Please Select a Date for " + orderNameNative;
+  }
+  if (orderName) {
+    title = "Please Select a Date for " + orderName;
+  }
+  
   const toastMarkup = toastProps.content && (
     <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
   );
@@ -45,22 +72,27 @@ export function DatePickerExample(props) {
     year: currentDate.getFullYear(),
   });
   const [selectedDates, setSelectedDates] = useState({
-    start: new Date("January 17, 2023 03:24:00"),
-    end: new Date("January 17, 2023 03:24:00"),
+    start: new Date("November 17, 2025 03:24:00"),
+    end: new Date("November 17, 2025 03:24:00"),
   });
 
   const handleMonthChange = useCallback(
     (month, year) => setDate({ month, year }),
     []
   );
-
+  useEffect(()=>{
+    if(orderId){
+      getOrderName();
+    }
+    
+  },[])
   const ConvertDate = (date) => {
     const convertedDate = new Date(date).toISOString();
     return convertedDate;
   };
 
   const submitDate = () => {
-    let defaultDate = new Date("Jan 17 2023");
+    let defaultDate = new Date("November 17, 2025 03:24:00");
 
     if (
       selectedDates.start.getFullYear() === defaultDate.getFullYear() &&
@@ -73,7 +105,8 @@ export function DatePickerExample(props) {
       props.handleError();
       return;
     }
-    updateOrder(props.orderId, ConvertDate(selectedDates.start));
+    setOrderNameNative("none")
+    updateOrder(orderId, ConvertDate(selectedDates.start));
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
   };
