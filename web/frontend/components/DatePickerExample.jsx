@@ -24,7 +24,6 @@ export function DatePickerExample(props) {
   const [error, setError] = useState(false);
   
   const orderId =  useSelector((state) => state.orderId);
-  console.log("-=======", orderId)
   const orderName = useSelector((state) => state.orderName);
   const dispatch = useDispatch();
 
@@ -36,7 +35,7 @@ export function DatePickerExample(props) {
       .then((response) => response.json())
       .then((json) => {
         setOrderNameNative(json);
-        console.log("=======",json)
+        //console.log("=======",json)
       });
     
     
@@ -51,7 +50,7 @@ export function DatePickerExample(props) {
     title = "Please Select a Date for " + orderName;
   }
   */
- console.log("======dfdfdf",orderNameNative)
+ 
   if(orderNameNative !== "none" && orderNameNative !== undefined){
 
     title = "Please Select a Date for " + orderNameNative;

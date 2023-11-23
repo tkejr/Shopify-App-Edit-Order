@@ -41,10 +41,10 @@ export default function HomePage() {
     const chargeId = urlParams.get("charge_id");
     const type = urlParams.get("type");
     const orderId = urlParams.get("id");
-    console.log("Charge ID:", orderId, type);
+  
     if(type === "edit"){
-      //dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
-      navigate("/EditOrder");
+      dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
+      navigate("/EditOrderPanel");
     }
     if(type === "backdate"){
       dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });

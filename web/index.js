@@ -249,7 +249,7 @@ app.get("/api/upgradePro", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
-  recurring_application_charge.price = 9.99;
+  recurring_application_charge.price = 7.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -276,7 +276,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Starter Plan";
-  recurring_application_charge.price = 4.99;
+  recurring_application_charge.price = 3.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -286,6 +286,60 @@ app.get("/api/upgradeStarter", async (req, res) => {
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
 
+  res.json({ confirmationUrl });
+});
+app.get("/api/upgradeYear", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+ // const freedays = await getFreeTrialDays(shop);
+  console.log("========Free days========");
+ // console.log(freedays);
+  ///IMPORTANT, change this to just /editify in prod
+  var url = "https://" + shop + "/admin/apps/editify-dev";
+  if (prod) {
+    url = "https://" + shop + "/admin/apps/editify";
+  }
+  
+ 
+
+const client = new shopify.api.clients.Graphql({session});
+const data = await client.query({
+  data: {
+    "query": `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean!) {
+      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test: $test) {
+        userErrors {
+          field
+          message
+        }
+        appSubscription {
+          id
+        }
+        confirmationUrl
+      }
+    }`,
+    "variables": {
+      "name": "Editify Pro Plan",
+      "returnUrl": url,
+      "lineItems": [
+        {
+          "plan": {
+            "appRecurringPricingDetails": {
+              "price": {
+                "amount": 99.99,
+                "currencyCode": "USD"
+              },
+              "interval": "ANNUAL"
+            }
+          }
+        }
+      ],
+      "test": true,
+    },
+  },
+});
+
+console.log(data.body.data.appSubscriptionCreate.confirmationUrl)
+const confirmationUrl = data.body.data.appSubscriptionCreate.confirmationUrl;
   res.json({ confirmationUrl });
 });
 app.get("/api/orders", async (_req, res) => {
@@ -334,11 +388,10 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
 });
 app.put("/api/orders/:id", async (_req, res) => {
 
-  /*
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
-
-  */
+     
   /*
   const order = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
@@ -709,6 +762,7 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -823,6 +877,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
