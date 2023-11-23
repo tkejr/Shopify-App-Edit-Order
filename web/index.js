@@ -338,7 +338,7 @@ const data = await client.query({
   },
 });
 
-console.log(data.body.data.appSubscriptionCreate.confirmationUrl)
+//console.log(data.body.data.appSubscriptionCreate.confirmationUrl)
 const confirmationUrl = data.body.data.appSubscriptionCreate.confirmationUrl;
   res.json({ confirmationUrl });
 });
@@ -1007,8 +1007,6 @@ app.use("/api/discount", discountRoutes);
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
-  // print the params
-  console.log(_req.params);
   return res
     .status(200)
     .set("Content-Type", "text/html")

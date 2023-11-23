@@ -20,7 +20,7 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
         <div style={styles.price}>{price} {newPrice}</div>
       </div>
       {features.map((feature, index) => (
-        <BlockStack key={index} >
+        <BlockStack >
           <div style={{ display: "flex", marginBottom:'10px' }}>
           <div style={{  float:'left' }}>
               <p>{feature} </p>
