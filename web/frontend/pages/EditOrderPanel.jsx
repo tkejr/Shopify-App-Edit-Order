@@ -12,7 +12,8 @@ import {
     TextField,
     Toast,
     Frame,
-    ButtonGroup
+    ButtonGroup,
+    TextContainer
 } from '@shopify/polaris'; 
 import {
    DuplicateMinor,
@@ -233,6 +234,51 @@ const ResourceDetailsLayout = () => {
      
       const [showSave, setShowSave] = useState(false);
       const [discountsChanged, setDiscountsChanged] = useState(false);
+    //new
+    const isPremiumUser = useSelector((state) => state.isPremiumUser);
+    const planName = useSelector((state) => state.planName);
+    const fetchRecurringCharges = async () => {
+      const res = await fetch("/api/check")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.hasPayment === "pro") {
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+          } else if (data.hasPayment === "starter") {
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+          } else {
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
+          }
+  
+          setUserStateLoading(false);
+        });
+    };
+    useEffect(() => {
+      fetchRecurringCharges().catch((error) => console.error(error));
+    
+    }, []);
+    const checkPremiumUserContent = () => {
+      return (
+        <Frame>
+          <LegacyCard title="Edit any Order how you need it">
+                <LegacyCard.Section>
+                  <TextContainer>
+                    <p>
+                    Sometimes, when importing orders, Shopify does not let a merchant edit the order further. We solve that. Go to the Plans page and select the Pro plan.
+                    If you think we missed anything, contact us and we will work on adding that functionality right away. 
+                    </p>
+                  </TextContainer>
+                  
+                </LegacyCard.Section>
+                <LegacyCard.Section>
+                <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+                </LegacyCard.Section>
+          </LegacyCard>
+         
+        </Frame>
+      );
+    };
     useEffect(() => {
         if(!orderId){
             navigate("/EditOrder")
@@ -330,6 +376,7 @@ const ResourceDetailsLayout = () => {
     return (
     <Frame>
         
+      { planName === 'pro' && isPremiumUser ? (
       <Page
         //backAction={{content: 'Orders', url: '#'}}
         //backAction={<Button onClick={() => console.log('dfnsjfjk')}>dsfdsf</Button>}
@@ -496,7 +543,8 @@ const ResourceDetailsLayout = () => {
         setUrl={setUrl}
         setToastProps={setToastProps}
         />
-      </Page>
+      </Page>) : checkPremiumUserContent()
+}
       {toastMarkup}
       </Frame>
     )
