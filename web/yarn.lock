@@ -173,46 +173,45 @@
     "@sendgrid/client" "^7.7.0"
     "@sendgrid/helpers" "^7.7.0"
 
-"@shopify/network@^1.5.1":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@shopify/network/-/network-1.6.4.tgz#fdfa8379cb6e06f05ee63d24aafcd6f8e275cb34"
-  integrity sha512-V+//Et386LnYdtNhQ3e33AKYfU25XEt8H5XYeMqPvJZpVvC9Z1lHKQMpmM/zq13VXjPUjt9/sNxHxMP3I6cbJg==
+"@shopify/network@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@shopify/network/-/network-3.2.1.tgz#c51590bb9ccd177bb7a35c2bad482233198d215b"
+  integrity sha512-Ih/6Oe80dynlUsRfEqptWBfsySCqI0rjQvPAjS8HuWeK9nZ+TvmYScfxjucKXZ2deXwAClnU6SMdh3/B1lMMog==
 
-"@shopify/shopify-api@^6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@shopify/shopify-api/-/shopify-api-6.2.0.tgz#3c37ea5d324cd3b1509df6e49026684f8f6cd966"
-  integrity sha512-f1IexEB7ijeMw0xG1taaO0Z0jQfD/8CVqjecSbVqlSypjBTCliCQ/Wv7yHxsmJbIMjIpRLcOHHbUy5ed+CEVvg==
+"@shopify/shopify-api@^7.7.0":
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/@shopify/shopify-api/-/shopify-api-7.7.0.tgz#0344b5ba90b4ac913c26193ffd6eaedc91d24889"
+  integrity sha512-VrOty3470GpGcf2nZDCUQGCHU5lz9X91RwAoHqlutKueBsS5d8d7P6wv667zCxh+DHoV+8BBcNwQr/esW5TsAg==
   dependencies:
-    "@shopify/network" "^1.5.1"
-    "@types/node-fetch" "^2.5.7"
-    "@types/supertest" "^2.0.10"
+    "@shopify/network" "^3.2.1"
+    compare-versions "^5.0.3"
+    isbot "^3.6.10"
     jose "^4.9.1"
     node-fetch "^2.6.1"
-    semver "^7.3.8"
     tslib "^2.0.3"
     uuid "^9.0.0"
 
-"@shopify/shopify-app-express@^1.1.0":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@shopify/shopify-app-express/-/shopify-app-express-1.2.2.tgz#bad0006e74725936d81bbfc876791eb62b5b957f"
-  integrity sha512-MjMXkOlzOwVCygkxXpP1LZ9o25cJnKp4SIDgEEjPM6Fy2NpO+T5luCO0VCI2/cuPwkTLbl4C1GD8oT8346/NOQ==
+"@shopify/shopify-app-express@^2.1.1":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@shopify/shopify-app-express/-/shopify-app-express-2.2.4.tgz#dad26b4753250cb3c390e2fe9bd6fe7d39d17e0b"
+  integrity sha512-tRqSamLlTNXTB08mfZ1FPy0mlvAsMy0FqzfQHri+296u8U4itwwFvBVgVmqdl4nsIgHEBE8OBIiFu6kIrEv2eQ==
   dependencies:
-    "@shopify/shopify-api" "^6.2.0"
-    "@shopify/shopify-app-session-storage" "^1.1.1"
-    "@shopify/shopify-app-session-storage-memory" "^1.0.4"
+    "@shopify/shopify-api" "^7.7.0"
+    "@shopify/shopify-app-session-storage" "^1.1.10"
+    "@shopify/shopify-app-session-storage-memory" "^1.0.13"
     cookie-parser "^1.4.6"
     express "^4.18.1"
-    semver "^7.3.8"
+    semver "^7.5.1"
     tslib "^2.4.0"
 
-"@shopify/shopify-app-session-storage-memory@^1.0.4":
+"@shopify/shopify-app-session-storage-memory@^1.0.13":
   version "1.0.13"
   resolved "https://registry.yarnpkg.com/@shopify/shopify-app-session-storage-memory/-/shopify-app-session-storage-memory-1.0.13.tgz#06a2aceaef7037b6a716495d22e6c8a6cf21b66e"
   integrity sha512-+bV+svJ/LUFCLumgLBovatJ2Mno8SXzgGdZTDf8wf+dWPEFAJm4w0JJHX2QMeDfjo7O2pb3J1bFAZpx/jNgHeQ==
   dependencies:
     tslib "^2.4.0"
 
-"@shopify/shopify-app-session-storage-sqlite@^1.0.0":
+"@shopify/shopify-app-session-storage-sqlite@^1.2.2":
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/@shopify/shopify-app-session-storage-sqlite/-/shopify-app-session-storage-sqlite-1.2.9.tgz#905a0162c55635574305d4ec9c1afac7d53de594"
   integrity sha512-pWyslzzWHilqm56Z/UvhgQQ0XYS7646TKckT4DNWtWeCD0TXIhaOkDRS6xG6Tz91MHzNgW1jJ1ce2bBid0tjnA==
@@ -220,7 +219,7 @@
     sqlite3 "^5.1.6"
     tslib "^2.4.0"
 
-"@shopify/shopify-app-session-storage@^1.1.1":
+"@shopify/shopify-app-session-storage@^1.1.10":
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/@shopify/shopify-app-session-storage/-/shopify-app-session-storage-1.1.10.tgz#90ad589c74954d6cf89e69c38b73c72e70ce9daf"
   integrity sha512-B9/3qUUU+8675uB61NY3Zn7aW32YGdJEbDkKO6uHsjR3fuoJMlIpkDpjO0FistFy7YAW5Ql766THgP3axYk86A==
@@ -232,45 +231,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@types/cookiejar@*":
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/@types/cookiejar/-/cookiejar-2.1.4.tgz#d3fe9c70f026237239ef57dd9d41c87f978b63b5"
-  integrity sha512-b698BLJ6kPVd6uhHsY7wlebZdrWPXYied883PDSzpJZYOP97EOn/oGdLCH3jJf157srkFReIZY5v0H1s8Dozrg==
-
 "@types/minimatch@^3.0.3":
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.5.tgz#1001cc5e6a3704b83c236027e77f2f58ea010f40"
   integrity sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==
-
-"@types/node-fetch@^2.5.7":
-  version "2.6.9"
-  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.6.9.tgz#15f529d247f1ede1824f7e7acdaa192d5f28071e"
-  integrity sha512-bQVlnMLFJ2d35DkPNjEPmd9ueO/rh5EiaZt2bhqiSarPjZIuIV6bPQVqcrEyvNo+AfTrRGVazle1tl597w3gfA==
-  dependencies:
-    "@types/node" "*"
-    form-data "^4.0.0"
-
-"@types/node@*":
-  version "20.9.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.9.1.tgz#9d578c610ce1e984adda087f685ace940954fe19"
-  integrity sha512-HhmzZh5LSJNS5O8jQKpJ/3ZcrrlG6L70hpGqMIAoM9YVD0YBRNWYsfwcXq8VnSjlNpCpgLzMXdiPo+dxcvSmiA==
-  dependencies:
-    undici-types "~5.26.4"
-
-"@types/superagent@*":
-  version "4.1.22"
-  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-4.1.22.tgz#bb3b2d8fa8b2b1c1946e415708f1a6cf0824fd2f"
-  integrity sha512-GMaOrnnUsjChvH8zlzdDPARRXky8bU3E8xsU/fOclgqsINekbwDu1+wzJzJaGzZP91SGpOutf5Te5pm5M/qCWg==
-  dependencies:
-    "@types/cookiejar" "*"
-    "@types/node" "*"
-
-"@types/supertest@^2.0.10":
-  version "2.0.16"
-  resolved "https://registry.yarnpkg.com/@types/supertest/-/supertest-2.0.16.tgz#7a1294edebecb960d957bbe9b26002a2b7f21cd7"
-  integrity sha512-6c2ogktZ06tr2ENoZivgm7YnprnhYE4ZoXGMY+oA7IuAf17M8FWvujXZGmxLv8y0PTyts4x5A+erSwVUFA8XSg==
-  dependencies:
-    "@types/superagent" "*"
 
 abbrev@1:
   version "1.1.1"
@@ -585,6 +549,11 @@ combined-stream@^1.0.8:
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
+
+compare-versions@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-5.0.3.tgz#a9b34fea217472650ef4a2651d905f42c28ebfd7"
+  integrity sha512-4UZlZP8Z99MGEY+Ovg/uJxJuvoXuN4M6B3hKaiackiHrgzQFEe3diJi1mf1PNHbFujM7FvLrK2bpgIaImbtZ1A==
 
 compressible@~2.0.16:
   version "2.0.18"
@@ -1315,6 +1284,11 @@ isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
   integrity sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==
+
+isbot@^3.6.10:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/isbot/-/isbot-3.7.1.tgz#83655e59bfae8cd410d3c63b398c8ad813bf3fdf"
+  integrity sha512-JfqOaY3O1lcWt2nc+D6Mq231CNpwZrBboLa59Go0J8hjGH+gY/Sy0CA/YLUSIScINmAVwTdJZIsOTk4PfBtRuw==
 
 isexe@^2.0.0:
   version "2.0.0"
@@ -2133,7 +2107,7 @@ semver@^6.0.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.3.5, semver@^7.3.8:
+semver@^7.3.5, semver@^7.5.1:
   version "7.5.4"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
   integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
@@ -2448,11 +2422,6 @@ undefsafe@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
-
-undici-types@~5.26.4:
-  version "5.26.5"
-  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
-  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 unique-filename@^1.1.1:
   version "1.1.1"

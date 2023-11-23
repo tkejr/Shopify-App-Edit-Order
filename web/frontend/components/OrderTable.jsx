@@ -53,7 +53,7 @@ export function OrderTable(props) {
     fetch("/api/orders")
       .then((response) => response.json())
       .then((json) => {
-        setRawData(json);
+        setRawData(json.data);
         setStatus("success");
       });
   };
@@ -63,7 +63,7 @@ export function OrderTable(props) {
   }, [props.reloadComp]);
   const orderData = useMemo(() => {
     let computedOrders = rawData;
-
+     
     computedOrders = computedOrders.filter((post) => {
       if (search === "#") {
         return post;
@@ -112,7 +112,7 @@ export function OrderTable(props) {
     fetch("/api/orders/" + selectedDates.start + "/" + selectedDates.end)
       .then((response) => response.json())
       .then((json) => {
-        setRawData(json);
+        setRawData(json.data);
         setStatus("success");
       });
     handleChange();

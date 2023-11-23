@@ -58,7 +58,7 @@ export function OrderTableEditOrder(props) {
     fetch("/api/orders")
       .then((response) => response.json())
       .then((json) => {
-        setRawData(json);
+        setRawData(json.data);
         setStatus("success");
       });
   };
@@ -120,11 +120,11 @@ export function OrderTableEditOrder(props) {
   const getCustomOrderDates = () => {
     setStatus("loading");
     fetch(
-      "/api/orders/unfulfilled/" + selectedDates.start + "/" + selectedDates.end
+      "/api/orders/" + selectedDates.start + "/" + selectedDates.end
     )
       .then((response) => response.json())
       .then((json) => {
-        setRawData(json);
+        setRawData(json.data);
         setStatus("success");
       });
     handleChange();
