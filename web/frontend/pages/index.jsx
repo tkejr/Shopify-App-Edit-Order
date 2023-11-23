@@ -19,13 +19,16 @@ import {
   CircleCancelMajor,
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 //import CustomSkeletonPage from "../components/SkeletonPage";
-import { onCLS, onFID, onLCP } from "web-vitals";
+import { sendToAnalytics } from "../../lcp-helper";
+import { getLCP } from "web-vitals";
 
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [shopDeets, setShopDeets] = useState();
   const [planIcon, setPlanIcon] = useState(null);
   const [editedIcon, setEditedIcon] = useState(null);
@@ -36,8 +39,17 @@ export default function HomePage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const chargeId = urlParams.get("charge_id");
-
-    console.log("Charge ID:", chargeId);
+    const type = urlParams.get("type");
+    const orderId = urlParams.get("id");
+  
+    if(type === "edit"){
+      dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
+      navigate("/EditOrderPanel");
+    }
+    if(type === "backdate"){
+      dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
+      navigate("/Backdate");
+    }
     const getAnalytics = async () => {
       try {
         const response = await fetch("/api/analytics", {
@@ -87,6 +99,11 @@ export default function HomePage() {
     };
     //getAnalytics();
     //fetchRecurringCharges();
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Index Page")
+    }
+    getLCP(handleLCP);
+    
   }, []);
   function handlePrimaryActionClick() {
     navigate("/Backdate");

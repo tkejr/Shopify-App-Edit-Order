@@ -25,7 +25,8 @@ import {
 import ErrorBanner from "../components/ErrorBanner";
 import { useSelector, useDispatch } from "react-redux";
 import { edit_paywall } from "../assets";
-
+import { sendToAnalytics } from "../../lcp-helper";
+import { getLCP } from "web-vitals";
 const PageExample = () => {
   const [show, setShow] = useState(false);
   const [reloadComp, setReloadComp] = useState(false);
@@ -72,6 +73,10 @@ const PageExample = () => {
     //dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     //dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Edit Order Page")
+    }
+    getLCP(handleLCP);
   }, []);
   const checkPremiumUserContent = () => {
     return (

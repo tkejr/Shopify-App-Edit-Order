@@ -66,6 +66,7 @@ app.get(
 
     const url = session.shop;
     const access_token = session.accessToken;
+
     //Tracking the install event
 
     const shopDetails = await shopify.api.rest.Shop.all({
@@ -144,15 +145,8 @@ app.post("/api/email", async (req, res) => {
 app.get("/api/check", async (req, res) => {
   const sess = res.locals.shopify.session;
   const url = sess.shop;
-
-  //harcoding for review stores
-  if (
-    url == "momiji-kids.myshopify.com" ||
-    url == "pekoe-petals.myshopify.com"
-  ) {
-    res.json({ hasPayment: "pro" });
-    return;
-  }
+  const access_token = sess.accessToken;
+  console.log("access token", access_token);
 
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
@@ -255,7 +249,7 @@ app.get("/api/upgradePro", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
-  recurring_application_charge.price = 9.99;
+  recurring_application_charge.price = 7.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -282,7 +276,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Starter Plan";
-  recurring_application_charge.price = 4.99;
+  recurring_application_charge.price = 3.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -292,6 +286,60 @@ app.get("/api/upgradeStarter", async (req, res) => {
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
 
+  res.json({ confirmationUrl });
+});
+app.get("/api/upgradeYear", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+ // const freedays = await getFreeTrialDays(shop);
+  console.log("========Free days========");
+ // console.log(freedays);
+  ///IMPORTANT, change this to just /editify in prod
+  var url = "https://" + shop + "/admin/apps/editify-dev";
+  if (prod) {
+    url = "https://" + shop + "/admin/apps/editify";
+  }
+  
+ 
+
+const client = new shopify.api.clients.Graphql({session});
+const data = await client.query({
+  data: {
+    "query": `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean!) {
+      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test: $test) {
+        userErrors {
+          field
+          message
+        }
+        appSubscription {
+          id
+        }
+        confirmationUrl
+      }
+    }`,
+    "variables": {
+      "name": "Editify Pro Plan",
+      "returnUrl": url,
+      "lineItems": [
+        {
+          "plan": {
+            "appRecurringPricingDetails": {
+              "price": {
+                "amount": 99.99,
+                "currencyCode": "USD"
+              },
+              "interval": "ANNUAL"
+            }
+          }
+        }
+      ],
+      "test": true,
+    },
+  },
+});
+
+//console.log(data.body.data.appSubscriptionCreate.confirmationUrl)
+const confirmationUrl = data.body.data.appSubscriptionCreate.confirmationUrl;
   res.json({ confirmationUrl });
 });
 app.get("/api/orders", async (_req, res) => {
@@ -339,9 +387,12 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
   res.status(200).json(data);
 });
 app.put("/api/orders/:id", async (_req, res) => {
+
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
-/*
+     
+  /*
   const order = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
   });
@@ -368,24 +419,22 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.created_at = newDate;
   order2.processed_at = newDate;
   ///
-  
- 
+
   if (orderTesting?.financial_status === "paid") {
     //if(orderTesting?.total_price - orderTesting?.total_discounts > 0){
-      order2.transactions = [
-        {
-          kind: "sale",
-          status: "success",
-          amount: parseFloat(
-            //orderTesting?.total_line_items_price + orderTesting?.total_shipping_price_set + orderTesting?.total_tax - orderTesting?.total_discounts
-            orderTesting?.total_price
-          ),
-        },
-      ];
+    order2.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: parseFloat(
+          //orderTesting?.total_line_items_price + orderTesting?.total_shipping_price_set + orderTesting?.total_tax - orderTesting?.total_discounts
+          orderTesting?.total_price
+        ),
+      },
+    ];
     //}
-    
-  }else{
-    if(orderTesting.total_price - orderTesting.total_outstanding > 0){
+  } else {
+    if (orderTesting.total_price - orderTesting.total_outstanding > 0) {
       /*
     order2.transactions = [
       {
@@ -395,15 +444,17 @@ app.put("/api/orders/:id", async (_req, res) => {
       },
     ];
     */
-   //console.log(orderTesting)
-    order2.transactions = [
-      {
-        "kind": "authorization",
-        "status": "success",
-        "amount": parseFloat( orderTesting.total_price - orderTesting.total_outstanding)
-      }
-    ];
-  }
+      //console.log(orderTesting)
+      order2.transactions = [
+        {
+          kind: "authorization",
+          status: "success",
+          amount: parseFloat(
+            orderTesting.total_price - orderTesting.total_outstanding
+          ),
+        },
+      ];
+    }
   }
   order2.line_items = orderTesting?.line_items;
 
@@ -412,77 +463,77 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
   //new
-// order2.fulfillment_status = orderTesting?.fulfillment_status;
-//order2.discount_applications = orderTesting?.discount_applications;
-//order2.fulfillments = []
- //
+  // order2.fulfillment_status = orderTesting?.fulfillment_status;
+  //order2.discount_applications = orderTesting?.discount_applications;
+  //order2.fulfillments = []
+  //
   order2.billing_address = orderTesting?.billing_address;
   order2.shipping_address = orderTesting?.shipping_address;
   //console.log(orderTesting)
-  if(orderTesting.shipping_lines){
+  if (orderTesting.shipping_lines) {
     order2.shipping_lines = orderTesting?.shipping_lines;
   }
-  if(orderTesting.customer){
+  if (orderTesting.customer) {
     order2.customer = orderTesting?.customer;
   }
-  
+
   if (orderTesting.tags) {
     order2.tags = orderTesting?.tags;
   }
-  if(orderTesting.email){
+  if (orderTesting.email) {
     order2.email = orderTesting?.email;
   }
   //console.log(orderTesting?.discount_codes[0].amount, orderTesting?.discount_codes)
   //console.log(orderTesting?.discount_codes)
-  
-  if(orderTesting?.discount_codes?.length === 1){
-    if(orderTesting?.discount_codes[0].type === 'percentage'){
-      
-      let code = '';
-      if(orderTesting.discount_codes[0].code === ''){
-        code = 'Custom Discount'
+
+  if (orderTesting?.discount_codes?.length === 1) {
+    if (orderTesting?.discount_codes[0].type === "percentage") {
+      let code = "";
+      if (orderTesting.discount_codes[0].code === "") {
+        code = "Custom Discount";
+      } else {
+        code = orderTesting.discount_codes[0].code;
       }
-      else{
-        code = orderTesting.discount_codes[0].code
-      }
-      let discount_code = [{code: code , amount: orderTesting.discount_codes[0].amount, type:'fixed_amount'}]
-      
+      let discount_code = [
+        {
+          code: code,
+          amount: orderTesting.discount_codes[0].amount,
+          type: "fixed_amount",
+        },
+      ];
+
       order2.discount_codes = discount_code;
-      
-    } 
-    else{
-      let code = '';
-      if(orderTesting.discount_codes[0].code === ''){
-        code = 'Custom Discount'
+    } else {
+      let code = "";
+      if (orderTesting.discount_codes[0].code === "") {
+        code = "Custom Discount";
+      } else {
+        code = orderTesting.discount_codes[0].code;
       }
-      else{
-        code = orderTesting.discount_codes[0].code
-      }
-      let discount_code = [{code: code , amount: orderTesting.discount_codes[0].amount, type:'fixed_amount'}]
-      
+      let discount_code = [
+        {
+          code: code,
+          amount: orderTesting.discount_codes[0].amount,
+          type: "fixed_amount",
+        },
+      ];
+
       order2.discount_codes = discount_code;
       //order2.discount_codes = orderTesting?.discount_codes;
     }
-    
-    
-  }
-  else{
+  } else {
     order2.current_total_discounts = orderTesting?.current_total_discounts;
-    order2.current_total_discounts_set = orderTesting?.current_total_discounts_set;
-    order2.discount_applications = orderTesting?.discount_applications; 
+    order2.current_total_discounts_set =
+      orderTesting?.current_total_discounts_set;
+    order2.discount_applications = orderTesting?.discount_applications;
     order2.total_discounts = orderTesting?.total_discounts;
     order2.total_discounts_set = orderTesting?.total_discounts_set;
   }
-  
- 
-  
-  
 
-  if(orderTesting.payment_details){
+  if (orderTesting.payment_details) {
     order2.payment_details = orderTesting?.payment_details;
   }
-  
-  
+
   //number
   order2.name = orderTesting?.name;
   order2.note = orderTesting?.note;
@@ -616,24 +667,23 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.user_id = orderTesting?.user_id; //
   
   */
- 
- //payment terms, fulfillments, discount applications,    what is landing site
- //console.log(order2)
-  try {  
-   // console.log(orderTesting)
+
+  //payment terms, fulfillments, discount applications,    what is landing site
+  //console.log(order2)
+  try {
+    // console.log(orderTesting)
     //saving the newly created order here
     // @ts-ignore
-    
+
     await order2.save({
       update: true,
     });
-    
+
     // deleting the old order with the old date
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: _req.params["id"],
     });
-    
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
@@ -657,7 +707,23 @@ app.put("/api/orders/:id", async (_req, res) => {
   //console.log(order2);
   res.status(status).send({ success: status === 200, error });
 });
-
+app.get("/api/orderName/:id", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "name",  
+  });
+  let returnObj = orderData.name;
+  console.log("======== shiping addy", orderData);
+  if(!orderData.name){
+   console.log('here, there is no order name');
+   returnObj = "none"
+   
+  } 
+  res.json(returnObj);
+});
 //get the line items
 app.get("/api/lineItems/:id", async (_req, res) => {
   if (prod) {
@@ -696,6 +762,7 @@ app.get("/api/lineItems/:id", async (_req, res) => {
 
 //edit the order quantity of a product
 app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -810,6 +877,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
 });
 //add a product to an order
 app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,

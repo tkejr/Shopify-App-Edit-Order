@@ -5,6 +5,8 @@ import {
   Link,
   Button,
   Badge,
+  Banner,
+  Text
 } from "@shopify/polaris";
 import PlanCard from "../components/PlanCard";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -15,7 +17,10 @@ import { useNavigate } from "@shopify/app-bridge-react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
-import {chatify_logo, editify_logo, resizify_logo} from '../assets'
+import {chatify_logo, editify_logo, resizify_logo} from '../assets';
+import { sendToAnalytics } from "../../lcp-helper";
+import { getLCP } from "web-vitals";
+
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
 
@@ -73,7 +78,17 @@ export default function HomePage() {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Plans Page")
+    }
+    getLCP(handleLCP);
   }, []);
+  const price = <Text as="p" textDecorationLine="line-through">
+  $4.99
+</Text>; 
+ const price2 = <Text as="p" textDecorationLine="line-through">
+ $9.99
+</Text>; 
 //Backdate Orders
 //Edit Shipping Cost
 //Edit Billing Address
@@ -85,12 +100,15 @@ export default function HomePage() {
     <Page title="Plans" defaultWidth>
       {(
         <Layout>
+          
           <>
+          
             <Layout.Section variant="oneHalf">
               <LegacyCard sectioned>
                 <PlanCard
                   planName="Starter Plan"
-                  price="4.99"
+                  price={price}
+                  newPrice="$3.99"
                   features={[
                     "Backdate Orders",
                     "Unlimited Date Edits",
@@ -125,7 +143,8 @@ export default function HomePage() {
               <LegacyCard sectioned>
                 <PlanCard
                   planName="Pro Plan"
-                  price="9.99"
+                  price={price2}
+                  newPrice="$7.99"
                   features={[
                     "Backdate Orders",
                     "Add/Remove and Change Quantity of Products from Order",
@@ -158,6 +177,13 @@ export default function HomePage() {
               </LegacyCard>
             </Layout.Section>
             <Layout.Section full>
+            <Banner onDismiss={() => {}}>
+              <p>
+               Black Friday Sale! Now each plan is 20% off!{' '}
+               
+              </p>
+            </Banner>
+            <br></br>
               <LegacyCard title="Partner Apps & Reviews">
                 <LegacyCard.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>

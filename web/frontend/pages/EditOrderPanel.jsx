@@ -12,7 +12,7 @@ import {
     TextField,
     Toast,
     Frame,
-    ContextualSaveBar
+    ButtonGroup
 } from '@shopify/polaris'; 
 import {
    DuplicateMinor,
@@ -37,6 +37,8 @@ const ResourceDetailsLayout = () => {
     const dispatch = useDispatch(); 
     const orderId = useSelector((state) => state.orderId);
     const orderName = useSelector((state) => state.orderName);
+    //orderName
+    const [orderNameNative, setOrderNameNative] = useState();
     //toggle between modes
     const [selected, setSelected] = useState('Simple Mode');
     const handleSelectChange = useCallback((value) => setSelected(value),[],);
@@ -235,13 +237,16 @@ const ResourceDetailsLayout = () => {
         if(!orderId){
             navigate("/EditOrder")
         }
+        if(!orderName){
+          getOrderName()
+        }
         
-        if (orderId && orderName && selected === "Simple Mode") {
+        if (orderId  && selected === "Simple Mode") {
           getLineItems();
           getOrderShipping();
           getOrderEmail();
         }
-        else if(orderId && orderName && selected === "Advanced Mode"){
+        else if(orderId  && selected === "Advanced Mode"){
             
             getOrderShippingCost();
             getOrderBilling();
@@ -309,13 +314,26 @@ const ResourceDetailsLayout = () => {
             setEmailTo(data.email);
           });
       };
+      //newCode
+     const getOrderName = async () => {
+   
+    
+    fetch("/api/orderName/" + orderId)
+    .then((response) => response.json())
+    .then((json) => {
+      setOrderNameNative(json);
+      console.log("=======",json)
+    });
+  
+  
+};
     return (
     <Frame>
         
       <Page
         //backAction={{content: 'Orders', url: '#'}}
         //backAction={<Button onClick={() => console.log('dfnsjfjk')}>dsfdsf</Button>}
-        title={orderName}
+        title={orderNameNative ? orderNameNative : orderName}
         primaryAction={showSave && (selected !== "Simple Mode") && <Button variant="primary" loading={loading} onClick={()=> updateOrderShippingCosts()}>Save</Button>}
         secondaryActions={[
           {
@@ -358,12 +376,18 @@ const ResourceDetailsLayout = () => {
             }
             
             <br></br>
+            {/*
             <Select
                 label="Mode"
                 options={options}
                 onChange={handleSelectChange}
                 value={selected}
             />
+          */}
+            <ButtonGroup variant="segmented">
+              <Button pressed={selected === 'Simple Mode'} onClick={()=> handleSelectChange('Simple Mode')} >Simple Mode </Button>
+              <Button pressed={selected === 'Advanced Mode'} onClick={()=> handleSelectChange('Advanced Mode')}>Advanced Mode</Button>
+            </ButtonGroup>
           </LegacyCard>
           {selected==="Simple Mode" ? (<LegacyCard title="Order Details" sectioned>
         <Layout.Section>

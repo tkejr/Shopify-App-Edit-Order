@@ -12,12 +12,12 @@ import {
   BlockStack
 } from "@shopify/polaris";
 import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
-function PlanCard({ features, price, planName, upgrade }) {
+function PlanCard({ features, price, planName, upgrade, newPrice }) {
   return (
     <BlockStack align="center">
       <div style={styles.header}>
         <div style={styles.planName}>{planName}</div>
-        <div style={styles.price}>${price}</div>
+        <div style={styles.price}>{price} {newPrice}</div>
       </div>
       {features.map((feature, index) => (
         <BlockStack >

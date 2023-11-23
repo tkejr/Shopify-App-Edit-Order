@@ -24,6 +24,8 @@ import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
+import { sendToAnalytics } from "../../lcp-helper";
+import { getLCP } from "web-vitals";
 //import CustomSkeletonPage from "../components/SkeletonPage";
 
 export default function CustomerPortal() {
@@ -238,7 +240,9 @@ export default function CustomerPortal() {
     };
 
     getPreferences();
+    
   }, [enabled]);
+  
 
   //payment stuff
   const dispatch = useDispatch();
@@ -275,6 +279,10 @@ export default function CustomerPortal() {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+    function handleLCP(metric){
+      sendToAnalytics(metric, "Customer Order Page")
+    }
+    getLCP(handleLCP);
   }, []);
   const checkPremiumUserContent = () => {
     return (

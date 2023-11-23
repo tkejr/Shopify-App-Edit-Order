@@ -14,8 +14,8 @@
   "dependencies": {
     "@prisma/client": "^5.3.1",
     "@sendgrid/mail": "^7.7.0",
-    "@shopify/shopify-app-express": "^1.1.0",
-    "@shopify/shopify-app-session-storage-sqlite": "^1.0.0",
+    "@shopify/shopify-app-express": "^2.1.1",
+    "@shopify/shopify-app-session-storage-sqlite": "^1.2.2",
     "axios": "^1.5.0",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
