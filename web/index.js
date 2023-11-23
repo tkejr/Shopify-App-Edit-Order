@@ -80,6 +80,7 @@ app.get(
       isTest: !prod,
     });
     if (prod) {
+      /*
       mixpanel.people.set(session.shop, {
         $first_name: shopDetails[0].shop_owner,
         $created: shopDetails[0].created_at,
@@ -94,11 +95,13 @@ app.get(
         $eligibility: shopDetails[0].eligible_for_payments,
         plan: "free",
       });
+
       if (hasPayment) {
         mixpanel.people.set(session.shop, {
           plan: "premium",
         });
       }
+      */
     }
     next();
   },
