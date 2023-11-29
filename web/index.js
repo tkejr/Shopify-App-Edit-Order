@@ -80,6 +80,7 @@ app.get(
       plans: plans,
       isTest: !prod,
     });
+    /*
     if (prod) {
       
       mixpanel.people.set(session.shop, {
@@ -103,6 +104,7 @@ app.get(
         });
       }
    }
+   */
     next();
   },
   // Load the app otherwise
