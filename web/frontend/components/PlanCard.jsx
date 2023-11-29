@@ -17,7 +17,7 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
     <BlockStack align="center">
       <div style={styles.header}>
         <div style={styles.planName}>{planName}</div>
-        <div style={styles.price}>{price} {newPrice}</div>
+        <div style={styles.price}>{price}</div>
       </div>
       {features.map((feature, index) => (
         <BlockStack >

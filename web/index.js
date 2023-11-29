@@ -72,6 +72,7 @@ app.get(
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
+    console.log("=================shop details", shopDetails)
     //email
 
     const hasPayment = await shopify.api.billing.check({
@@ -80,7 +81,7 @@ app.get(
       isTest: !prod,
     });
     if (prod) {
-      /*
+      
       mixpanel.people.set(session.shop, {
         $first_name: shopDetails[0].shop_owner,
         $created: shopDetails[0].created_at,
@@ -101,8 +102,7 @@ app.get(
           plan: "premium",
         });
       }
-      */
-    }
+   }
     next();
   },
   // Load the app otherwise
@@ -252,7 +252,7 @@ app.get("/api/upgradePro", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Pro Plan";
-  recurring_application_charge.price = 7.99;
+  recurring_application_charge.price = 9.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -279,7 +279,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
   const recurring_application_charge =
     new shopify.api.rest.RecurringApplicationCharge({ session: session });
   recurring_application_charge.name = "Editify Starter Plan";
-  recurring_application_charge.price = 3.99;
+  recurring_application_charge.price = 4.99;
   recurring_application_charge.return_url = url;
   //recurring_application_charge.billing_account_id = 770125316;
   recurring_application_charge.trial_days = freedays;
@@ -448,6 +448,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     ];
     */
       //console.log(orderTesting)
+      
       order2.transactions = [
         {
           kind: "authorization",
@@ -457,6 +458,7 @@ app.put("/api/orders/:id", async (_req, res) => {
           ),
         },
       ];
+      
     }
   }
   order2.line_items = orderTesting?.line_items;
@@ -682,11 +684,15 @@ app.put("/api/orders/:id", async (_req, res) => {
       update: true,
     });
 
+    //cancel the old order
+    await orderTesting?.cancel({}); 
     // deleting the old order with the old date
+    
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: _req.params["id"],
     });
+    
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;

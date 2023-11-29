@@ -83,12 +83,17 @@ export default function HomePage() {
     }
     getLCP(handleLCP);
   }, []);
+  /*
   const price = <Text as="p" textDecorationLine="line-through">
   $4.99
 </Text>; 
  const price2 = <Text as="p" textDecorationLine="line-through">
  $9.99
+ 
 </Text>; 
+*/
+const price = "$4.99"
+const price2 = "$9.99"
 //Backdate Orders
 //Edit Shipping Cost
 //Edit Billing Address
@@ -108,7 +113,7 @@ export default function HomePage() {
                 <PlanCard
                   planName="Starter Plan"
                   price={price}
-                  newPrice="$3.99"
+                  newPrice="$4.99"
                   features={[
                     "Backdate Orders",
                     "Unlimited Date Edits",
@@ -144,7 +149,7 @@ export default function HomePage() {
                 <PlanCard
                   planName="Pro Plan"
                   price={price2}
-                  newPrice="$7.99"
+                  newPrice="$9.99"
                   features={[
                     "Backdate Orders",
                     "Add/Remove and Change Quantity of Products from Order",
@@ -177,12 +182,14 @@ export default function HomePage() {
               </LegacyCard>
             </Layout.Section>
             <Layout.Section full>
+              {/*
             <Banner onDismiss={() => {}}>
               <p>
                Black Friday Sale! Now each plan is 20% off!{' '}
                
               </p>
             </Banner>
+                  */}
             <br></br>
               <LegacyCard title="Partner Apps & Reviews">
                 <LegacyCard.Section>
