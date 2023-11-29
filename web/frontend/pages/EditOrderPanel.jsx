@@ -187,14 +187,16 @@ const ResourceDetailsLayout = () => {
       const updateOrderShippingCosts = async () => {
         //setUpdateButton("Loading...");
         setLoading(true);
+        /*
         if(!discountsChanged){
             //alert("here, discounts did not change")
             //console.log(discounts)
             setDiscounts([])
         }
+        */
         const data = {
           shippingCostDetails: shippingCostDetails,
-          discount_codes: discounts,
+          discount_codes: (discountsChanged ? discounts : []),
         };
         try {
           const response = await fetch(`/api/shipping/${orderId}`, {

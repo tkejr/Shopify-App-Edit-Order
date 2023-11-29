@@ -86,7 +86,9 @@ router.put("/:id", async (req, res) => {
     newOrder.shipping_lines = order?.shipping_lines
   }
   //console.log("======", discountCodes)
-  if(discountCodes !== []){
+  
+  if(discountCodes.length > 0){
+    //console.log('in here ===================', discountCodes)
     if(order?.discount_codes){
         //newOrder.discount_codes= order?.discount_codes;
        // console.log('========{{{{{}}}}}}}', newOrder.discount_codes, discountCodes)
@@ -97,6 +99,7 @@ router.put("/:id", async (req, res) => {
     } 
      
   }
+  
   else{
     //console.log("====== here in the discountCodes dont exist", discountCodes)
 /*
@@ -106,6 +109,7 @@ router.put("/:id", async (req, res) => {
     }
     */
    ////new logic
+   //console.log('in here 2 ===============', discountCodes)
    if(order?.discount_codes?.length === 1){
     if(order?.discount_codes[0].type === 'percentage'){
       
@@ -264,7 +268,8 @@ order.tax_lines =  [
     await newOrder.save({
       update: true,
     });
-
+    //cancel the old order
+    await order?.cancel({}); 
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],
