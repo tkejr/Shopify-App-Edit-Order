@@ -391,8 +391,8 @@ app.get("/api/orders/unfulfilled", async (_req, res) => {
 app.put("/api/orders/:id", async (_req, res) => {
 
   
-  //const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
-  //const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
      
   /*
   const order = new shopify.api.rest.Order({
@@ -1019,7 +1019,7 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
 });
 //add a line item discount 
 app.post("/api/addLineItemDiscount/:id/:lineItemId/:amount/:description/:code", async (req, res) => {
-  /*
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -1027,7 +1027,7 @@ app.post("/api/addLineItemDiscount/:id/:lineItemId/:amount/:description/:code", 
     undefined,
     1
   );
-*/
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({session}); 
   if (prod) {
@@ -1341,7 +1341,7 @@ console.log('=================HERE')
 */
 //add a custom item
 app.post("/api/addCustomItem/:id/:title/:amount/:code", async (req, res) => {
-  /*
+  
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(
     uid,
@@ -1349,7 +1349,7 @@ app.post("/api/addCustomItem/:id/:title/:amount/:code", async (req, res) => {
     undefined,
     1
   );
-*/
+
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({session}); 
   if (prod) {
