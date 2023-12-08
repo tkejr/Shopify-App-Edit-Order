@@ -29,6 +29,7 @@ import sendInvoice from "./routes/sendInvoice.js";
 //new for billing
 import { billingConfig } from "./shopify.js";
 
+
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 //ENV Logic
@@ -84,20 +85,19 @@ app.get(
     if (prod) {
       
       mixpanel.people.set(session.shop, {
-        $first_name: shopDetails[0].shop_owner,
-        $created: shopDetails[0].created_at,
-        $email: shopDetails[0].customer_email,
-        $phone: shopDetails[0].phone,
-        $country: shopDetails[0].country_name,
-        $country_code: shopDetails[0].country_code,
-        $city: shopDetails[0].city,
-        $region: shopDetails[0].province,
-        $zip: shopDetails[0].zip,
-        $shopify_plan: shopDetails[0].plan_name,
-        $eligibility: shopDetails[0].eligible_for_payments,
+        $first_name: shopDetails.data[0].shop_owner,
+        $created: shopDetails.data[0].created_at,
+        $email: shopDetails.data[0].customer_email,
+        $phone: shopDetails.data[0].phone,
+        $country: shopDetails.data[0].country_name,
+        $country_code: shopDetails.data[0].country_code,
+        $city: shopDetails.data[0].city,
+        $region: shopDetails.data[0].province,
+        $zip: shopDetails.data[0].zip,
+        $shopify_plan: shopDetails.data[0].plan_name,
+        $eligibility: shopDetails.data[0].eligible_for_payments,
         plan: "free",
-      });
-
+      }); 
       if (hasPayment) {
         mixpanel.people.set(session.shop, {
           plan: "premium",
@@ -480,9 +480,11 @@ app.put("/api/orders/:id", async (_req, res) => {
   if (orderTesting.shipping_lines) {
     order2.shipping_lines = orderTesting?.shipping_lines;
   }
+  
   if (orderTesting.customer) {
     order2.customer = orderTesting?.customer;
   }
+  
 
   if (orderTesting.tags) {
     order2.tags = orderTesting?.tags;
@@ -529,15 +531,19 @@ app.put("/api/orders/:id", async (_req, res) => {
       //order2.discount_codes = orderTesting?.discount_codes;
     }
   } else {
+    
+    
     order2.current_total_discounts = orderTesting?.current_total_discounts;
     order2.current_total_discounts_set =
       orderTesting?.current_total_discounts_set;
     order2.discount_applications = orderTesting?.discount_applications;
     order2.total_discounts = orderTesting?.total_discounts;
     order2.total_discounts_set = orderTesting?.total_discounts_set;
+    
+    
   }
 
-  if (orderTesting.payment_details) {
+  if (orderTesting?.payment_details) {
     order2.payment_details = orderTesting?.payment_details;
   }
 
@@ -674,7 +680,28 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.user_id = orderTesting?.user_id; //
   
   */
+/*
+  const draft_order = new shopify.api.rest.DraftOrder({session: res.locals.shopify.session});
+draft_order.line_items = [
+  {
+    "title": "Custom Tee",
+    "price": "20.00",
+    "quantity": 2
+  }
+];
+draft_order.applied_discount = {
+  "description": "Custom discount",
+  "value_type": "fixed_amount",
+  "value": "10.0",
+  "amount": "10.00",
+  "title": "Custom"
+};
 
+draft_order.use_customer_default_address = true;
+await draft_order.save({
+  update: true,
+});
+*/
   //payment terms, fulfillments, discount applications,    what is landing site
   //console.log(order2)
   try {
@@ -968,7 +995,7 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
       data: {
         query: `mutation orderEditCommit($id: ID!) {
       orderEditCommit(id: $id) {
-        order {
+        order { 
           id
         }
         userErrors {
@@ -993,7 +1020,443 @@ app.get("/api/addProduct/:orderId/:productId", async (req, res) => {
 
   res.status(status).send({ success: status === 200, error });
 });
+//add a line item discount 
+app.post("/api/addLineItemDiscount/:id/:lineItemId/:amount/:description/:code", async (req, res) => {
+  
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(
+    uid,
+    undefined,
+    undefined,
+    1
+  );
 
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({session}); 
+  if (prod) {
+    mixpanel.track("EO Add Line item discount", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: req.params["id"],
+    }); 
+  }
+  //get all the vars
+  const orderId = req.params["id"];
+  const lineItemId = req.params["lineItemId"];
+  let status = 200;
+  let error = null;
+  const amountOfDiscount = parseFloat(req.params["amount"]);
+  const description = req.params["description"];
+  const currencyCode = req.params["code"];
+  
+  try {
+    const openOrder = await client.query({
+      data: {
+        query: `mutation orderEditBegin($id: ID!) {
+      orderEditBegin(id: $id) {
+        calculatedOrder {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: "gid://shopify/Order/" + orderId,
+        },
+      },
+    });
+  
+    //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+    const calculatedOrderId =
+      openOrder.body.data.orderEditBegin.calculatedOrder.id;
+    
+    //console.log("this is the line item if", lineItemId)
+    const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId;
+
+    const addLineItemDiscount = await client.query({
+      data: {
+        query: `mutation orderEditAddLineItemDiscount($discount: OrderEditAppliedDiscountInput!, $id: ID!, $lineItemId: ID!) {
+          orderEditAddLineItemDiscount(discount: $discount, id: $id, lineItemId: $lineItemId) {
+            addedDiscountStagedChange {
+              id
+            }
+            calculatedLineItem {
+              id
+             
+            }
+            calculatedOrder {
+              id
+              addedLineItems(first: 5) {
+                edges {
+                  node {
+                    id
+                    title
+                    quantity
+                    calculatedDiscountAllocations {
+                      discountApplication {
+                        id
+                        description
+                      }
+                    }
+                  }
+                }
+              }
+              addedDiscountApplications(first: 5) {
+                edges {
+                  node {
+                    id
+                    description
+                  }
+                }
+              }
+            }
+           
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        variables: {
+          id: calculatedOrderId,
+          lineItemId: calculatedLineItem,
+          "discount": {
+            "description": description,
+            "fixedValue": {
+              "amount": amountOfDiscount,
+              "currencyCode": currencyCode
+            },
+            //"percentValue": 1.1
+          },
+          //"restock": true
+        },
+      },
+    });
+    //console.log('========', addLineItemDiscount.body.data.orderEditAddLineItemDiscount.calculatedOrder.addedDiscountApplications)
+    //const addedDiscountStagedChange = addLineItemDiscount.body.data.orderEditAddLineItemDiscount.addedDiscountStagedChange.id;
+    //const addedDiscountApplications = addLineItemDiscount.body.data.orderEditAddLineItemDiscount.calculatedOrder.addedDiscountApplications;
+    
+    // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+    const commitChange = await client.query({
+      data: {
+        query: `mutation orderEditCommit($id: ID!) {
+      orderEditCommit(id: $id) {
+        order {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: calculatedOrderId,
+          notifyCustomer: false,
+          staffNote: "",
+        },
+      },
+    });
+    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+  } catch (e) {
+    console.log(`Failed to add line item discount:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
+  
+  res.status(status).send({ success: status === 200, error });
+});
+
+/*
+app.get("/api/removeLineItemDiscount/:id/:lineItemId/:amount/:description/:code", async (req, res) => {
+  
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(
+    uid,
+    undefined,
+    undefined,
+    1
+  );
+ 
+console.log('=================HERE')
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({session}); 
+  if (prod) {
+    mixpanel.track("EO Add Line item discount", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: req.params["id"],
+    }); 
+  }
+  //get all the vars
+  const orderId = req.params["id"];
+  const lineItemId = req.params["lineItemId"];
+  let status = 200;
+  let error = null;
+  const amountOfDiscount = parseFloat(req.params["amount"]);
+  const description = req.params["description"];
+  const currencyCode = req.params["code"];
+  
+  try {
+    const openOrder = await client.query({
+      data: {
+        query: `mutation orderEditBegin($id: ID!) {
+      orderEditBegin(id: $id) {
+        calculatedOrder {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: "gid://shopify/Order/" + orderId,
+        },
+      },
+    });
+  
+    //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+    const calculatedOrderId =
+      openOrder.body.data.orderEditBegin.calculatedOrder.id;
+    
+    //console.log("this is the line item if", lineItemId)
+    const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId;
+
+    const addLineItemDiscount = await client.query({
+      data: {
+        query: `mutation orderEditAddLineItemDiscount($discount: OrderEditAppliedDiscountInput!, $id: ID!, $lineItemId: ID!) {
+          orderEditAddLineItemDiscount(discount: $discount, id: $id, lineItemId: $lineItemId) {
+            addedDiscountStagedChange {
+              id
+            }
+            calculatedLineItem {
+              id
+             
+            }
+            calculatedOrder {
+              id
+              addedLineItems(first: 5) {
+                edges {
+                  node {
+                    id
+                    title
+                    quantity
+                    calculatedDiscountAllocations {
+                      discountApplication {
+                        id
+                        description
+                      }
+                    }
+                  }
+                }
+              }
+              addedDiscountApplications(first: 5) {
+                edges {
+                  node {
+                    id
+                    description
+                  }
+                }
+              }
+            }
+           
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        variables: {
+          id: calculatedOrderId,
+          lineItemId: calculatedLineItem,
+          "discount": {
+            "description": description,
+            "fixedValue": {
+              "amount": amountOfDiscount,
+              "currencyCode": currencyCode
+            },
+            //"percentValue": 1.1
+          },
+          //"restock": true
+        },
+      },
+    });
+    //console.log('========', addLineItemDiscount.body.data.orderEditAddLineItemDiscount.addedDiscountStagedChange.id)
+    //const addedDiscountStagedChange = addLineItemDiscount.body.data.orderEditAddLineItemDiscount.addedDiscountStagedChange.id;
+    //const addedDiscountApplications = addLineItemDiscount.body.data.orderEditAddLineItemDiscount.calculatedOrder.addedDiscountApplications;
+    
+
+    const removeLineItemDiscount = await client.query({
+      data: {
+        query: `mutation orderEditRemoveLineItemDiscount($discountApplicationId: ID!, $id: ID!) {
+          orderEditRemoveLineItemDiscount(discountApplicationId: $discountApplicationId, id: $id) {
+            calculatedLineItem {
+              id
+            }
+            calculatedOrder {
+              id
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        variables: {
+          "discountApplicationId": "",
+          "id": calculatedOrderId
+        },
+      },
+    });
+    // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+    const commitChange = await client.query({
+      data: {
+        query: `mutation orderEditCommit($id: ID!) {
+      orderEditCommit(id: $id) {
+        order {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: calculatedOrderId,
+          notifyCustomer: false,
+          staffNote: "",
+        },
+      },
+    });
+    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+  } catch (e) {
+    console.log(`Failed to edit line item discount:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
+  
+  res.status(status).send({ success: status === 200, error });
+});
+*/
+//add a custom item
+app.post("/api/addCustomItem/:id/:title/:amount/:code", async (req, res) => {
+  
+  const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
+  const updatedUserDetails = await updateUserDetails(
+    uid,
+    undefined,
+    undefined,
+    1
+  );
+
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({session}); 
+  if (prod) {
+    mixpanel.track("Custom Item Added", {
+      distinct_id: res.locals.shopify.session.shop,
+      orderId: req.params["id"],
+    }); 
+  }
+  //get all the vars
+  const orderId = req.params["id"];
+  const title = req.params["title"];
+  let status = 200;
+  let error = null;
+  const amount = parseFloat(req.params["amount"]);
+  const currencyCode = req.params["code"];
+  try {
+    const openOrder = await client.query({
+      data: {
+        query: `mutation orderEditBegin($id: ID!) {
+      orderEditBegin(id: $id) {
+        calculatedOrder {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: "gid://shopify/Order/" + orderId,
+        },
+      },
+    });
+  
+    //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+    const calculatedOrderId =
+      openOrder.body.data.orderEditBegin.calculatedOrder.id;
+    console.log('order id', calculatedOrderId)
+    //console.log("this is the line item if", lineItemId)
+   // const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId;
+
+    const addCustomItem = await client.query({
+      data: {
+        query: `mutation orderEditAddCustomItem($id: ID!, $price: MoneyInput!, $quantity: Int!, $title: String!) {
+          orderEditAddCustomItem(id: $id, price: $price, quantity: $quantity, title: $title) {
+            calculatedLineItem {
+              id
+            }
+            calculatedOrder {
+              id
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        variables: {
+          id: calculatedOrderId,
+         
+          "locationId": "",
+          "price": {
+            "amount": amount,
+            "currencyCode": currencyCode
+          },
+          "quantity": 1,
+          "requiresShipping": false,
+          "taxable": true,
+          "title": title
+        },
+      },
+    });
+
+    // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+    const commitChange = await client.query({
+      data: {
+        query: `mutation orderEditCommit($id: ID!) {
+      orderEditCommit(id: $id) {
+        order {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        variables: {
+          id: calculatedOrderId,
+          notifyCustomer: false,
+          staffNote: "",
+        },
+      },
+    });
+    
+  } catch (e) {
+    console.log(`Failed to add custom item:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
+  
+  res.status(status).send({ success: status === 200, error });
+});
 //Order Billing routes
 app.use("/api/orderBilling", orderBillingRoutes);
 

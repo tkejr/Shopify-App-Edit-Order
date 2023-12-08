@@ -150,7 +150,7 @@ export function OrderTable(props) {
     []
   );
   const rowMarkup = orderData.map(
-    ({ name, processed_at, customer, total_price, id, currency }, index) => (
+    ({ name, processed_at, customer, total_price, id, currency, total_outstanding }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
@@ -163,6 +163,9 @@ export function OrderTable(props) {
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);
+              if(total_price === '0.00'){
+                alert('sfdsfssdf')
+              }
             }}
           >
             {name}
@@ -171,6 +174,7 @@ export function OrderTable(props) {
         <IndexTable.Cell>{ConvertDate(processed_at)}</IndexTable.Cell>
 
         <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
+        <IndexTable.Cell>{total_outstanding}</IndexTable.Cell>
         <IndexTable.Cell>
           {total_price} {currency}
         </IndexTable.Cell>
