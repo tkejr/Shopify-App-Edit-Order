@@ -1,2 +1,2 @@
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders, read_customers, write_customers, write_orders, read_products, write_order_edits"
+scopes = "read_orders, read_customers, write_customers, write_orders, read_products, write_order_edits, write_draft_orders"

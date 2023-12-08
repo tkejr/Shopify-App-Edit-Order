@@ -41,9 +41,9 @@ const LineItemList = (props)  =>{
                     media={media2}
                     accessibilityLabel={`View details for ${name}`}
                   >
-                    <div> {name}</div>
+                    <div> {name}</div> 
                     <div>
-                      Price: {price} {price_set.shop_money.currency_code}
+                      Price: {price} {price_set.shop_money.currency_code} 
                     </div>
                     <div>SKU: {sku}</div>
                     <div>x{fulfillable_quantity} unfulfilled </div>
@@ -52,6 +52,12 @@ const LineItemList = (props)  =>{
                       onClick={() => props.openQuantity(id, fulfillable_quantity)}
                     >
                       Adjust Quantity
+                    </Button>
+                    <Button
+                      plain
+                      onClick={() => props.openLineItemDiscounts(id,price_set.shop_money.currency_code )}
+                    >
+                      Add Line Item discount
                     </Button>
                     <br></br>
                     

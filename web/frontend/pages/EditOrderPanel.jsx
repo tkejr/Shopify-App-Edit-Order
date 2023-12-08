@@ -28,6 +28,8 @@ import AddedProduct from '../components/helpersForEditOrder/AddedProduct';
 import LineItemList from '../components/helpersForEditOrder/LineItemList';
 import ErrorBanner from '../components/ErrorBanner';
 import AdjustQuantity from '../components/helpersForEditOrder/AdjustQuantity';
+import AddLineItemDiscount from '../components/helpersForEditOrder/AddLineItemDiscount';
+import AddCustomItem from '../components/helpersForEditOrder/AddCustomItem';
 import UpdateShippingAddress from '../components/helpersForEditOrder/UpdateShippingAddress';
 import AdvancedEditingPanel from '../components/helpersForEditOrder/AdvancedEditingPanel';
 import UpdateBillingAddress from '../components/helpersForEditOrder/UpdateBillingAddress';
@@ -129,6 +131,26 @@ const ResourceDetailsLayout = () => {
         setOriginalQuantity("" + quantity);
         handleChangeQuantity();
       };
+      //add line item discounts
+    const [activeLineItemDiscounts, setActiveLineItemDiscounts] = useState(false);
+    const [currencyCode, setCurrencyCode] = useState("");
+    const handleChangeAddLineItemDiscounts = useCallback(
+        () => setActiveLineItemDiscounts(!activeLineItemDiscounts),
+        [activeLineItemDiscounts]
+        );
+      const openLineItemDiscounts = (id, currencyCode) => {
+        //setErrorContent("");
+        //setModalError(false);
+        handleId(id);
+        setCurrencyCode(currencyCode)
+        //setQuantity("" + quantity);
+        //setOriginalQuantity("" + quantity);
+        //handleChangeQuantity();
+        handleChangeAddLineItemDiscounts()
+      };
+    //add custom item
+    const [activeCustomItem, setActiveCustomItem] = useState(false);
+    const handleChangeCustomItem = useCallback(() => setActiveCustomItem(!activeCustomItem), [activeCustomItem]);
     //shipping address stuff
     const [shippingDetails, setShippingDetails] = useState(null);
     const [activeShipping, setActiveShipping] = useState(false);
@@ -312,7 +334,7 @@ const ResourceDetailsLayout = () => {
           .then((response) => response.json())
           .then((json) => {
             setLineItems(json);
-            console.log(json);
+            //console.log(json);
     
             setStatus("success");
           });
@@ -370,11 +392,13 @@ const ResourceDetailsLayout = () => {
     .then((response) => response.json())
     .then((json) => {
       setOrderNameNative(json);
-      console.log("=======",json)
+      //console.log("=======",json)
     });
   
   
 };
+
+   
     return (
     <Frame>
         
@@ -441,7 +465,10 @@ const ResourceDetailsLayout = () => {
           {selected==="Simple Mode" ? (<LegacyCard title="Order Details" sectioned>
         <Layout.Section>
           {orderId ? (
+            <>
                 <Button onClick={() => handleChange()}>Add Product</Button>
+                <Button onClick={() => handleChangeCustomItem()}>Add Custom Item</Button>
+                </>
           ) : (
             <Button disabled={true} >
               Pick an Order
@@ -452,7 +479,7 @@ const ResourceDetailsLayout = () => {
           {status !== "success" ? (
             <Spinner accessibilityLabel="Spinner example" size="large" />
           ) : (
-            <LineItemList line_items={line_items} openQuantity={openQuantity} />
+            <LineItemList line_items={line_items} openQuantity={openQuantity} openLineItemDiscounts= {openLineItemDiscounts}/>
           )}
 
         </LegacyCard.Section>
@@ -516,6 +543,30 @@ const ResourceDetailsLayout = () => {
         quantity={quantity}
         setQuantity={setQuantity}
         originalQuantity={originalQuantity}
+        lineItemId={lineItemId}
+        handleError={handleError}
+        setErrorContent={setErrorContent}
+        setUrl={setUrl}
+        setReload={setReload}
+        reload={reload}
+        setToastProps={setToastProps}/>
+        <AddCustomItem
+        activeCustomItem={activeCustomItem}
+        handleChangeCustomItem={handleChangeCustomItem}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        originalQuantity={originalQuantity}
+        lineItemId={lineItemId}
+        handleError={handleError}
+        setErrorContent={setErrorContent}
+        setUrl={setUrl}
+        setReload={setReload}
+        reload={reload}
+        setToastProps={setToastProps}/>
+        <AddLineItemDiscount
+        activeLineItemDiscounts = {activeLineItemDiscounts}
+        handleChangeAddLineItemDiscounts = {handleChangeAddLineItemDiscounts}
+        currencyCode={currencyCode}
         lineItemId={lineItemId}
         handleError={handleError}
         setErrorContent={setErrorContent}
