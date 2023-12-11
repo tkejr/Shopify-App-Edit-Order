@@ -163,11 +163,9 @@ export function OrderTable(props) {
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);
-              if(total_price === '0.00'){
-                alert('sfdsfssdf')
-              }
+             
             }}
-          >
+          >  
             {name}
           </Button>
         </IndexTable.Cell>
@@ -252,7 +250,8 @@ export function OrderTable(props) {
             { title: "Name" },
             { title: "Date" },
             { title: "Customer Name" },
-            { title: "Amount spent" },
+            { title: "Total Outstanding" },
+            { title: "Total Price" },
           ]}
         >
 
