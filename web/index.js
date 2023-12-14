@@ -215,6 +215,10 @@ app.get("/api/check", async (req, res) => {
           */
         } else if (subscription.name === "Editify Starter Plan") {
           hasPayment = "starter";
+        }else if (subscription.name === "Editify Starter Annual Plan") {
+          hasPayment = "starterAnnual";
+        }else if (subscription.name === "Editify Pro Annual Plan") {
+          hasPayment = "proAnnual";
         }
       }
     );
@@ -261,7 +265,7 @@ app.get("/api/upgradePro", async (req, res) => {
   });
   const confirmationUrl = recurring_application_charge.confirmation_url;
   //for testing if the user actually clicked on approvexs
-  res.json({ confirmationUrl });
+  res.json({ confirmationUrl }); 
 });
 
 app.get("/api/upgradeStarter", async (req, res) => {
@@ -290,7 +294,7 @@ app.get("/api/upgradeStarter", async (req, res) => {
 
   res.json({ confirmationUrl });
 });
-app.get("/api/upgradeYear", async (req, res) => {
+app.get("/api/upgradeProAnnual", async (req, res) => {
   const session = res.locals.shopify.session;
   const shop = session.shop;
  // const freedays = await getFreeTrialDays(shop);
@@ -320,7 +324,7 @@ const data = await client.query({
       }
     }`,
     "variables": {
-      "name": "Editify Pro Plan",
+      "name": "Editify Pro Annual Plan",
       "returnUrl": url,
       "lineItems": [
         {
@@ -335,7 +339,61 @@ const data = await client.query({
           }
         }
       ],
-      "test": true,
+      "test": !prod,
+    },
+  },
+});
+
+//console.log(data.body.data.appSubscriptionCreate.confirmationUrl)
+const confirmationUrl = data.body.data.appSubscriptionCreate.confirmationUrl;
+  res.json({ confirmationUrl });
+});
+app.get("/api/upgradeStarterAnnual", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shop = session.shop;
+ // const freedays = await getFreeTrialDays(shop);
+  console.log("========Free days========");
+ // console.log(freedays);
+  ///IMPORTANT, change this to just /editify in prod
+  var url = "https://" + shop + "/admin/apps/editify-dev";
+  if (prod) {
+    url = "https://" + shop + "/admin/apps/editify";
+  }
+  
+ 
+
+const client = new shopify.api.clients.Graphql({session});
+const data = await client.query({
+  data: {
+    "query": `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean!) {
+      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test: $test) {
+        userErrors {
+          field
+          message
+        }
+        appSubscription {
+          id
+        }
+        confirmationUrl
+      }
+    }`,
+    "variables": {
+      "name": "Editify Starter Annual Plan",
+      "returnUrl": url,
+      "lineItems": [
+        {
+          "plan": {
+            "appRecurringPricingDetails": {
+              "price": {
+                "amount": 49.99,
+                "currencyCode": "USD"
+              },
+              "interval": "ANNUAL"
+            }
+          }
+        }
+      ],
+      "test": !prod,
     },
   },
 });
@@ -423,9 +481,9 @@ app.put("/api/orders/:id", async (_req, res) => {
   ///
 
   if (orderTesting?.financial_status === "paid") {
-    //if(orderTesting?.total_price - orderTesting?.total_discounts > 0){
+  if(orderTesting?.total_price > 0){
     order2.transactions = [
-      {
+      {  
         kind: "sale",
         status: "success",
         amount: parseFloat(
@@ -434,7 +492,10 @@ app.put("/api/orders/:id", async (_req, res) => {
         ),
       },
     ];
-    //}
+    } 
+    else{
+      console.log('this is a free paid order')
+    }
   } else {
     if (orderTesting.total_price - orderTesting.total_outstanding > 0) {
       /*
@@ -459,6 +520,7 @@ app.put("/api/orders/:id", async (_req, res) => {
       ];
       
     }
+    
   }
   order2.line_items = orderTesting?.line_items;
 
@@ -1348,8 +1410,8 @@ app.post("/api/addCustomItem/:id/:title/:amount/:code", async (req, res) => {
     undefined,
     undefined,
     1
-  );
-
+  );  
+   
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({session}); 
   if (prod) {

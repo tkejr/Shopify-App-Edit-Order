@@ -17,7 +17,7 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
     <BlockStack align="center">
       <div style={styles.header}>
         <div style={styles.planName}>{planName}</div>
-        <div style={styles.price}>{price}</div>
+       {planName === "Starter Annual Plan" || planName ==="Pro Annual Plan" ? <div style={styles.price}><s>{price}</s> {newPrice}</div> : <div style={styles.price}> {price} </div>}
       </div>
       {features.map((feature, index) => (
         <BlockStack >
@@ -25,7 +25,7 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
           <div style={{  float:'left' }}>
               <p>{feature} </p>
             </div>
-            {planName === "Starter Plan" && index > 2 ? (
+            {(planName === "Starter Plan" || planName === "Starter Annual Plan") && index > 2 ? (
               <BlockStack inlineAlign="end">
               <Icon source={CircleCancelMajor} tone="critical" backdrop />
               </BlockStack>
