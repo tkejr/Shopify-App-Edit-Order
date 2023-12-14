@@ -163,7 +163,7 @@ export function OrderTable(props) {
             dataPrimaryLink
             onClick={() => {
               orderClicked(id, name);
-             
+              
             }}
           >  
             {name}

@@ -33,7 +33,7 @@ export default function HomePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userStateLoading, setUserStateLoading] = useState(true);
-
+  const [showAnnual, setShowAnnual] = useState(false);
   const fetchRecurringCharges = async () => {
     const res = await fetch("/api/check")
       .then((response) => response.json())
@@ -44,7 +44,13 @@ export default function HomePage() {
         } else if (data.hasPayment === "starter") {
           dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
-        } else {
+        }else if (data.hasPayment === "starterAnnual") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        } else if (data.hasPayment === "proAnnual") {
+          dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+          dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+        }  else {
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
         }
 
@@ -64,6 +70,26 @@ export default function HomePage() {
   const upgradePro = async () => {
     setLoading(true);
     const res = await fetch("/api/upgradePro")
+      .then((response) => response.json())
+      .then((data) => {
+        navigate(data.confirmationUrl);
+
+        setLoading(false);
+      });
+  };
+  const upgradeStarterAnnual = async () => {
+    setLoadingStarter(true);
+    const res = await fetch("/api/upgradeStarterAnnual")
+      .then((response) => response.json())
+      .then((data) => {
+        navigate(data.confirmationUrl);
+
+        setLoadingStarter(false);
+      });
+  };
+  const upgradeProAnnual = async () => {
+    setLoading(true);
+    const res = await fetch("/api/upgradeProAnnual")
       .then((response) => response.json())
       .then((data) => {
         navigate(data.confirmationUrl);
@@ -102,12 +128,21 @@ const price2 = "$9.99"
 //Financial Reporting
 //Customer Portal
   return (
-    <Page title="Plans" defaultWidth>
+    <Page 
+      title="Plans" 
+      defaultWidth 
+      secondaryActions={[
+        {
+          content: showAnnual ? "Monthly Plans" : "Save with Annual Plans",
+          accessibilityLabel: 'Annual plans',
+          onAction: () => setShowAnnual(!showAnnual),
+        },
+      ]}>
       {(
         <Layout>
           
           <>
-          
+          {!showAnnual && <>
             <Layout.Section variant="oneHalf">
               <LegacyCard sectioned>
                 <PlanCard
@@ -127,7 +162,7 @@ const price2 = "$9.99"
 
                 <LegacyCard.Section>
                  
-                  {(!isPremiumUser || planName === "pro") && (
+                  {(!isPremiumUser || planName !== "starter") && (
                     <Button variant="primary" onClick={() => upgradeStarter()}>
                       {" "}
                       {loadingStarter ? "Loading..." : "Get Starter Plan"}
@@ -163,7 +198,7 @@ const price2 = "$9.99"
 
                 <LegacyCard.Section>
                  
-                  {(!isPremiumUser || planName === "starter") && (
+                  {(!isPremiumUser || planName !== "pro") && (
                     <Button variant="primary" onClick={() => upgradePro()}>
                       {" "}
                       {loading ? "Loading..." : "Get Pro Plan"}
@@ -181,6 +216,87 @@ const price2 = "$9.99"
                 </LegacyCard.Section>
               </LegacyCard>
             </Layout.Section>
+            </>
+}
+            { showAnnual &&
+            <>
+          
+            <Layout.Section variant="oneHalf">
+              <LegacyCard sectioned>
+                <PlanCard
+                  planName="Starter Annual Plan"
+                  price={'$59.99'}
+                  newPrice="$49.99"
+                  features={[
+                    "Backdate Orders",
+                    "Unlimited Date Edits",
+                    "Updates Sales in Shopify Analytics",
+                    "Edit Shipping Cost, Billing Address, Send Invoice",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradeStarterAnnual}
+                ></PlanCard>
+
+                <LegacyCard.Section>
+                 
+                  {(!isPremiumUser || planName !== "starterAnnual") && (
+                    <Button variant="primary" onClick={() => upgradeStarterAnnual()}>
+                      {" "}
+                      {loadingStarter ? "Loading..." : "Get Starter Annual Plan"}
+                    </Button>
+                  )}
+                  {planName === "starterAnnual" && (
+                    <div style={{ padding: "4px" }}>
+                      <Badge progress="complete" tone="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                </LegacyCard.Section>
+              </LegacyCard>
+            </Layout.Section>
+            <Layout.Section variant="oneHalf">
+              <LegacyCard sectioned>
+                <PlanCard
+                  planName="Pro Annual Plan"
+                  price={'$119.99'}
+                  newPrice="$99.99"
+                  features={[
+                    "Backdate Orders",
+                    "Add/Remove and Change Quantity of Products from Order",
+                    "Accurate Shopify Analytics",
+                    "Edit Shipping Cost, Billing Address, Send Invoice",
+                    "Customer self-service editing with Customer Portal",
+                    "Priority Support",
+                  ]}
+                  upgrade={upgradeProAnnual}
+                ></PlanCard>
+
+                <LegacyCard.Section>
+                 
+                  {(!isPremiumUser || planName !== "proAnnual" ) && (
+                    <Button variant="primary" onClick={() => upgradeProAnnual()}>
+                      {" "}
+                      {loading ? "Loading..." : "Get Pro Annual Plan"}
+                    </Button>
+                  )}
+                  {(planName === "proAnnual")  && (
+                    <div style={{ padding: "4px" }}>
+                      <Badge progress="complete" tone="success">
+                        {" "}
+                        Active
+                      </Badge>
+                    </div>
+                  )}
+                  {"    "}
+                </LegacyCard.Section>
+              </LegacyCard>
+            </Layout.Section>
+
+            </>
+}
             <Layout.Section full>
               {/*
             <Banner onDismiss={() => {}}>

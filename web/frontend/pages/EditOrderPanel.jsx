@@ -271,7 +271,13 @@ const ResourceDetailsLayout = () => {
           } else if (data.hasPayment === "starter") {
             dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
             dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
-          } else {
+          }else if (data.hasPayment === "starterAnnual") {
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+          } else if (data.hasPayment === "proAnnual") {
+            dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
+            dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
+          }  else {
             dispatch({ type: "SET_IS_PREMIUM_USER", payload: false });
           }
   
@@ -402,7 +408,7 @@ const ResourceDetailsLayout = () => {
     return (
     <Frame>
         
-      { planName === 'pro' && isPremiumUser ? (
+      { (planName === 'pro' || planName === 'proAnnual') && isPremiumUser ? (
       <Page
         //backAction={{content: 'Orders', url: '#'}}
         //backAction={<Button onClick={() => console.log('dfnsjfjk')}>dsfdsf</Button>}
