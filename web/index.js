@@ -465,7 +465,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     session: res.locals.shopify.session,
     id: _req.params["id"],
   });
-
+ 
   //here is the new order we are creating, appropro named order2
   const order2 = new shopify.api.rest.Order({
     session: res.locals.shopify.session,
@@ -484,6 +484,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   ///
 
   if (orderTesting?.financial_status === "paid") {
+    
   if(orderTesting?.total_price > 0){
     order2.transactions = [
       {  
@@ -495,10 +496,13 @@ app.put("/api/orders/:id", async (_req, res) => {
         ),
       },
     ];
+   
     } 
+    
     else{
       console.log('this is a free paid order')
     }
+      
   } else {
     if (orderTesting.total_price - orderTesting.total_outstanding > 0) {
       /*
@@ -558,6 +562,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   //console.log(orderTesting?.discount_codes)
 
   if (orderTesting?.discount_codes?.length === 1) {
+    /*
     if (orderTesting?.discount_codes[0].type === "percentage") {
       let code = "";
       if (orderTesting.discount_codes[0].code === "") {
@@ -591,7 +596,13 @@ app.put("/api/orders/:id", async (_req, res) => {
 
       order2.discount_codes = discount_code;
       //order2.discount_codes = orderTesting?.discount_codes;
-    }
+    }*/
+    order2.current_total_discounts = orderTesting?.current_total_discounts;
+    order2.current_total_discounts_set =
+      orderTesting?.current_total_discounts_set;
+    order2.discount_applications = orderTesting?.discount_applications;
+    order2.total_discounts = orderTesting?.total_discounts;
+    order2.total_discounts_set = orderTesting?.total_discounts_set;
   } else {
     
     
