@@ -232,7 +232,7 @@ else{
       update: true,
     });
   //cancel the old order
-    await order?.cancel({}); 
+    //await order?.cancel({}); 
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],

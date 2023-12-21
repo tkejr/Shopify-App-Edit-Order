@@ -787,7 +787,7 @@ await draft_order.save({
     });
 
     //cancel the old order
-    await orderTesting?.cancel({}); 
+    //await orderTesting?.cancel({}); 
     // deleting the old order with the old date
     
     await shopify.api.rest.Order.delete({
