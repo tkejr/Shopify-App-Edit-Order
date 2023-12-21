@@ -6,7 +6,7 @@ import {
   Frame,
   LegacyCard,
   Button,
-  Text
+  Banner
 } from "@shopify/polaris";
 import { getLCP } from "web-vitals";
 import React, { useState, useEffect, useCallback } from "react";
@@ -139,8 +139,18 @@ export default function Backdate() {
   const handleError = () => {
     setError(!error);
   };
+  const [showBanner, setBanner] = useState(true);
   return (
     <Page title="Backdate Order" defaultWidth>
+
+        {showBanner && <Banner onDismiss={() => {setBanner(false)}}>
+              <p>
+               If a transaction went through on an order you are trying to backdate, it will say that an error occurred when you backdate. 
+               Do not worry, a backdated order still gets created. Cancel the old order once you are satisfied with the new backdated one{' '}
+               
+              </p>
+            </Banner>
+}
       <Modal
         //activator={activator}
         open={activeResizify}
