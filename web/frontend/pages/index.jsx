@@ -154,7 +154,7 @@ export default function HomePage() {
             {/*
             <Layout>
             
-              <Layout.Section oneThird>
+              <Layout.Section variant="oneThird">
                 <LegacyCard title="Backdated Orders">
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -166,7 +166,7 @@ export default function HomePage() {
                   </LegacyCard.Section>
                 </LegacyCard>
               </Layout.Section>
-              <Layout.Section oneThird>
+              <Layout.Section variant="oneThird">
                 <LegacyCard title="Edited Orders">
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -178,7 +178,7 @@ export default function HomePage() {
                   </LegacyCard.Section>
                 </LegacyCard>
               </Layout.Section>
-              <Layout.Section oneThird>
+              <Layout.Section variant="oneThird">
                 <LegacyCard title="Customer Edited Orders">
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -192,7 +192,7 @@ export default function HomePage() {
               </Layout.Section>
 
             </Layout>
-              */}
+              */ }
             <br></br>
             <Layout>
               <Layout.Section>
@@ -248,11 +248,12 @@ export default function HomePage() {
                       {editedIcon}
                       <div style={{ marginLeft: "10px" }}>
                         <p>
-                          Backdated an Order 🎉{" "}
-                          {showTry && (
+                          {//Backdated an Order 🎉{" "}
+}
+                          {true && (
                             <Link
                               onClick={() => {
-                                navigate("/EditOrder");
+                                navigate("/Backdate");
                               }}
                             >
                               Try Now
@@ -268,7 +269,7 @@ export default function HomePage() {
             </Layout>
             <FooterHelp>
               Learn more about{" "}
-              <Link url="https://editify.kejrtech.com">Editify</Link>
+              <Link  target="_blank" url="https://editify.kejrtech.com">Editify</Link>
             </FooterHelp>
           </Page>
         </Frame>

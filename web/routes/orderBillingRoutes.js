@@ -143,9 +143,7 @@ else{
   if(order.email !== '') {
     newOrder.email = order.email;
   }
-  if(order.payment_details){
-    newOrder.payment_details = order.payment_details;
-  }
+  
 
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
@@ -163,9 +161,9 @@ else{
   newOrder.cancel_reason = order.cancel_reason;
   newOrder.closed_at = order.closed_at;
   newOrder.company = order.company;
-  newOrder.payment_gateway_names = order.payment_gateway_names;
+  //newOrder.payment_gateway_names = order.payment_gateway_names;
   newOrder.phone = order.phone;
-  newOrder.processing_method = order.processing_method;
+  //newOrder.processing_method = order.processing_method;
   newOrder.referring_site = order.referring_site;
   newOrder.refunds = order.refunds;
   newOrder.total_tip_received = order.total_tip_received;

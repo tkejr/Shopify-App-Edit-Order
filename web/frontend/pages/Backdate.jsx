@@ -200,7 +200,7 @@ export default function Backdate() {
         <Layout>
           {(planName === "pro" || planName === "starter" || planName === "starterAnnual" || planName === "proAnnual" ) && isPremiumUser ? (
             <>
-               {showBanner && <Banner onDismiss={() => {setBanner(false)}}>
+               {false && <Banner onDismiss={() => {setBanner(false)}}>
               <p>
                If a transaction went through on an order you are trying to backdate, it will say that an error occurred when you backdate. 
                Do not worry, a backdated order still gets created. Cancel the old order once you are satisfied with the new backdated one{' '}

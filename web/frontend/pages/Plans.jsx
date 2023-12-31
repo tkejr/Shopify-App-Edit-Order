@@ -307,6 +307,7 @@ const price2 = "$9.99"
             </Banner>
                   */}
             <br></br>
+            {/*
               <LegacyCard title="Partner Apps & Reviews">
                 <LegacyCard.Section>
                   <div style={{ display: "flex", alignItems: "center" }}>
@@ -370,6 +371,7 @@ const price2 = "$9.99"
                   </div>
                 </LegacyCard.Section>
               </LegacyCard>
+                    */}
               <br></br>
 
               <div style={{ height: "30px" }}></div>
