@@ -613,9 +613,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     
   }
 
-  if (orderTesting?.payment_details) {
-    order2.payment_details = orderTesting?.payment_details;
-  }
+  
 
   //number
   order2.name = orderTesting?.name;
@@ -632,10 +630,10 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.cancelled_at = orderTesting?.cancelled_at;
   order2.closed_at = orderTesting?.closed_at;
   order2.total_weight = orderTesting?.total_weight;
-  order2.payment_gateway_names = orderTesting?.payment_gateway_names;
+  //order2.payment_gateway_names = orderTesting?.payment_gateway_names;
 
   order2.phone = orderTesting?.phone;
-  order2.processing_method = orderTesting?.processing_method;
+  //order2.processing_method = orderTesting?.processing_method;
 
   //
   //order2.landing_site = orderTesting?.landing_site;

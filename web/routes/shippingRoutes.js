@@ -183,10 +183,7 @@ router.put("/:id", async (req, res) => {
   if(order.email !== ''){
     newOrder.email = order.email;
   }
-  if(order.payment_details)
-  {
-    newOrder.payment_details = order.payment_details;
-  }
+ 
   
   newOrder.customer = order.customer;
   newOrder.billing_address = order.billing_address;
@@ -206,9 +203,9 @@ router.put("/:id", async (req, res) => {
   //newOrder.total_tax = order.total_tax;
  //misc
   newOrder.total_weight = order.total_weight;
-  newOrder.payment_gateway_names = order.payment_gateway_names;
+  //newOrder.payment_gateway_names = order.payment_gateway_names;
   newOrder.phone = order.phone;
-  newOrder.processing_method = order.processing_method;
+  //newOrder.processing_method = order.processing_method;
   newOrder.referring_site = order.referring_site;
   newOrder.refunds = order.refunds;
   newOrder.cart_token = order.cart_token;
