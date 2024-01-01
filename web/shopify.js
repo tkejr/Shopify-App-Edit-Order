@@ -14,7 +14,7 @@ const DB_PATH = `${process.cwd()}/database.sqlite`;
 export const billingConfig = {
   "Editify Starter Plan": {
     //
-    amount: 3.99,
+    amount: 4.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
     trialDays: 3,
@@ -34,7 +34,7 @@ export const billingConfig = {
 
 const shopify = shopifyApp({
   api: {
-    apiVersion: LATEST_API_VERSION,
+    apiVersion: "2023-07",
     restResources,
     billing: billingConfig, // or replace with billingConfig above to enable example billing
   },
