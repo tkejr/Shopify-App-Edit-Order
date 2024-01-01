@@ -97,7 +97,7 @@ export default function HomePage() {
           setLoader(false);
         });
     };
-    //getAnalytics();
+    getAnalytics();
     //fetchRecurringCharges();
     function handleLCP(metric){
       sendToAnalytics(metric, "Index Page")
@@ -151,7 +151,7 @@ export default function HomePage() {
             </LegacyCard>
 
             <br></br>
-            {/*
+            {
             <Layout>
             
               <Layout.Section variant="oneThird">
@@ -192,7 +192,7 @@ export default function HomePage() {
               </Layout.Section>
 
             </Layout>
-              */ }
+               }
             <br></br>
             <Layout>
               <Layout.Section>

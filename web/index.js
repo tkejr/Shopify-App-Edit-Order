@@ -129,7 +129,7 @@ app.post("/api/email", async (req, res) => {
     to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
     from: "editifyshopify@gmail.com", // Change to your verified sender
     subject: `Feedback form has been submitted by ${name}`,
-    text: `A feedback form was filled with feedbacl message ${message} and their emai is ${email}`,
+    text: `A feedback form was filled with feedbacl message ${message} and their email is ${email}`,
   };
 
   sgMail
@@ -776,8 +776,8 @@ await draft_order.save({
     // console.log(orderTesting)
     //saving the newly created order here
     // @ts-ignore
-
-    await order2.save({
+   
+    const response  = await order2.save({
       update: true,
     });
 

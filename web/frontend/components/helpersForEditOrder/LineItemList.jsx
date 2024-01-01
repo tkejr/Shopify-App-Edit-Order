@@ -31,7 +31,8 @@ const LineItemList = (props)  =>{
                   product_id,
                   price_set,
                 } = item;
-
+               
+                
                 const media2 = <Thumbnail source={media} alt="placeholder" />;
 
                 return (
