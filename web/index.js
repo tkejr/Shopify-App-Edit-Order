@@ -780,7 +780,7 @@ await draft_order.save({
     //saving the newly created order here
     // @ts-ignore
    
-    const response  = await order2.save({
+     await order2.save({
       update: true,
     });
 
