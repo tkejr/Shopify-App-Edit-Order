@@ -100,7 +100,7 @@ const PageExample = () => {
                 
               </LegacyCard.Section>
               <LegacyCard.Section>
-              <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+              <Button onClick={()=>navigate("/Plans")}>Go to Plans</Button>
               </LegacyCard.Section>
         </LegacyCard>
        

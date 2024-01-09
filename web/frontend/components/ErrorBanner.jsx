@@ -36,8 +36,7 @@ function ErrorBanner({ open, onClose, content, url, buttonText }) {
 
             <div style={{ paddingTop: "10px" }}>
               <Link url={url}>
-                {console.log("This is button text")}
-                {console.log(buttonText)}
+                
                 {(buttonText !== "" || buttonText == "undefined") && (
                   <Button>{buttonText}</Button>
                 )}

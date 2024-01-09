@@ -62,14 +62,14 @@ app.get(
   async (req, res, next) => {
     //sending email on install
 
-    const plans = Object.keys(billingConfig);
-    const session = res.locals.shopify.session;
+    //const plans = Object.keys(billingConfig);
+    //const session = res.locals.shopify.session;
 
-    const url = session.shop;
-    const access_token = session.accessToken;
+   // const url = session.shop;
+    //const access_token = session.accessToken;
 
     //Tracking the install event
-
+/*
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
@@ -103,6 +103,7 @@ app.get(
           plan: "premium",
         });
       }
+      
    }
    */
     next();
