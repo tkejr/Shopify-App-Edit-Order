@@ -110,7 +110,7 @@ export function OrderTableEditOrder(props) {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: id });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: name });
     dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: line_items });
-    navigate("/EditOrderPanel")
+    //navigate("/EditOrderPanel")
   };
   //advanced search
 

@@ -54,6 +54,7 @@ const LineItemList = (props)  =>{
                     >
                       Adjust Quantity
                     </Button>
+                    {"  "}
                     <Button
                       plain
                       onClick={() => props.openLineItemDiscounts(id,price_set.shop_money.currency_code )}

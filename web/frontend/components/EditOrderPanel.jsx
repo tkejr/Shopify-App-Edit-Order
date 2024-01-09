@@ -1,5 +1,3 @@
-
-
 import {
     Box, 
     Page,
@@ -34,12 +32,13 @@ import UpdateShippingAddress from '../components/helpersForEditOrder/UpdateShipp
 import AdvancedEditingPanel from '../components/helpersForEditOrder/AdvancedEditingPanel';
 import UpdateBillingAddress from '../components/helpersForEditOrder/UpdateBillingAddress';
 import InvoiceModal from '../components/SendInvoice';
-const ResourceDetailsLayout = () => {
+export function EditOrderPanel (){
     const navigate = useNavigate();
     const fetch = useAuthenticatedFetch();
     const dispatch = useDispatch(); 
     const orderId = useSelector((state) => state.orderId);
     const orderName = useSelector((state) => state.orderName);
+    const [userStateLoading, setUserStateLoading] = useState(true);
     //orderName
     const [orderNameNative, setOrderNameNative] = useState();
     //toggle between modes
@@ -419,7 +418,7 @@ const ResourceDetailsLayout = () => {
             content: "Back to Orders",
             icon:  MobileBackArrowMajor,
             accessibilityLabel: "Secondary action label",
-            onAction: () => navigate("/EditOrder"),
+            onAction: () => {dispatch({ type: "SET_PROPS_ORDER_ID", payload: false }); dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })},
           },
           {
             content: "Send Invoice",
@@ -603,6 +602,7 @@ const ResourceDetailsLayout = () => {
         setUrl={setUrl}
         setToastProps={setToastProps}
         />
+        <br></br>
       </Page>) : checkPremiumUserContent()
 }
       {toastMarkup}
@@ -610,4 +610,4 @@ const ResourceDetailsLayout = () => {
     )
   }
 
-  export default ResourceDetailsLayout; 
+  //export default ResourceDetailsLayout; 

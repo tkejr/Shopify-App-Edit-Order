@@ -28,6 +28,9 @@ export default function App() {
                   {
                     label: "Edit Order",
                     destination: "/EditOrder",
+                    subNavigationItems:[
+                      "/EditOrderPanel"
+                    ]
                   },
                   {
                     label: "Customer Portal",

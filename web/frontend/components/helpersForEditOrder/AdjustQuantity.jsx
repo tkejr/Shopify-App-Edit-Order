@@ -95,7 +95,7 @@ const AdjustQuantity = (props)  =>{
         <Banner
           title="Error"
           onDismiss={() => handleModalError()}
-          status="critical"
+          tone="critical"
         >
           <p>{errorContent}</p>
         </Banner>

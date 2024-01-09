@@ -253,7 +253,7 @@ export function EditOrderComponent(props) {
       if (!response.ok) {
         throw new Error("Failed to update billing details");
       }
-      setToastProps({ content: "Billing details updated successfully" });
+      setToastProps({ content: "Details updated successfully" });
     } catch (error) {
       // Handle error, e.g., show an error message
       console.error("Error updating billing details:", error);
@@ -284,7 +284,7 @@ export function EditOrderComponent(props) {
         throw new Error("Failed to update shipping details");
       }
 
-      setToastProps({ content: "Shipping details updated successfully" });
+      setToastProps({ content: "Details updated successfully" });
     } catch (error) {
       // Handle error, e.g., show an error message
       console.error("Error updating billing details:", error);

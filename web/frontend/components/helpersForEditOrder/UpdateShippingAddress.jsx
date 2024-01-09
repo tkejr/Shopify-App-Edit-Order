@@ -52,7 +52,7 @@ const [updateButton, setUpdateButton] = useState("Update");
         throw new Error("Failed to update shipping details");
       }
 
-      props.setToastProps({ content: "Shipping details updated successfully" });
+      props.setToastProps({ content: "Details updated successfully" });
     } catch (error) {
       
       props.setErrorContent(

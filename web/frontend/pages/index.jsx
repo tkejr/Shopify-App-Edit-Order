@@ -8,6 +8,16 @@ import {
   Link,
   FooterHelp,
   List,
+  CalloutCard,
+  Card,
+  BlockStack,
+  Bleed,
+  Text,
+  Box,
+  InlineStack,
+  InlineGrid,
+  ButtonGroup,
+  Button
 } from "@shopify/polaris";
 import React, { useState, useCallback, useEffect } from "react";
 
@@ -17,6 +27,7 @@ import {
   CustomersMajor,
   CircleTickMajor,
   CircleCancelMajor,
+  CancelMajor
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
 import { useDispatch } from "react-redux";
@@ -35,7 +46,7 @@ export default function HomePage() {
   const [loader, setLoader] = useState(true);
   const [showPlan, setShowPlan] = useState(false);
   const [showTry, setShowTry] = useState(false);
-
+  const [showSetup, setShowSetup] = useState(true);
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const chargeId = urlParams.get("charge_id");
@@ -44,7 +55,7 @@ export default function HomePage() {
   
     if(type === "edit"){
       dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
-      navigate("/EditOrderPanel");
+      navigate("/EditOrder");
     }
     if(type === "backdate"){
       dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
@@ -196,7 +207,63 @@ export default function HomePage() {
             <br></br>
             <Layout>
               <Layout.Section>
-                <LegacyCard title="Setup Guide">
+             
+             
+{showSetup &&
+    <Card roundedAbove="sm">
+      <BlockStack gap="200">
+        <InlineGrid columns="1fr auto">
+          <Text as="h2" variant="headingSm">
+            Setup Guide
+          </Text>
+          <ButtonGroup>
+            <Button onClick={() => setShowSetup(!showSetup)} variant="tertiary"><Icon
+            source={CancelMajor}
+            tone="base"/></Button>
+            
+          </ButtonGroup>
+        </InlineGrid>
+        <BlockStack gap="400">
+          <Text as="p" variant="bodyMd">
+            Go to the Plans Page and select your plan. Backdating is only available if you have at least a Starter Plan
+          </Text>
+          <Text as="h3" variant="headingSm" fontWeight="medium">
+            
+          </Text>
+        </BlockStack>
+        {""}
+         <Bleed marginBlockEnd="400" marginInline="400">
+        <Box background="bg-surface-secondary" padding="400">
+          <BlockStack gap="200">
+            <Text as="h3" variant="headingSm" fontWeight="medium">
+              How to Backdate an Order
+            </Text>
+            <List>
+              <List.Item>Select an Order</List.Item>
+              <List.Item>Select Date</List.Item>
+              <List.Item>Click Submit</List.Item>
+            </List>
+          </BlockStack>
+        </Box>
+      </Bleed>
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm" fontWeight="medium">
+            {"     "}
+          </Text>
+          <br></br>
+          <Text as="p" variant="bodyMd">
+            Note: Make sure there is a shipping and billing address present on the order you are trying to backdate
+          </Text>
+          <InlineStack align="end">
+            <ButtonGroup>
+              
+            </ButtonGroup>
+          </InlineStack>
+        </BlockStack>
+      </BlockStack>
+    </Card>
+}
+                {/*<LegacyCard title="Setup Guide">
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {planIcon}
@@ -228,20 +295,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   </LegacyCard.Section>
-                  {/* <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div style={{ marginLeft: "10px" }}>
-                        <p>2. Select Date</p>
-                      </div>
-                    </div>
-                  </LegacyCard.Section>
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div style={{ marginLeft: "10px" }}>
-                        <p>3 . Click Submit</p>
-                      </div>
-                    </div>
-                  </LegacyCard.Section> */}
+                  
 
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -263,7 +317,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   </LegacyCard.Section>
-                </LegacyCard>
+                            </LegacyCard>*/}
               </Layout.Section>
               <Layout.Section oneHalf></Layout.Section>
             </Layout>

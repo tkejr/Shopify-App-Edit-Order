@@ -30,7 +30,7 @@ function ErrorBanner({ open, onClose, content, url, buttonText }) {
           <Banner
             title="Error"
             onDismiss={() => handleError()}
-            status="critical"
+            tone="critical"
           >
             <p>{content}</p>
 

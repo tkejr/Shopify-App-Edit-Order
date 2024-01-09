@@ -115,7 +115,7 @@ const AddLineItemDiscount = (props)  =>{
         <Banner
           title="Important"
           //onDismiss={}
-          tone="info"
+          tone="warning"
         >
           <p>This can only be done on unpaid components of an order. Also, this cannot be done more than once on the same line item.
              If you make a mistake, then the only way to get rid of the discount is to add the product again and remove the old one. If you cannot add a new product, add a Custom Item</p>

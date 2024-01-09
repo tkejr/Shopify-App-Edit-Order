@@ -304,7 +304,7 @@ export default function CustomerPortal() {
     */}
               </LegacyCard.Section>
               <LegacyCard.Section>
-              <Button onClick={()=>navigate("/plans")}>Go to Plans</Button>
+              <Button onClick={()=>navigate("/Plans")}>Go to Plans</Button>
               </LegacyCard.Section>
         </LegacyCard>
        
@@ -327,6 +327,8 @@ export default function CustomerPortal() {
                 updatePreference({
                   enable: !enabled,
                 });
+                setToastContent(enabled ? "Portal Turned On" : "Portal Turned Off");
+                toggleActive();
               },
             }}
           >
@@ -444,7 +446,10 @@ export default function CustomerPortal() {
               content={toastContent}
             />
             {toastMarkup}
+            <br></br>
+            <br></br>
           </Page>
+          
         )
       ) : (
         checkPremiumUserContent()

@@ -452,11 +452,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
   const updatedUserDetails = await updateUserDetails(uid, undefined, 1);
      
-  /*
-  const order = new shopify.api.rest.Order({
-    session: res.locals.shopify.session,
-  });
-  */
+  
   //old way to get order above, now we find the specific order by the id and use that to copy all of the contents over
   const orderTesting = await shopify.api.rest.Order.find({
     session: res.locals.shopify.session,
@@ -488,7 +484,6 @@ app.put("/api/orders/:id", async (_req, res) => {
         kind: "sale",
         status: "success",
         amount: parseFloat(
-          //orderTesting?.total_line_items_price + orderTesting?.total_shipping_price_set + orderTesting?.total_tax - orderTesting?.total_discounts
           orderTesting?.total_price
         ),
       },
@@ -502,17 +497,7 @@ app.put("/api/orders/:id", async (_req, res) => {
       
   } else {
     if (orderTesting.total_price - orderTesting.total_outstanding > 0) {
-      /*
-    order2.transactions = [
-      {
-        kind: "sale",
-        status: "success",
-        amount: parseFloat( orderTesting.total_price - orderTesting.total_outstanding),
-      },
-    ];
-    */
-      //console.log(orderTesting)
-      
+     
       order2.transactions = [
         {
           kind: "authorization",
@@ -527,9 +512,7 @@ app.put("/api/orders/:id", async (_req, res) => {
     
   }
   order2.line_items = orderTesting?.line_items;
-
   order2.financial_status = orderTesting?.financial_status;
-
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
   //new
@@ -539,7 +522,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   //
   order2.billing_address = orderTesting?.billing_address;
   order2.shipping_address = orderTesting?.shipping_address;
-  //console.log(orderTesting)
+  
   if (orderTesting.shipping_lines) {
     order2.shipping_lines = orderTesting?.shipping_lines;
   }
@@ -630,14 +613,32 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.cancelled_at = orderTesting?.cancelled_at;
   order2.closed_at = orderTesting?.closed_at;
   order2.total_weight = orderTesting?.total_weight;
-  //order2.payment_gateway_names = orderTesting?.payment_gateway_names;
+  
 
   order2.phone = orderTesting?.phone;
-  //order2.processing_method = orderTesting?.processing_method;
+  
+  //console.log(orderTesting)
+  // @ts-ignore
 
+  /*
+  if(orderTesting.cancelled_at){
+    orderTesting.cancelled_at = null; 
+    orderTesting.cancel_reason = '';
+  }
+  let fulfillments = orderTesting?.fulfillments;
+
+ fulfillments?.forEach((fulfillment)=>{
+  fulfillment.created_at = newDate;
+  fulfillment.updated_at = newDate; 
+ })
+ console.log(orderTesting)
+
+ orderTesting.fulfillments = fulfillments;
+  //console.log(orderTesting)
   //
   //order2.landing_site = orderTesting?.landing_site;
   //order2.location_id = orderTesting?.location_id;
+  */
   /*
   
  ///order2.payment_terms = orderTesting.payment_terms;
@@ -748,28 +749,8 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.user_id = orderTesting?.user_id; //
   
   */
-/*
-  const draft_order = new shopify.api.rest.DraftOrder({session: res.locals.shopify.session});
-draft_order.line_items = [
-  {
-    "title": "Custom Tee",
-    "price": "20.00",
-    "quantity": 2
-  }
-];
-draft_order.applied_discount = {
-  "description": "Custom discount",
-  "value_type": "fixed_amount",
-  "value": "10.0",
-  "amount": "10.00",
-  "title": "Custom"
-};
 
-draft_order.use_customer_default_address = true;
-await draft_order.save({
-  update: true,
-});
-*/
+
   //payment terms, fulfillments, discount applications,    what is landing site
   //console.log(order2)
   try {
@@ -780,15 +761,15 @@ await draft_order.save({
      await order2.save({
       update: true,
     });
-
-    //cancel the old order
-    //await orderTesting?.cancel({}); 
+ //await orderTesting.save({update:true})
+    //await orderTesting.cancel({})
     // deleting the old order with the old date
     
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: _req.params["id"],
     });
+    
     
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
