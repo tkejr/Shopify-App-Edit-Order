@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal, TextContainer, Banner, Button, Link } from "@shopify/polaris";
 
-function ErrorBanner({ open, onClose, content, url, buttonText }) {
+function ErrorBanner({
+  open,
+  onClose,
+  content,
+  url,
+  buttonText,
+  buttonAction,
+}) {
   const [isError, setIsError] = useState(open);
 
   useEffect(() => {
@@ -27,18 +34,13 @@ function ErrorBanner({ open, onClose, content, url, buttonText }) {
     <>
       {isError && (
         <div style={{ paddingTop: "10px", paddingBottom: "10px" }}>
-          <Banner
-            title="Error"
-            onDismiss={() => handleError()}
-            tone="critical"
-          >
+          <Banner title="Error" onDismiss={() => handleError()} tone="critical">
             <p>{content}</p>
 
             <div style={{ paddingTop: "10px" }}>
               <Link url={url}>
-                
                 {(buttonText !== "" || buttonText == "undefined") && (
-                  <Button>{buttonText}</Button>
+                  <Button onClick={() => buttonAction()}>{buttonText}</Button>
                 )}
               </Link>
             </div>

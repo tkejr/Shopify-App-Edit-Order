@@ -122,8 +122,7 @@ export default function CustomerPortal() {
 
   //api functions
   const updatePreference = async (requestBody) => {
-    handleToggle();
-    //setLoading(true)
+    // setLoading(true);
     try {
       const response = await fetch("/api/preferences", {
         method: "PUT",
@@ -132,12 +131,11 @@ export default function CustomerPortal() {
         },
         body: JSON.stringify(requestBody),
       });
-     
+      console.log(response);
+
       if (response.ok) {
         //const data = await response.json();
-        setIsError(false);
-        setToastContent("Updated Successfully");
-        
+        setToastContent("Updated Successfully to " + selected);
         toggleActive();
       } else {
         setToastContent("Some Problem Occurred With API");
@@ -148,15 +146,15 @@ export default function CustomerPortal() {
       setToastContent("Some Problem Occurred With API" + response);
       handleError();
     }
-    //setLoading(false)
+    // setLoading(false);
   };
 
   const getOrder = async () => {
     //if already saved no need to make a backend request again
-    // if (statusUrl) {
-    //   window.open(statusUrl, "_blank");
-    //   return;
-    // }
+    if (statusUrl) {
+      window.open(statusUrl, "_blank");
+      return;
+    }
     try {
       const response = await fetch("/api/viewLast", {
         method: "GET",
@@ -168,13 +166,11 @@ export default function CustomerPortal() {
 
       if (response.ok) {
         const data = await response.json();
-         setIsError(false);
-        // setToastContent("Order Fetched un");
-        console.log("DEBUG");
-        console.log(data.data[0]);
-        setStatusUrl(data.data[0].order_status_url);
-        window.open(data.data[0].order_status_url, "_blank");
-        //toggleActive();
+        setIsError(false);
+        setToastContent("Latest Order Fetched");
+        toggleActive();
+        setStatusUrl(data.data.data[0].order_status_url);
+        window.open(data.data.data[0].order_status_url, "_blank");
       } else {
         setToastContent("Some Problem Occurred With API");
         handleError();
@@ -192,14 +188,14 @@ export default function CustomerPortal() {
   const handleCopyClick = () => {
     // Copy the content to the clipboard
     setToastContent("Copied Successfully");
-    toggleActive()
+    toggleActive();
     //handleError();
     navigator.clipboard.writeText(copiedContent);
   };
 
   const settingStatusMarkup = (
     <Badge
-      status={badgeStatus}
+      tone={badgeStatus}
       statusAndProgressLabelOverride={`Setting is ${badgeContent}`}
     >
       {badgeContent}
@@ -240,9 +236,7 @@ export default function CustomerPortal() {
     };
 
     getPreferences();
-    
   }, [enabled]);
-  
 
   //payment stuff
   const dispatch = useDispatch();
@@ -261,7 +255,7 @@ export default function CustomerPortal() {
         } else if (data.hasPayment === "starter") {
           dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
-        }else if (data.hasPayment === "starterAnnual") {
+        } else if (data.hasPayment === "starterAnnual") {
           dispatch({ type: "SET_PLAN_NAME", payload: data.hasPayment });
           dispatch({ type: "SET_IS_PREMIUM_USER", payload: true });
         } else if (data.hasPayment === "proAnnual") {
@@ -285,63 +279,61 @@ export default function CustomerPortal() {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
-    function handleLCP(metric){
-      sendToAnalytics(metric, "Customer Order Page")
+    function handleLCP(metric) {
+      sendToAnalytics(metric, "Customer Order Page");
     }
     getLCP(handleLCP);
   }, []);
   const checkPremiumUserContent = () => {
     return (
       <Page title="Customer Portal" defaultWidth>
-         <LegacyCard title="Discover how the Customer Portal can help you">
-              <LegacyCard.Section>
-                {/*
+        <LegacyCard title="Discover how the Customer Portal can help you">
+          <LegacyCard.Section>
+            {/*
                 <TextContainer>
                   <p>
                   Upgrade to Pro to let customers be able to edit orders without contacting you. This helps reduce returns and saves you money. Go to the plans page a select the Pro plan
                   </p>
                 </TextContainer>
     */}
-              </LegacyCard.Section>
-              <LegacyCard.Section>
-              <Button onClick={()=>navigate("/Plans")}>Go to Plans</Button>
-              </LegacyCard.Section>
+          </LegacyCard.Section>
+          <LegacyCard.Section>
+            <Button onClick={() => navigate("/Plans")}>Go to Plans</Button>
+          </LegacyCard.Section>
         </LegacyCard>
-       
       </Page>
     );
   };
   //new
-  const preferenceText = loading ? "Loading..." : "Save"; 
+  const preferenceText = loading ? "Loading..." : "Save";
   return (
     <Frame>
       {(planName === "pro" || planName === "proAnnual") && isPremiumUser ? (
-         (
-          <Page
-            //backAction={{ content: "Products", url: "#" }}
-            title="Customer Portal"
-            titleMetadata={settingStatusMarkup}
-            primaryAction={{
-              content: contentStatus,
-              onAction: () => {
-                updatePreference({
-                  enable: !enabled,
-                });
-                setToastContent(enabled ? "Portal Turned On" : "Portal Turned Off");
-                toggleActive();
-              },
-            }}
-          >
-
-            <LegacyCard title="About">
-              <LegacyCard.Section>
-                <p>
-                  Allow Customers to manage and edit their orders through their
-                  customer order status page. To use Order Editor's Customer
-                  Portal, you must have customer accounts enabled for your
-                  store.
-                </p>
-                {/* <img
+        <Page
+          //backAction={{ content: "Products", url: "#" }}
+          title="Customer Portal"
+          titleMetadata={settingStatusMarkup}
+          primaryAction={{
+            content: contentStatus,
+            onAction: () => {
+              updatePreference({
+                enable: !enabled,
+              });
+              setToastContent(
+                enabled ? "Portal Turned Off" : "Portal Turned On"
+              );
+              toggleActive();
+            },
+          }}
+        >
+          <LegacyCard title="About">
+            <LegacyCard.Section>
+              <p>
+                Allow Customers to manage and edit their orders through their
+                customer order status page. To use Order Editor's Customer
+                Portal, you must have customer accounts enabled for your store.
+              </p>
+              {/* <img
                 style={{
                   width: "80vw", // This makes the image take up to 80% of the viewport width
                   maxWidth: "50%", // This ensures the image never exceeds the size of its container
@@ -349,108 +341,107 @@ export default function CustomerPortal() {
                 src={cust1} // Make sure cust1 contains a valid image URL
                 alt="Customer Image"
               />{" "} */}
-              </LegacyCard.Section>
-            </LegacyCard>
-            <LegacyCard title="Install Customer Portal">
-              <LegacyCard.Section>
-                {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
-                <p>
-                  Add the Customer Portal snippet to the additional scripts in
-                  your order status page. This snippet contains your unique
-                  account token that should be kept secret. Make sure you have
-                  customer accounts enabled
-                </p>
-                <br></br>
-              </LegacyCard.Section>
-              <LegacyCard.Section title="Step 1: Copy the install snippet">
-                <TextField
-                  value={copiedContent}
-                  multiline={4}
-                  disabled
-                  style={{
-                    backgroundColor: "#f0f0f0", // Light grey background color
-                    color: "#888888", // Grey text color
-                  }}
-                  labelStyle={{
-                    fontWeight: "bold", // Make the label bold
-                  }}
-                />
-                <br></br>
-                <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
-                
-              </LegacyCard.Section>
-              <LegacyCard.Section title="Step 2: Add to your order status page">
-                <h1>
-                  Add the snippet to the additional scripts in your{" "}
-                  <a href={dynamicLink} target="_blank">
-                    order status page
-                  </a>
-                </h1>
-                <br></br>
-                <img
-                  style={{
-                    width: "80vw", // This makes the image take up to 80% of the viewport width
-                    maxWidth: "80%", // This ensures the image never exceeds the size of its container
-                  }}
-                  src={cust2} // Make sure cust1 contains a valid image URL
-                  alt="Customer Image"
-                />{" "}
-              </LegacyCard.Section>
-              <LegacyCard.Section title="Step 3: View Order">
-                <h1>
-                  Click on View Order to see the checkout page and see the
-                  customer portal box embedded onto that page
-                </h1>
-                <br></br>
-                {/* <img
-                  style={{
-                    width: "80vw", // This makes the image take up to 80% of the viewport width
-                    maxWidth: "50%", // This ensures the image never exceeds the size of its container
-                  }} // Set the width using inline styles
-                  src={cust3} // Make sure cust1 contains a valid image URL
-                  alt="Customer Image"
-                />{" "} */}
-                <br></br>
-                <br></br>
-                <Button onClick={getOrder}>View Order Status</Button>
-              </LegacyCard.Section>
-            </LegacyCard>
-            <LegacyCard
-              title="Customer editing"
-              primaryFooterAction={{
-                content: preferenceText,
-                onAction: () => {
-                  // setToastContent(selected);
-                  // toggleActive();
-                  updatePreference({
-                    time_to_edit: timeStringToSeconds(selected),
-                  });
-                },
-              }}
-            >
-              {/* Content of the LegacyCard */}
+            </LegacyCard.Section>
+          </LegacyCard>
+          <LegacyCard title="Install Customer Portal">
+            <LegacyCard.Section>
+              {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
+              <p>
+                Add the Customer Portal snippet to the additional scripts in
+                your order status page. This snippet contains your unique
+                account token that should be kept secret. Make sure you have
+                customer accounts enabled
+              </p>
+              <br></br>
+            </LegacyCard.Section>
+            <LegacyCard.Section title="Step 1: Copy the install snippet">
+              <TextField
+                value={copiedContent}
+                multiline={4}
+                disabled
+                style={{
+                  backgroundColor: "#f0f0f0", // Light grey background color
+                  color: "#888888", // Grey text color
+                }}
+                labelStyle={{
+                  fontWeight: "bold", // Make the label bold
+                }}
+              />
+              <br></br>
+              <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
+            </LegacyCard.Section>
+            <LegacyCard.Section title="Step 2: Add to your order status page">
+              <h1>
+                Add the snippet to the additional scripts in your{" "}
+                <a href={dynamicLink} target="_blank">
+                  order status page
+                </a>
+              </h1>
+              <br></br>
+              <img
+                style={{
+                  width: "80vw", // This makes the image take up to 80% of the viewport width
+                  maxWidth: "80%", // This ensures the image never exceeds the size of its container
+                }}
+                src={cust2} // Make sure cust1 contains a valid image URL
+                alt="Customer Image"
+              />{" "}
+            </LegacyCard.Section>
+            <LegacyCard.Section title="Step 3: View Order">
+              <h1>
+                Click on View Order to see the checkout page and see the
+                customer portal box embedded onto that page
+              </h1>
+              <br></br>
+              <img
+                style={{
+                  width: "80vw", // This makes the image take up to 80% of the viewport width
+                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
+                }} // Set the width using inline styles
+                src={cust3} // Make sure cust1 contains a valid image URL
+                alt="Customer Image"
+              />{" "}
+              <br></br>
+              <br></br>
+              <Button onClick={getOrder}>View Order Status</Button>
+            </LegacyCard.Section>
+          </LegacyCard>
+          <LegacyCard
+            title="Customer editing"
+            primaryFooterAction={{
+              content: preferenceText,
+              onAction: () => {
+                updatePreference({
+                  time_to_edit: timeStringToSeconds(selected),
+                });
+              },
+            }}
+          >
+            {/* Content of the LegacyCard */}
 
-              <LegacyCard.Section>
-                <h1>Adjust when customers can edit their orders.</h1>
-                <br></br>
-                <Select
-                  options={options}
-                  onChange={handleSelectChange}
-                  value={selected}
-                />
-              </LegacyCard.Section>
-            </LegacyCard>
-            <ErrorBanner
-              open={error}
-              onClose={handleError}
-              content={toastContent}
-            />
-            {toastMarkup}
-            <br></br>
-            <br></br>
-          </Page>
-          
-        )
+            <LegacyCard.Section>
+              <h1>Adjust when customers can edit their orders.</h1>
+              <br></br>
+              <Select
+                options={options}
+                onChange={handleSelectChange}
+                value={selected}
+              />
+            </LegacyCard.Section>
+          </LegacyCard>
+          <ErrorBanner
+            open={error}
+            onClose={handleError}
+            content={toastContent}
+            buttonText="Contact Support"
+            buttonAction={() => {
+              navigate("/Help");
+            }}
+          />
+          {toastMarkup}
+          <br></br>
+          <br></br>
+        </Page>
       ) : (
         checkPremiumUserContent()
       )}
