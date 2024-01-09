@@ -30,7 +30,7 @@ import {
   CancelMajor
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 //import CustomSkeletonPage from "../components/SkeletonPage";
 import { sendToAnalytics } from "../../lcp-helper";
@@ -46,7 +46,7 @@ export default function HomePage() {
   const [loader, setLoader] = useState(true);
   const [showPlan, setShowPlan] = useState(false);
   const [showTry, setShowTry] = useState(false);
-  const [showSetup, setShowSetup] = useState(true);
+  const showSetup = useSelector((state) => state.showSetup);
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const chargeId = urlParams.get("charge_id");
@@ -217,7 +217,7 @@ export default function HomePage() {
             Setup Guide
           </Text>
           <ButtonGroup>
-            <Button onClick={() => setShowSetup(!showSetup)} variant="tertiary"><Icon
+            <Button onClick={() => {dispatch({ type: "SET_SHOW_SETUP", payload: false });}} variant="tertiary"><Icon
             source={CancelMajor}
             tone="base"/></Button>
             

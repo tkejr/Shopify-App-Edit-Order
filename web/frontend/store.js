@@ -6,6 +6,7 @@ const initialState = {
   orderName: false,
   line_items: [],
   planName: "",
+  showSetup: true
 };
 
 const reducer = (state = initialState, action) => {
@@ -20,6 +21,8 @@ const reducer = (state = initialState, action) => {
       return { ...state, line_items: action.payload };
     case "SET_PLAN_NAME":
       return { ...state, planName: action.payload };
+    case "SET_SHOW_SETUP":
+      return { ...state, showSetup: action.payload };
     default:
       return state;
   }
