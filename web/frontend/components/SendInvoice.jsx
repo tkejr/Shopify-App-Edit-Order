@@ -129,7 +129,7 @@ const InvoiceModal = (props) => {
 
         { props.emailTo === "" &&
         <Modal.Section>
-        <Banner onDismiss={() => {}}>
+        <Banner tone="warning">
             <p>
               Make sure there is a customer to this order before sending an invoice{' '}
          

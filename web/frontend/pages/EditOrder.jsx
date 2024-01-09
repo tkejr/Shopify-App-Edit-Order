@@ -19,7 +19,7 @@ import {
   useNavigate,
 } from "@shopify/app-bridge-react";
 import {
-  EditOrderComponent,
+  EditOrderPanel,
   OrderTableEditOrder,
 } from "../components";
 import ErrorBanner from "../components/ErrorBanner";
@@ -27,7 +27,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { edit_paywall } from "../assets";
 import { sendToAnalytics } from "../../lcp-helper";
 import { getLCP } from "web-vitals";
+
 const PageExample = () => {
+  const orderIdReal = useSelector((state) => state.orderId);
   const [show, setShow] = useState(false);
   const [reloadComp, setReloadComp] = useState(false);
   const [userStateLoading, setUserStateLoading] = useState(true);
@@ -119,8 +121,9 @@ const PageExample = () => {
   const handleError = () => {
     setError(!error);
   };
+  
   return (
-    <Page title="Edit Order" defaultWidth>
+    <Page title={!orderIdReal ? "Edit Order" : ""} defaultWidth>
       {
         <ErrorBanner
           open={error}
@@ -135,7 +138,7 @@ const PageExample = () => {
           {(planName === "pro" || planName === "proAnnual") && isPremiumUser ? (
             <>
               <Layout.Section oneHalf>
-                {
+                {!orderIdReal &&
                   <OrderTableEditOrder
                     toggleShow={toggleShow}
                     setOrderId={setOrderId}
@@ -146,8 +149,8 @@ const PageExample = () => {
                 }
               </Layout.Section>
               <Layout.Section oneHalf>
-                {/*
-                <EditOrderComponent
+                { orderIdReal && 
+                <EditOrderPanel
                   orderId={orderId}
                   orderName={orderName}
                   reloadComp={reloadComp}
@@ -157,7 +160,7 @@ const PageExample = () => {
                   setUrl={setUrl}
                   handleError={handleError}
                 />
-              */}
+              }
               </Layout.Section>
             </>
           ) : (

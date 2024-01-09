@@ -13,7 +13,7 @@ import { useAuthenticatedFetch } from "../../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
 
 const UpdateBillingAddress = (props)  =>{
-  
+const dispatch = useDispatch()
 
 const fetch = useAuthenticatedFetch();
 const navigate = useNavigate();
@@ -47,7 +47,7 @@ const [updateButton, setUpdateButton] = useState("Update");
       if (!response.ok) {
         throw new Error("Failed to update billing details");
       }
-      props.setToastProps({ content: "Billing details updated successfully" });
+      props.setToastProps({ content: "Details updated successfully" });
     } catch (error) {
       
       props.setErrorContent(
@@ -61,7 +61,9 @@ const [updateButton, setUpdateButton] = useState("Update");
     //props.setReloadComp(!props.reloadComp);
     //props.handleChangeShipping();//
     //navigate back to edit order
-    navigate("/EditOrder")
+    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })
+    navigate("/")
   };
   
   return (
@@ -179,9 +181,9 @@ const [updateButton, setUpdateButton] = useState("Update");
         </FormLayout>
 
         <br></br>
-        <Banner onDismiss={() => {}}>
+        <Banner tone="warning">
           <p>
-            Clicking the Update button will update the Billing address and then send you back to the Edit Order page
+            Clicking the Update button will update the Billing address and then send you back to the home page
           </p>
         </Banner>
       </Modal.Section>

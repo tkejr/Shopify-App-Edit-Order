@@ -149,8 +149,9 @@ export function OrderTable(props) {
     (month, year) => setDate({ month, year }),
     []
   );
+ 
   const rowMarkup = orderData.map(
-    ({ name, processed_at, customer, total_price, id, currency, total_outstanding }, index) => (
+    ({ name, processed_at, customer, total_price, id, currency, total_outstanding, financial_status, cancelled_at }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
@@ -174,8 +175,11 @@ export function OrderTable(props) {
         <IndexTable.Cell>{customer && customer.first_name}</IndexTable.Cell>
         <IndexTable.Cell>{total_outstanding}</IndexTable.Cell>
         <IndexTable.Cell>
-          {total_price} {currency}
+          {total_price} {currency}   
         </IndexTable.Cell>
+        {/*
+        <IndexTable.Cell>{financial_status} {cancelled_at}</IndexTable.Cell>
+          */}
       </IndexTable.Row>
     )
   );
@@ -252,6 +256,7 @@ export function OrderTable(props) {
             { title: "Customer Name" },
             { title: "Total Outstanding" },
             { title: "Total Price" },
+           
           ]}
         >
 
