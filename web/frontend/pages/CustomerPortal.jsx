@@ -131,12 +131,17 @@ export default function CustomerPortal() {
         },
         body: JSON.stringify(requestBody),
       });
-      console.log(response);
 
       if (response.ok) {
         //const data = await response.json();
-        setToastContent("Updated Successfully to " + selected);
-        toggleActive();
+        if (requestBody.time_to_edit == undefined) {
+          setToastContent(enabled ? "Portal Turned Off" : "Portal Turned On");
+          toggleActive();
+          handleToggle();
+        } else {
+          setToastContent("Updated Successfully");
+          toggleActive();
+        }
       } else {
         setToastContent("Some Problem Occurred With API");
         handleError();
@@ -319,10 +324,6 @@ export default function CustomerPortal() {
               updatePreference({
                 enable: !enabled,
               });
-              setToastContent(
-                enabled ? "Portal Turned Off" : "Portal Turned On"
-              );
-              toggleActive();
             },
           }}
         >
