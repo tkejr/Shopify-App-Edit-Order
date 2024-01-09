@@ -50,11 +50,12 @@ router.put("/", async (req, res) => {
     access_token: session.accessToken,
   };
 
-  console.log("Setting User access Token");
+  console.log("Test Update Preference");
   const updatedUser = await updateUser(shopUrl, updateData);
   const updatePref = await updateUserPreference(updatedUser.id, req.body);
-
-  res.status(200);
+  // console.log("===== TEST in CP====");
+  // console.log(updatedUser);
+  res.status(200).send("OK");
 });
 
 export default router;

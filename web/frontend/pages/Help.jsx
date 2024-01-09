@@ -109,8 +109,7 @@ export default function Help() {
           </LegacyCard.Section>
         </LegacyCard>
         <FooterHelp>
-          For More Support{" "}
-          <Link url="https://www.editify.kejrtech.com">Email Us</Link>
+          For more support email us at contact@shopvana.io
         </FooterHelp>
       </Page>
       {toastMarkup}

@@ -17,7 +17,7 @@ import {
   InlineStack,
   InlineGrid,
   ButtonGroup,
-  Button
+  Button,
 } from "@shopify/polaris";
 import React, { useState, useCallback, useEffect } from "react";
 
@@ -27,7 +27,7 @@ import {
   CustomersMajor,
   CircleTickMajor,
   CircleCancelMajor,
-  CancelMajor
+  CancelMajor,
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,12 +52,12 @@ export default function HomePage() {
     const chargeId = urlParams.get("charge_id");
     const type = urlParams.get("type");
     const orderId = urlParams.get("id");
-  
-    if(type === "edit"){
+
+    if (type === "edit") {
       dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
       navigate("/EditOrder");
     }
-    if(type === "backdate"){
+    if (type === "backdate") {
       dispatch({ type: "SET_PROPS_ORDER_ID", payload: orderId });
       navigate("/Backdate");
     }
@@ -110,11 +110,10 @@ export default function HomePage() {
     };
     getAnalytics();
     //fetchRecurringCharges();
-    function handleLCP(metric){
-      sendToAnalytics(metric, "Index Page")
+    function handleLCP(metric) {
+      sendToAnalytics(metric, "Index Page");
     }
     getLCP(handleLCP);
-    
   }, []);
   function handlePrimaryActionClick() {
     navigate("/Backdate");
@@ -122,7 +121,7 @@ export default function HomePage() {
 
   return (
     <>
-      {(
+      {
         <Frame>
           <Page
             title="Editify"
@@ -163,106 +162,173 @@ export default function HomePage() {
 
             <br></br>
             {
-            <Layout>
-            
-              <Layout.Section variant="oneThird">
-                <LegacyCard title="Backdated Orders">
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <Icon source={OrdersMajor} color="primary" backdrop />
-                      <div style={{ marginLeft: "10px" }}>
-                        {shopDeets?.no_back_orders}
+              <Layout>
+                <Layout.Section variant="oneThird">
+                  <Card>
+                    <div
+                      style={{
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginRight: "10px" }}>
+                          {" "}
+                          <Text as="h1" variant="bodyLg" fontWeight="bold">
+                            Backdated Orders{" "}
+                          </Text>
+                        </div>
+                        <div>
+                          {" "}
+                          <Icon source={OrdersMajor} color="primary" backdrop />
+                        </div>
                       </div>
-                    </div>{" "}
-                  </LegacyCard.Section>
-                </LegacyCard>
-              </Layout.Section>
-              <Layout.Section variant="oneThird">
-                <LegacyCard title="Edited Orders">
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <Icon source={EditMajor} color="primary" backdrop />
-                      <div style={{ marginLeft: "10px" }}>
-                        {shopDeets?.no_edit_orders}
+                    </div>
+                    <Text as="h1" variant="heading3xl" fontWeight="medium">
+                      {shopDeets?.no_back_orders}
+                    </Text>
+                  </Card>
+                </Layout.Section>
+                <Layout.Section variant="oneThird">
+                  <Card>
+                    <div
+                      style={{
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginRight: "10px" }}>
+                          {" "}
+                          <Text as="h1" variant="bodyLg" fontWeight="bold">
+                            Edited Orders{" "}
+                          </Text>
+                        </div>
+                        <div>
+                          {" "}
+                          <Icon source={EditMajor} color="primary" backdrop />
+                        </div>
                       </div>
-                    </div>{" "}
-                  </LegacyCard.Section>
-                </LegacyCard>
-              </Layout.Section>
-              <Layout.Section variant="oneThird">
-                <LegacyCard title="Customer Edited Orders">
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <Icon source={CustomersMajor} color="primary" backdrop />
-                      <div style={{ marginLeft: "10px" }}>
-                        {shopDeets?.no_cust_edit_orders}
+                    </div>
+                    <Text as="h1" variant="heading3xl" fontWeight="medium">
+                      {shopDeets?.no_edit_orders}
+                    </Text>
+                  </Card>
+                </Layout.Section>
+                <Layout.Section variant="oneThird">
+                  {/* <LegacyCard title="Customer Edited Orders">
+                    <LegacyCard.Section>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <Icon
+                          source={CustomersMajor}
+                          color="primary"
+                          backdrop
+                        />
+                        <div style={{ marginLeft: "10px" }}>
+                          {shopDeets?.no_cust_edit_orders}
+                        </div>
+                      </div>{" "}
+                    </LegacyCard.Section>
+                  </LegacyCard> */}
+                  <Card>
+                    <div
+                      style={{
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginRight: "10px" }}>
+                          {" "}
+                          <Text as="h1" variant="bodyLg" fontWeight="bold">
+                            Customer Edited Orders{" "}
+                          </Text>
+                        </div>
+                        <div>
+                          {" "}
+                          <Icon
+                            source={CustomersMajor}
+                            color="primary"
+                            backdrop
+                          />
+                        </div>
                       </div>
-                    </div>{" "}
-                  </LegacyCard.Section>
-                </LegacyCard>
-              </Layout.Section>
-
-            </Layout>
-               }
+                    </div>
+                    <Text as="h1" variant="heading3xl" fontWeight="medium">
+                      {shopDeets?.no_edit_orders}
+                    </Text>
+                  </Card>
+                </Layout.Section>
+              </Layout>
+            }
             <br></br>
             <Layout>
               <Layout.Section>
-             
-             
-{showSetup &&
-    <Card roundedAbove="sm">
-      <BlockStack gap="200">
-        <InlineGrid columns="1fr auto">
-          <Text as="h2" variant="headingSm">
-            Setup Guide
-          </Text>
-          <ButtonGroup>
-            <Button onClick={() => {dispatch({ type: "SET_SHOW_SETUP", payload: false });}} variant="tertiary"><Icon
-            source={CancelMajor}
-            tone="base"/></Button>
-            
-          </ButtonGroup>
-        </InlineGrid>
-        <BlockStack gap="400">
-          <Text as="p" variant="bodyMd">
-            Go to the Plans Page and select your plan. Backdating is only available if you have at least a Starter Plan
-          </Text>
-          <Text as="h3" variant="headingSm" fontWeight="medium">
-            
-          </Text>
-        </BlockStack>
-        {""}
-         <Bleed marginBlockEnd="400" marginInline="400">
-        <Box background="bg-surface-secondary" padding="400">
-          <BlockStack gap="200">
-            <Text as="h3" variant="headingSm" fontWeight="medium">
-              How to Backdate an Order
-            </Text>
-            <List>
-              <List.Item>Select an Order</List.Item>
-              <List.Item>Select Date</List.Item>
-              <List.Item>Click Submit</List.Item>
-            </List>
-          </BlockStack>
-        </Box>
-      </Bleed>
-        <BlockStack gap="200">
-          <Text as="h3" variant="headingSm" fontWeight="medium">
-            {"     "}
-          </Text>
-          <br></br>
-          <Text as="p" variant="bodyMd">
-            Note: Make sure there is a shipping and billing address present on the order you are trying to backdate
-          </Text>
-          <InlineStack align="end">
-            <ButtonGroup>
-              
-            </ButtonGroup>
-          </InlineStack>
-        </BlockStack>
-      </BlockStack>
-    </Card>
-}
+                {showSetup && (
+                  <Card roundedAbove="sm">
+                    <BlockStack gap="200">
+                      <InlineGrid columns="1fr auto">
+                        <Text as="h2" variant="headingSm">
+                          Setup Guide
+                        </Text>
+                        <ButtonGroup>
+                          <Button
+                            onClick={() => {
+                              dispatch({
+                                type: "SET_SHOW_SETUP",
+                                payload: false,
+                              });
+                            }}
+                            variant="tertiary"
+                          >
+                            <Icon source={CancelMajor} tone="base" />
+                          </Button>
+                        </ButtonGroup>
+                      </InlineGrid>
+                      <BlockStack gap="400">
+                        <Text as="p" variant="bodyMd">
+                          Go to the Plans Page and select your plan. Backdating
+                          is only available if you have at least a Starter Plan
+                        </Text>
+                        <Text
+                          as="h3"
+                          variant="headingSm"
+                          fontWeight="medium"
+                        ></Text>
+                      </BlockStack>
+                      {""}
+                      <Bleed marginBlockEnd="400" marginInline="400">
+                        <Box background="bg-surface-secondary" padding="400">
+                          <BlockStack gap="200">
+                            <Text
+                              as="h3"
+                              variant="headingSm"
+                              fontWeight="medium"
+                            >
+                              How to Backdate an Order
+                            </Text>
+                            <List>
+                              <List.Item>Select an Order</List.Item>
+                              <List.Item>Select Date</List.Item>
+                              <List.Item>Click Submit</List.Item>
+                            </List>
+                          </BlockStack>
+                        </Box>
+                      </Bleed>
+                      <BlockStack gap="200">
+                        <Text as="h3" variant="headingSm" fontWeight="medium">
+                          {"     "}
+                        </Text>
+                        <br></br>
+                        <Text as="p" variant="bodyMd">
+                          Note: Make sure there is a shipping and billing
+                          address present on the order you are trying to
+                          backdate
+                        </Text>
+                        <InlineStack align="end">
+                          <ButtonGroup></ButtonGroup>
+                        </InlineStack>
+                      </BlockStack>
+                    </BlockStack>
+                  </Card>
+                )}
                 {/*<LegacyCard title="Setup Guide">
                   <LegacyCard.Section>
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -323,11 +389,13 @@ export default function HomePage() {
             </Layout>
             <FooterHelp>
               Learn more about{" "}
-              <Link  target="_blank" url="https://editify.kejrtech.com">Editify</Link>
+              <Link target="_blank" url="https://editify.kejrtech.com">
+                Editify
+              </Link>
             </FooterHelp>
           </Page>
         </Frame>
-      )}
+      }
     </>
   );
 }

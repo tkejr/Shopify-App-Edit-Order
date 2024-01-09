@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Modal,
@@ -8,8 +6,7 @@ import {
   Button,
   Link,
   Icon,
-  
-  BlockStack
+  BlockStack,
 } from "@shopify/polaris";
 import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
 function PlanCard({ features, price, planName, upgrade, newPrice }) {
@@ -17,25 +14,32 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
     <BlockStack align="center">
       <div style={styles.header}>
         <div style={styles.planName}>{planName}</div>
-       {planName === "Starter Annual Plan" || planName ==="Pro Annual Plan" ? <div style={styles.price}><s>{price}</s> {newPrice}</div> : <div style={styles.price}> {price} </div>}
+        {planName === "Starter Annual Plan" ||
+        planName === "Pro Annual Plan" ? (
+          <div style={styles.price}>
+            <s>{price}</s> {newPrice}
+          </div>
+        ) : (
+          <div style={styles.price}> {price} </div>
+        )}
       </div>
       {features.map((feature, index) => (
         <BlockStack key={index}>
-          <div style={{ display: "flex", marginBottom:'10px' }}>
-          <div style={{  float:'left' }}>
-              <p>{feature} </p>
-            </div>
-            {(planName === "Starter Plan" || planName === "Starter Annual Plan") && index > 2 ? (
+          <div style={{ display: "flex", marginBottom: "10px" }}>
+            {(planName === "Starter Plan" ||
+              planName === "Starter Annual Plan") &&
+            index > 2 ? (
               <BlockStack inlineAlign="end">
-              <Icon source={CircleCancelMajor} tone="critical" backdrop />
+                <Icon source={CircleCancelMajor} tone="critical" backdrop />
               </BlockStack>
             ) : (
-              <div style={{float:'right'}}>
-              <Icon source={CircleTickMajor} tone="success" backdrop />
+              <div style={{ float: "right" }}>
+                <Icon source={CircleTickMajor} tone="success" backdrop />
               </div>
             )}
-
-           
+            <div style={{ float: "right" }}>
+              <p>{feature} </p>
+            </div>
           </div>
         </BlockStack>
       ))}
