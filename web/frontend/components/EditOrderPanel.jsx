@@ -103,9 +103,9 @@ export function EditOrderPanel (){
           setShowProducts(false);
         } else {
           setErrorContent(
-            "There was an error adding the product to the order. See the reasons why that may be the case here: "
+            "There was an error adding the product to the order. Make sure the order is not fulfilled and paid. If the error perists, contact support: "
           );
-          setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+          //setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
           handleError();
         }
     
@@ -229,23 +229,31 @@ export function EditOrderPanel (){
           });
     
           if (!response.ok) {
-            throw new Error("Failed to update order details");
+            setLoading(false);
+           setErrorContent(
+            "There was an error updating the order details to the order. Contact Support: "
+          );
+          //setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+          handleError();
           }
-          setLoading(false);
-          setToastProps({ content: "Order details updated successfully" });
-          dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
-          dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
-          dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
-          setLineItems([]);
-          navigate("/EditOrder")
+          else{
+            setLoading(false);
+            setToastProps({ content: "Order details updated successfully" });
+            dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+            dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
+            dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
+            setLineItems([]);
+            navigate("/EditOrder")
+          }
+         
         } catch (error) {
           // Handle error, e.g., show an error message
           //console.error("Error updating shipping details:", error);
           setLoading(false);
          setErrorContent(
-            "There was an error updating the order details to the order. See the reasons why that may be the case here: "
+            "There was an error updating the order details to the order. Contact Support: "
           );
-          setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+          //setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
           handleError();
         }
        // setUpdateButton("Update");
@@ -437,7 +445,10 @@ export function EditOrderPanel (){
           onClose={handleError}
           content={errorContent}
           url={url}
-          buttonText={"Learn More"}
+          buttonText={"Contact Support"}
+          buttonAction={() => {
+            navigate("/Help");
+          }}
         ></ErrorBanner>
       }
         <Layout>

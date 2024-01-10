@@ -72,6 +72,7 @@ export default function HomePage() {
 
         if (response.ok) {
           const data = await response.json();
+          console.log(data.data);
           setShopDeets(data.data);
           if (data.data.no_back_orders > 0) {
             setEditedIcon(
@@ -119,6 +120,34 @@ export default function HomePage() {
     navigate("/Backdate");
   }
 
+  const handleDismissOnboarding = async () => {
+    const updatedData = {
+      onboardingdismissed: true,
+    };
+
+    try {
+      const response = await fetch("/api/analytics", {
+        // Replace '/update-user' with your actual route
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ updatedData }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Update successful:", data);
+        // Update your shopDeets state here to reflect the changes
+        setShopDeets(data);
+      } else {
+        console.error("Update failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
+  };
+
   return (
     <>
       {
@@ -136,27 +165,6 @@ export default function HomePage() {
                     and Much More
                   </p>
                 </TextContainer>
-                {/* <div style={{ display: "flex" }}>
-                  <div style={{ flex: 1, marginRight: "20px" }}>
-                    <TextContainer>
-                      Install the Shopify POS App
-                      <p>
-                        Shopify POS is the easiest way to sell your products in
-                        person. Available for iPad, iPhone, and Android.
-                      </p>
-                    </TextContainer>
-                  </div>
-                  <img
-                    alt=""
-                    width="10%"
-                    height="10%"
-                    style={{
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                    src="https://cdn.pixabay.com/photo/2013/07/13/12/50/pencil-160443_1280.png"
-                  />
-                </div> */}
               </LegacyCard.Section>
             </LegacyCard>
 
@@ -214,20 +222,6 @@ export default function HomePage() {
                   </Card>
                 </Layout.Section>
                 <Layout.Section variant="oneThird">
-                  {/* <LegacyCard title="Customer Edited Orders">
-                    <LegacyCard.Section>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <Icon
-                          source={CustomersMajor}
-                          color="primary"
-                          backdrop
-                        />
-                        <div style={{ marginLeft: "10px" }}>
-                          {shopDeets?.no_cust_edit_orders}
-                        </div>
-                      </div>{" "}
-                    </LegacyCard.Section>
-                  </LegacyCard> */}
                   <Card>
                     <div
                       style={{
@@ -261,7 +255,7 @@ export default function HomePage() {
             <br></br>
             <Layout>
               <Layout.Section>
-                {showSetup && (
+                {shopDeets && shopDeets.onboardingdismissed == false && (
                   <Card roundedAbove="sm">
                     <BlockStack gap="200">
                       <InlineGrid columns="1fr auto">
@@ -271,10 +265,7 @@ export default function HomePage() {
                         <ButtonGroup>
                           <Button
                             onClick={() => {
-                              dispatch({
-                                type: "SET_SHOW_SETUP",
-                                payload: false,
-                              });
+                              handleDismissOnboarding();
                             }}
                             variant="tertiary"
                           >
@@ -312,78 +303,10 @@ export default function HomePage() {
                           </BlockStack>
                         </Box>
                       </Bleed>
-                      <BlockStack gap="200">
-                        <Text as="h3" variant="headingSm" fontWeight="medium">
-                          {"     "}
-                        </Text>
-                        <br></br>
-                        <Text as="p" variant="bodyMd">
-                          Note: Make sure there is a shipping and billing
-                          address present on the order you are trying to
-                          backdate
-                        </Text>
-                        <InlineStack align="end">
-                          <ButtonGroup></ButtonGroup>
-                        </InlineStack>
-                      </BlockStack>
+                      
                     </BlockStack>
                   </Card>
                 )}
-                {/*<LegacyCard title="Setup Guide">
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      {planIcon}
-                      <div style={{ marginLeft: "10px" }}>
-                        <p>
-                          Have An Active Paid Plan{" "}
-                          {showPlan && (
-                            <Link
-                              onClick={() => {
-                                navigate("/Plans");
-                              }}
-                            >
-                              {" "}
-                              See Our Plans
-                            </Link>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </LegacyCard.Section>
-                  <LegacyCard.Section title="Steps to Backdate">
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div style={{ marginLeft: "10px" }}>
-                        <List type="bullet">
-                          <List.Item>Select An Order</List.Item>
-                          <List.Item>Select Date</List.Item>
-                          <List.Item>Click Submit</List.Item>
-                        </List>
-                      </div>
-                    </div>
-                  </LegacyCard.Section>
-                  
-
-                  <LegacyCard.Section>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      {editedIcon}
-                      <div style={{ marginLeft: "10px" }}>
-                        <p>
-                          {//Backdated an Order 🎉{" "}
-}
-                          {showTry&& (
-                            <Link
-                              onClick={() => {
-                                navigate("/Backdate");
-                              }}
-                            >
-                              Try Now
-                            </Link>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </LegacyCard.Section>
-                            </LegacyCard>*/}
               </Layout.Section>
               <Layout.Section oneHalf></Layout.Section>
             </Layout>

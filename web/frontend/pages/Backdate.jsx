@@ -134,7 +134,7 @@ export default function Backdate() {
   //error stuff
   const [url, setUrl] = useState("");
   const [errorContent, setErrorContent] = useState("");
-  const [buttonText, setButtonText] = useState("Learn More");
+  const [buttonText, setButtonText] = useState("Contact Support");
   const [error, setError] = useState(false);
   const handleError = () => {
     setError(!error);
@@ -194,6 +194,9 @@ export default function Backdate() {
           content={errorContent}
           url={url}
           buttonText={buttonText}
+          buttonAction={() => {
+            navigate("/Help");
+          }}
         ></ErrorBanner>
       }
       { (

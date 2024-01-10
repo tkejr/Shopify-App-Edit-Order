@@ -68,9 +68,9 @@ const AdjustQuantity = (props)  =>{
             //props.setReloadComp(!props.reloadComp);
           } else {
             props.setErrorContent(
-              "There was an error updating the quantity. For more information on why this could have happened, click the button below: "
+              "There was an error updating the quantity. Make sure the line item is not fulfilled. If the error persists, contact support:  "
             );
-            props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+            //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
             props.handleError();
           }
           setUpdateButton("Update")

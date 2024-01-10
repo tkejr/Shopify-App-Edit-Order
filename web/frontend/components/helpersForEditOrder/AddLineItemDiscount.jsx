@@ -59,9 +59,9 @@ const AddLineItemDiscount = (props)  =>{
       
     } else {
       props.setErrorContent(
-        "There was an error adding the line item discount. See the reasons why that may be the case here: "
+        "There was an error adding the line item discount. Contact Support: "
       );
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
     setUpdateButton("Update")

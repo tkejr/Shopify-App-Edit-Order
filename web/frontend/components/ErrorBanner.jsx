@@ -17,7 +17,7 @@ function ErrorBanner({
       const timer = setTimeout(() => {
         setIsError(false);
         onClose();
-      }, 10000); // 10000 ms = 10 seconds, people are slow readers
+      }, 11000); // 10000 ms = 10 seconds, people are slow readers
 
       return () => {
         clearTimeout(timer);
@@ -38,8 +38,8 @@ function ErrorBanner({
             <p>{content}</p>
 
             <div style={{ paddingTop: "10px" }}>
-              <Link url={url}>
-                {(buttonText !== "" || buttonText == "undefined") && (
+              <Link target="_blank" url={url}>
+                {(buttonText !== "" || buttonText == "undefined" ) && (
                   <Button onClick={() => buttonAction()}>{buttonText}</Button>
                 )}
               </Link>

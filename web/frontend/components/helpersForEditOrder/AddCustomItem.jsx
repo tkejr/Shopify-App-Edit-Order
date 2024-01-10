@@ -55,9 +55,9 @@ const AddCustomItem = (props)  =>{
           setCurrencyCode("");
         } else {
           props.setErrorContent(
-            "There was an error adding the custom item to the order. See the reasons why that may be the case here: "
+            "There was an error adding the custom item to the order. Make sure the currency code is correct. If the error persists, contact support: "
           );
-          props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+          //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
           props.handleError();
         }
         setUpdateButton("Update")

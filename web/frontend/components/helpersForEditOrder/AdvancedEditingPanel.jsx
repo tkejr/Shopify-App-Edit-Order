@@ -88,23 +88,7 @@ const AdvancedEditingPanel = (props)  =>{
               ) : (
                 <>{shippingLines}</>
               )}
-              {/* <div style={{ padding: "10px" }}>
-                <Button
-                  plain
-                  disclosure={expanded ? "up" : "down"}
-                  onClick={() => {
-                    setExpanded(!expanded);
-                  }}
-                >
-                  {expanded ? "Close" : "Shipping Taxes"}
-                </Button>
-              </div>
-              {expanded && (
-                <>
-                  <Button onClick={() => addTaxLine()}>Add Tax Line</Button>
-                  {taxLinesArray}
-                </>
-              )} */}
+             
             </FormLayout>
         </LegacyCard.Section>
           <LegacyCard.Section title="Discounts">
@@ -114,23 +98,7 @@ const AdvancedEditingPanel = (props)  =>{
               ) : (
                 <>{discountLines}</>
               )}
-              {/* <div style={{ padding: "10px" }}>
-                <Button
-                  plain
-                  disclosure={expanded ? "up" : "down"}
-                  onClick={() => {
-                    setExpanded(!expanded);
-                  }}
-                >
-                  {expanded ? "Close" : "Shipping Taxes"}
-                </Button>
-              </div>
-              {expanded && (
-                <>
-                  <Button onClick={() => addTaxLine()}>Add Tax Line</Button>
-                  {taxLinesArray}
-                </>
-              )} */}
+              
             </FormLayout>
         </LegacyCard.Section>
        

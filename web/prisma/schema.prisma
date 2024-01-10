@@ -25,4 +25,5 @@ model users {
   plan                String?              @default("free") @db.VarChar
   free_trial_used     Boolean?             @default(true)
   custom_preferences  custom_preferences[]
+  onboardingdismissed Boolean?             @default(false)
 }

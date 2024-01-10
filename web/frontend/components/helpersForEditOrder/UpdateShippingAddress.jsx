@@ -49,21 +49,30 @@ const [updateButton, setUpdateButton] = useState("Update");
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update shipping details");
+        props.setErrorContent(
+          "There was an error updating the shipping details to the order. Make sure it is a correct shipping address. If the error persists, contact support: "
+        );
+        //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+        props.handleError();
+        setUpdateButton("Update");
+      }
+      else{
+        props.setToastProps({ content: "Details updated successfully" });
+        setUpdateButton("Update");
+        //props.setReloadComp(!props.reloadComp);
+        props.handleChangeShipping();
       }
 
-      props.setToastProps({ content: "Details updated successfully" });
+      
     } catch (error) {
       
       props.setErrorContent(
-        "There was an error updating the shipping details to the order. If adding a shipping address, add the correct fields. For US, Province is State. See the reasons why that may be the case here: "
+        "There was an error updating the shipping details to the order. Make sure it is a correct shipping address. If the error persists, contact support: "
       );
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
-    setUpdateButton("Update");
-    //props.setReloadComp(!props.reloadComp);
-    props.handleChangeShipping();
+   
   };
   return (
     <Modal

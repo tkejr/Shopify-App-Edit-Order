@@ -129,8 +129,11 @@ const PageExample = () => {
           open={error}
           onClose={handleError}
           content={errorContent}
-          url={url}
-          buttonText={"Learn More"}
+          //url={url}
+          buttonText={"Contact Support"}
+          buttonAction={() => {
+            navigate("/Help");
+          }}
         ></ErrorBanner>
       }
       {(
