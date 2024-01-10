@@ -129,9 +129,11 @@ export function DatePickerExample(props) {
       //Banner error
      //console.log('=== eror',response)
       props.setErrorContent(
-        "There was an error updating the date. See the reasons why that may be the case here: "
+        "There was an error updating the date. Make sure the order you are trying to backdate has a shipping and billing address. If the error persists, contact support: "
       );
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+
+      //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      props.setButtonText("Contact Support")
       props.handleError();
     }
   };

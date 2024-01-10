@@ -303,20 +303,7 @@ export default function HomePage() {
                           </BlockStack>
                         </Box>
                       </Bleed>
-                      <BlockStack gap="200">
-                        <Text as="h3" variant="headingSm" fontWeight="medium">
-                          {"     "}
-                        </Text>
-                        <br></br>
-                        <Text as="p" variant="bodyMd">
-                          Note: Make sure there is a shipping and billing
-                          address present on the order you are trying to
-                          backdate
-                        </Text>
-                        <InlineStack align="end">
-                          <ButtonGroup></ButtonGroup>
-                        </InlineStack>
-                      </BlockStack>
+                      
                     </BlockStack>
                   </Card>
                 )}

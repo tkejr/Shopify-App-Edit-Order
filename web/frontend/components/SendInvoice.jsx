@@ -68,21 +68,21 @@ const InvoiceModal = (props) => {
       const data = await response.json();
       if (data.success) {
         // Handle success scenario
-        console.log(data);
+        //console.log(data);
         props.setToastProps({ content: "Invoice sent" });
       } else {
         // Handle errors
         props.setErrorContent(
-          "There was an error sending the invoice, double check that everything is correct "
+          "There was an error sending the invoice, double check that no field is empty and the email is correct. If the error persists, contact support:  "
         );
-        props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+        //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
         props.handleError();
       }
     } catch (error) {
       props.setErrorContent(
-        "There was an error sending the invoice, double check that everything is correct "
+        "There was an error sending the invoice, double check that no field is empty and the email is correct. If the error persists, contact support: "
       );
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
     }
     //setEmailTo("");

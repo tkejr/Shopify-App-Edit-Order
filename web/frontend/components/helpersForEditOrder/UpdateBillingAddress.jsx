@@ -45,25 +45,36 @@ const [updateButton, setUpdateButton] = useState("Update");
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update billing details");
+        props.setErrorContent(
+          "There was an error updating the billing details to the order. Make sure it is a valid billing address. If the error persists, contact support:  "
+        );
+        //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+        props.handleError();
+        setUpdateButton("Update");
+        //throw new Error("Failed to update billing details");
+        
       }
-      props.setToastProps({ content: "Details updated successfully" });
+      else{
+        props.setToastProps({ content: "Details updated successfully" });
+        setUpdateButton("Update");
+        //props.setReloadComp(!props.reloadComp);
+        //props.handleChangeShipping();//
+        //navigate back to edit order
+        dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
+        dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })
+        navigate("/")
+      }
+      
     } catch (error) {
       
       props.setErrorContent(
-        "There was an error updating the billing details to the order. See the reasons why that may be the case here: "
+        "There was an error updating the billing details to the order. Make sure it is a valid billing address. If the error persists, contact support:  "
       );
-      props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+      //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.handleError();
       
     }
-    setUpdateButton("Update");
-    //props.setReloadComp(!props.reloadComp);
-    //props.handleChangeShipping();//
-    //navigate back to edit order
-    dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
-    dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })
-    navigate("/")
+    
   };
   
   return (
