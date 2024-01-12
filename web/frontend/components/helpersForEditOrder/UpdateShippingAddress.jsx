@@ -54,6 +54,7 @@ const [updateButton, setUpdateButton] = useState("Update");
         );
         //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
         props.handleError();
+        props.handleChangeShipping();
         setUpdateButton("Update");
       }
       else{

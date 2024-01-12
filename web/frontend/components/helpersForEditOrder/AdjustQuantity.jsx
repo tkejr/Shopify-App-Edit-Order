@@ -1,35 +1,37 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Modal,
-  TextContainer,
+  InlineError,
   Banner,
-  Button,
-  LegacyCard,
-  ResourceList,
-  SkeletonThumbnail,
-  Thumbnail,
+  Button,  
   TextField
 } from "@shopify/polaris";
 import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../../hooks";
-
+import { useNavigate } from "@shopify/app-bridge-react";
 const AdjustQuantity = (props)  =>{
-  const fetch = useAuthenticatedFetch()
+  const fetch = useAuthenticatedFetch();
+  const navigate = useNavigate();
   const orderId = useSelector((state) => state.orderId);
   const [status, setStatus] = useState("");
   const [updateButton, setUpdateButton] = useState("Update");
   const [errorContent, setErrorContent] = useState("");
   const [modalError, setModalError] = useState(false);
+  const [inlineError, setInlineError] = useState(false);
   //const [quantity, setQuantity] = useState();
  // const [originalQuantity, setOriginalQuantity] = useState(props.originalQuantity);
   const handleModalError = () => {
     setModalError(!modalError);
   };
+  const handleInlineError = () => {
+    setInlineError(!inlineError);
+  };
   const handleQuantityChange = (number) => {
+    setInlineError(false)
     if (number < 0) {
-      setErrorContent("Quantity must be at least 0"); 
-      handleModalError();
+      setErrorContent("Quantity must be at least 0."); 
+      handleInlineError();
     } else {
       props.setQuantity("" + number);
     }
@@ -38,18 +40,20 @@ const AdjustQuantity = (props)  =>{
         
         setErrorContent("")
         setModalError(false)
+        setInlineError(false); 
       }, []);
     const changeAmount = async () => {
        setUpdateButton("Loading...")
         if (props.quantity === props.originalQuantity) {
           setErrorContent(
-            `Please select a quantity that is different from the original quantity: ${props.originalQuantity}`
+            `Please select a quantity that is different from the original quantity: ${props.originalQuantity}.  
+             \n \n If the error persists please contact support: `
           );
           handleModalError();
           setUpdateButton("Update")
         } else if (props.originalQuantity === "0") {
           setErrorContent(
-            "Cannot change the quantity of a product that was originally zero"
+            "Cannot change the quantity of a product that was originally zero. To learn more, contact support: "
           );
           handleModalError();
           setUpdateButton("Update")
@@ -98,6 +102,7 @@ const AdjustQuantity = (props)  =>{
           tone="critical"
         >
           <p>{errorContent}</p>
+          <Button onClick={() => navigate("/Help")}>Contact Support</Button>
         </Banner>
       </div>
     )}
@@ -112,6 +117,8 @@ const AdjustQuantity = (props)  =>{
         error={props.quantity < 0}
         autoComplete="off"
       />
+      <br></br>
+       {inlineError && <InlineError message={"Quantity must be at least 0"} fieldID="inLineError" />}
     </Modal.Section>
   </Modal>
   );

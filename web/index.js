@@ -127,7 +127,7 @@ app.post("/api/email", async (req, res) => {
   const url = sess.shop;
   const { name, email, message } = req.body;
   const feedbackMsg = {
-    to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+    to: [ "contact@shopvana.io"], // Change to your recipient "tanmaykejriwal28@gmail.com",
     from: "editifyshopify@gmail.com", // Change to your verified sender
     subject: `Feedback form has been submitted by ${name}`,
     text: `A feedback form was filled with feedbacl message ${message} and their email is ${email}`,
@@ -504,14 +504,33 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.discount_applications = orderTesting?.discount_applications;
   //order2.fulfillments = []
   //
-  order2.billing_address = orderTesting?.billing_address;
-  order2.shipping_address = orderTesting?.shipping_address;
+  console.log('in here ====', orderTesting?.shipping_address, orderTesting?.billing_address, orderTesting?.customer)
+  if(orderTesting?.shipping_address == null){
+    //order2.shipping_address = {}
+    status = 500;
+    error = "s"; 
+  }else{
+    order2.shipping_address = orderTesting?.shipping_address;
+  }
+  console.log(order2.shipping_address)
+  if(orderTesting?.billing_address == null){
+    status = 501;
+    error = "s"; 
+    //order2.billing_address = {first_name:"test", last_name:"editify", address1:"6029 Bridal", country:"Singapore", zip:"179399"}
+  }else{
+    order2.billing_address = orderTesting?.billing_address;
+   }
+  
 
   if (orderTesting.shipping_lines) {
     order2.shipping_lines = orderTesting?.shipping_lines;
   }
 
-  if (orderTesting.customer) {
+  if (JSON.stringify(orderTesting.customer) === "{}") {
+    status = 502;
+    error = "s"; 
+    //order2.customer = {}; 
+  }else{
     order2.customer = orderTesting?.customer;
   }
 
@@ -592,7 +611,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_weight = orderTesting?.total_weight;
 
   order2.phone = orderTesting?.phone;
-
+if(status < 500){
   try {
     // console.log(orderTesting)
     //saving the newly created order here
@@ -627,10 +646,14 @@ app.put("/api/orders/:id", async (_req, res) => {
       order_number: order2.order_number,
     });
   }
-
-  //console.log("========= Order id ==========");
-  //console.log(order2);
   res.status(status).send({ success: status === 200, error });
+}else{
+  res.status(status).send({ success: status === 200, error });
+}
+ 
+
+
+  
 });
 app.get("/api/orderName/:id", async (req, res) => {
   const session = res.locals.shopify.session;

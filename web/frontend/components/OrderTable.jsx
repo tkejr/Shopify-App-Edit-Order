@@ -12,8 +12,6 @@ import {
 //import { useAppQuery } from "../hooks";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
-
-import Paginate from "./Paginate";
 import FiltersComponent from "./FiltersComponent";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -150,6 +148,14 @@ export function OrderTable(props) {
     []
   );
  
+
+  //new stuff
+  const [totalPages, setTotalPages] = useState(0);
+
+    useEffect(() => {
+        if (totalItems > 0 && ITEMS_PER_PAGE > 0)
+            setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
+    }, [totalItems, ITEMS_PER_PAGE]);
   const rowMarkup = orderData.map(
     ({ name, processed_at, customer, total_price, id, currency, total_outstanding, financial_status, cancelled_at }, index) => (
       <IndexTable.Row
@@ -258,6 +264,16 @@ export function OrderTable(props) {
             { title: "Total Price" },
            
           ]}
+          pagination={{
+            hasNext: (currentPage < totalPages),
+            hasPrevious: (currentPage > 1),
+            onNext: () => {if(currentPage < totalPages) 
+              {setCurrentPage(currentPage + 1)}},
+            onPrevious:()=>{
+              if(currentPage > 1) 
+              {setCurrentPage(currentPage - 1)}
+            }
+          }}
         >
 
           {rowMarkup}
@@ -266,14 +282,7 @@ export function OrderTable(props) {
       
       )}
 
-{
-      <Paginate
-        total={totalItems}
-        itemsPerPage={ITEMS_PER_PAGE}
-        currentPage={currentPage}
-        onPageChange={(page) => setCurrentPage(page)}
-      />
-        }
+
     </Card>
   );
 }

@@ -43,15 +43,37 @@ const [updateButton, setUpdateButton] = useState("Update");
         },
         body: JSON.stringify(props.billingDetails),
       });
-
+       console.log('this is the response', response.status)
       if (!response.ok) {
-        props.setErrorContent(
-          "There was an error updating the billing details to the order. Make sure it is a valid billing address. If the error persists, contact support:  "
-        );
-        //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
-        props.handleError();
-        setUpdateButton("Update");
-        //throw new Error("Failed to update billing details");
+        if(response.status === 500){
+          props.setErrorContent(
+            "There was an error updating the billing details to the order. Make sure it is a valid billing address. If the error persists, contact support:  "
+          );
+         
+        }
+        else if(response.status === 501){
+          props.setErrorContent(
+            "Please provide a shipping address to this order first. If the order persists, then contact support:  "
+          );
+         
+        }
+        else if(response.status === 502){
+          props.setErrorContent(
+            "Please provide a customer for this order. If the order persists, then contact support:  "
+          );
+         
+        }
+        else{
+          props.setErrorContent(
+            "An unknown error occurred. If the error persists, contact support:  "
+          );
+          
+        }
+       
+         //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
+         props.handleError();
+         props.handleChangeBilling();
+         setUpdateButton("Update");
         
       }
       else{
@@ -62,7 +84,8 @@ const [updateButton, setUpdateButton] = useState("Update");
         //navigate back to edit order
         dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
         dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })
-        navigate("/")
+        dispatch({ type: "SET_PROPS_LINE_ITES", payload: [] })
+        //navigate("/")
       }
       
     } catch (error) {
@@ -194,7 +217,7 @@ const [updateButton, setUpdateButton] = useState("Update");
         <br></br>
         <Banner tone="warning">
           <p>
-            Clicking the Update button will update the Billing address and then send you back to the home page
+            Clicking the Update button will update the Billing address and then send you to the orders list
           </p>
         </Banner>
       </Modal.Section>

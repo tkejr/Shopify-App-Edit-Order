@@ -105,7 +105,7 @@ export default {
       //Send Email to us so we know uninstalled happen
       const Installmsg = {
         to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-        from: "editifyshopify@gmail.com", // Change to your verified sender
+        from: "contact@shopvana.io", // Change to your verified sender
         subject: `Fucking Hell - ${shop_data.name} Uninstalled`,
         text: `IMPROVE THE APP ALREADY`,
       };
@@ -167,7 +167,7 @@ export default {
         //send email to us
         const Installmsg = {
           to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
-          from: "editifyshopify@gmail.com", // Change to your verified sender
+          from: "contact@shopvana.io", // Change to your verified sender
           subject: `LFG Ka-ching-$$  ${payload.app_subscription.name}`,
           text: `An Installation was made by ${shop} `,
         };

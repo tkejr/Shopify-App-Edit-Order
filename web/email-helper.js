@@ -5,7 +5,7 @@ console.log("process.env.DATABASE_URL", process.env.DATABASE_URL);
 const emailHelper = async (shopEmail) => {
   const msg = {
     to: shopEmail, // Change to your recipient
-    from: "editifyshopify@gmail.com", // Change to your verified sender
+    from: "contact@shopvana.io", // Change to your verified sender
     subject: "Editify",
     text: "Welcome to Editify",
     html: `
@@ -84,7 +84,7 @@ const emailHelper = async (shopEmail) => {
 const uninstallEmailHelper = async (shopEmail) => {
   const msg = {
     to: shopEmail, // Change to your recipient
-    from: "editifyshopify@gmail.com", // Change to your verified sender
+    from: "contact@shopvana.io", // Change to your verified sender
     subject: "Editify | Uninstalled :(",
     text: "Sorry to See you go !",
     html: `
