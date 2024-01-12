@@ -116,8 +116,6 @@ export function DatePickerExample(props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date: newDate }),
     };
-    // I did the one which has variable id's, not hardcoded, but it probably does not work as is
-
     setIsLoading(true);
     const response = await fetch("/api/orders/" + id, requestOptions);
   
@@ -126,12 +124,33 @@ export function DatePickerExample(props) {
       props.setReloadComp(!props.reloadComp);
     } else {
       setIsLoading(false);
-      //Banner error
-     //console.log('=== eror',response)
-      props.setErrorContent(
-        "There was an error updating the date. Make sure the order you are trying to backdate has a shipping and billing address. If the error persists, contact support: "
-      );
 
+      if(response.status === 502){
+        props.setErrorContent(
+          "There was an error updating the date. Make sure the order you are trying to backdate has a customer. If the error persists, contact support:  "
+        );
+        
+       
+      }
+      else if(response.status === 501){
+        props.setErrorContent(
+          "There was an error updating the date. Make sure the order you are trying to backdate has a billing address. If the error persists, contact support:  "
+        );
+       
+      }
+      else if(response.status === 500){
+        props.setErrorContent(
+          "There was an error updating the date. Make sure the order you are trying to backdate has a shipping address. If the error persists, contact support:   "
+        );
+       
+      }
+      else{
+        props.setErrorContent(
+          "An unknown error occurred. If the error persists, contact support:  "
+        );
+        
+      }
+      //Banner error
       //props.setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
       props.setButtonText("Contact Support")
       props.handleError();

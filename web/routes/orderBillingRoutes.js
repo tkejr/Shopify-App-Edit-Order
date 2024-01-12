@@ -54,10 +54,27 @@ router.put("/:id", async (req, res) => {
     newOrder.billing_address = edited_billing;
   }
   
+  //name, address1 and 2, phone, province, city, zip, country, zip, why is name here again
+  //this is the minimum needed for singapore
+  if(edited_billing.address1 === "" || edited_billing.country === "" || edited_billing.zip === "" || edited_billing.first_name === "" || edited_billing.last_name === "" ){
+    status = 500; 
+    error = 'Invalid billing address'; 
+  }
   
- 
-  newOrder.shipping_address = order.shipping_address;
+  if(order.shipping_address == null){
+    console.log('in here', order.shipping_address)
+    status = 501; 
+    error = 'No shipping address in order'; 
+  }
 
+
+  if(JSON.stringify(order.customer) === "{}"){
+    console.log('in here', order.shipping_address)
+    status = 502; 
+    error = 'No customer in order'; 
+  }
+  newOrder.shipping_address = order.shipping_address;
+  //need to check that this exists 
 
   //this is the list of financial status
   // authorized expired paid partially_paid partially_refunded pending refunded unpaid voided
@@ -223,26 +240,32 @@ else{
   //
 
   //console.log(newOrder)
-  try {
-    //saving the newly created order here
-    // @ts-ignore
-    await newOrder.save({
-      update: true,
-    });
-  //cancel the old order
-    //await order?.cancel({}); 
-    await shopify.api.rest.Order.delete({
-      session: res.locals.shopify.session,
-      id: req.params["id"],
-    });
-  } catch (e) {
-    console.log(`Failed to update billing:  ${e.message}`);
-    status = 500;
-
-    error = e.message;
+  if(status < 500){
+    
+    try {
+      //saving the newly created order here
+      // @ts-ignore
+      await newOrder.save({
+        update: true,
+      });
+    //cancel the old order
+      //await order?.cancel({}); 
+      await shopify.api.rest.Order.delete({
+        session: res.locals.shopify.session,
+        id: req.params["id"],
+      });
+    } catch (e) {
+      console.log(`Failed to update billing:  ${e.message}`);
+      status = 500;
+  
+      error = e.message;
+    }
+  
+    res.status(status).send({ success: status === 200, error });
+  }else{
+    res.status(status).send({ success: status === 200 , error });
   }
-
-  res.status(status).send({ success: status === 200, error });
+  
 });
 
 router.get("/shipping/:id", async (req, res) => {
