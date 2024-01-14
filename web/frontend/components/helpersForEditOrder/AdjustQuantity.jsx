@@ -30,7 +30,7 @@ const AdjustQuantity = (props)  =>{
   const handleQuantityChange = (number) => {
     setInlineError(false)
     if (number < 0) {
-      setErrorContent("Quantity must be at least 0."); 
+      setErrorContent("When adjusting the quantity, the quantity must be at least 1."); 
       handleInlineError();
     } else {
       props.setQuantity("" + number);
