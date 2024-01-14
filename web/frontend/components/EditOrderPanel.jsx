@@ -63,6 +63,9 @@ export function EditOrderPanel (){
     const [url, setUrl] = useState('');
     const [error, setError] = useState(false);
     const handleError = () => {setError(!error);};
+
+    //
+    const [inlineError, setInlineError] = useState(false);
     //line items stuff
     const [line_items, setLineItems] = useState([]);
     const [reload, setReload] = useState(false);
@@ -128,6 +131,7 @@ export function EditOrderPanel (){
         handleId(id);
         setQuantity("" + quantity);
         setOriginalQuantity("" + quantity);
+        setInlineError(false);
         handleChangeQuantity();
       };
       //add line item discounts
@@ -566,6 +570,8 @@ export function EditOrderPanel (){
         setUrl={setUrl}
         setReload={setReload}
         reload={reload}
+        setInlineError={setInlineError}
+        inlineError={inlineError}
         setToastProps={setToastProps}/>
         <AddCustomItem
         activeCustomItem={activeCustomItem}

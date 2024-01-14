@@ -18,17 +18,18 @@ const AdjustQuantity = (props)  =>{
   const [updateButton, setUpdateButton] = useState("Update");
   const [errorContent, setErrorContent] = useState("");
   const [modalError, setModalError] = useState(false);
-  const [inlineError, setInlineError] = useState(false);
+  //const [inlineError, setInlineError] = useState(false);
   //const [quantity, setQuantity] = useState();
- // const [originalQuantity, setOriginalQuantity] = useState(props.originalQuantity);
+ // const [originalQuantity, setOriginalQuantity] = useState(props.originalQuantity)
+ 
   const handleModalError = () => {
     setModalError(!modalError);
   };
   const handleInlineError = () => {
-    setInlineError(!inlineError);
+    props.setInlineError(!props.inlineError);
   };
   const handleQuantityChange = (number) => {
-    setInlineError(false)
+    props.setInlineError(false)
     if (number < 0) {
       setErrorContent("When adjusting the quantity, the quantity must be at least 1."); 
       handleInlineError();
@@ -40,7 +41,7 @@ const AdjustQuantity = (props)  =>{
         
         setErrorContent("")
         setModalError(false)
-        setInlineError(false); 
+        props.setInlineError(false); 
       }, []);
     const changeAmount = async () => {
        setUpdateButton("Loading...")
@@ -118,7 +119,7 @@ const AdjustQuantity = (props)  =>{
         autoComplete="off"
       />
       <br></br>
-       {inlineError && <InlineError message={"Quantity must be at least 0"} fieldID="inLineError" />}
+       { props.inlineError && <InlineError message={"Quantity must be at least 1"} fieldID="inLineError" />}
     </Modal.Section>
   </Modal>
   );

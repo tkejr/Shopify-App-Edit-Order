@@ -385,7 +385,7 @@ export function EditOrderComponent(props) {
 
   const handleQuantityChange = (number) => {
     if (number < 0) {
-      setErrorContent("Quantity must be at least 0"); //error in modal for sure
+      setErrorContent("Quantity must be at least 1"); //error in modal for sure
       handleModalError();
     } else {
       setQuantity("" + number);
