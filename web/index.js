@@ -507,7 +507,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   console.log('in here ====', orderTesting?.shipping_address, orderTesting?.billing_address, orderTesting?.customer)
   if(orderTesting?.shipping_address == null){
     //order2.shipping_address = {}
-    status = 500;
+    status = 503;
     error = "s"; 
   }else{
     order2.shipping_address = orderTesting?.shipping_address;

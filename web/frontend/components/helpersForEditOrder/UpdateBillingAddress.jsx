@@ -30,7 +30,8 @@ const [updateButton, setUpdateButton] = useState("Update");
       province:'',
       city: '',
       zip: '',
-
+      company:'',
+      province_code:''
        });
   };
   const updateOrderBilling = async () => {
@@ -197,12 +198,21 @@ const [updateButton, setUpdateButton] = useState("Update");
             />
           </FormLayout.Group>
           <FormLayout.Group>
-            {/* <TextField
+            { <TextField
             type="text"
-            label="Province Code"
-            value={billingDetails.province_code}
-            onChange={(value) => handleFieldChange("province_code", value)}
-          /> */}
+            label="Company"
+            value={props.billingDetails?.company}
+            onChange={(value) => props.handleFieldChangeBilling("company", value)}
+          /> }
+            <TextField
+              type="text"
+              label="Province Code"
+              value={props.billingDetails?.province_code}
+              onChange={(value) => props.handleFieldChangeBilling("province_code", value)}
+            />
+          </FormLayout.Group>
+          <FormLayout.Group>
+           
             <TextField
               type="text"
               label="ZIP"
