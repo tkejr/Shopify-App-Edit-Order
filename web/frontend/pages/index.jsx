@@ -22,12 +22,12 @@ import {
 import React, { useState, useCallback, useEffect } from "react";
 
 import {
-  OrdersMajor,
-  EditMajor,
-  CustomersMajor,
-  CircleTickMajor,
-  CircleCancelMajor,
-  CancelMajor,
+  OrderIcon,
+  EditIcon,
+  PersonFilledIcon,
+  CheckCircleIcon,
+  MinusCircleIcon,
+ 
 } from "@shopify/polaris-icons";
 import { useAuthenticatedFetch } from "../hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -72,15 +72,15 @@ export default function HomePage() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data.data);
+          //console.log(data.data);
           setShopDeets(data.data);
           if (data.data.no_back_orders > 0) {
             setEditedIcon(
-              <Icon source={CircleTickMajor} color="success" backdrop />
+              <Icon source={CheckCircleIcon} color="success" backdrop />
             );
           } else {
             setEditedIcon(
-              <Icon source={CircleCancelMajor} color="critical" backdrop />
+              <Icon source={MinusCircleIcon} color="critical" backdrop />
             );
             setShowTry(true);
           }
@@ -97,11 +97,11 @@ export default function HomePage() {
         .then((data) => {
           if (data.hasPayment === "pro" || data.hasPayment === "starter") {
             setPlanIcon(
-              <Icon source={CircleTickMajor} color="success" backdrop />
+              <Icon source={CheckCircleIcon} color="success" backdrop />
             );
           } else {
             setPlanIcon(
-              <Icon source={CircleCancelMajor} color="critical" backdrop />
+              <Icon source={MinusCircleIcon} color="critical" backdrop />
             );
             setShowPlan(true);
           }
@@ -187,7 +187,7 @@ export default function HomePage() {
                         </div>
                         <div>
                           {" "}
-                          <Icon source={OrdersMajor} color="primary" backdrop />
+                          <Icon source={OrderIcon} color="primary" backdrop />
                         </div>
                       </div>
                     </div>
@@ -212,7 +212,7 @@ export default function HomePage() {
                         </div>
                         <div>
                           {" "}
-                          <Icon source={EditMajor} color="primary" backdrop />
+                          <Icon source={EditIcon} color="primary" backdrop />
                         </div>
                       </div>
                     </div>
@@ -238,7 +238,7 @@ export default function HomePage() {
                         <div>
                           {" "}
                           <Icon
-                            source={CustomersMajor}
+                            source={PersonFilledIcon}
                             color="primary"
                             backdrop
                           />
@@ -269,7 +269,7 @@ export default function HomePage() {
                             }}
                             variant="tertiary"
                           >
-                            <Icon source={CancelMajor} tone="base" />
+                            <Icon source={MinusCircleIcon} tone="base" />
                           </Button>
                         </ButtonGroup>
                       </InlineGrid>

@@ -138,7 +138,7 @@ export function DatePickerExample(props) {
         );
        
       }
-      else if(response.status === 500){
+      else if(response.status === 503){
         props.setErrorContent(
           "There was an error updating the date. Make sure the order you are trying to backdate has a shipping address. If the error persists, contact support:   "
         );
@@ -146,7 +146,7 @@ export function DatePickerExample(props) {
       }
       else{
         props.setErrorContent(
-          "An unknown error occurred. If the error persists, contact support:  "
+          "If a duplicate order was created, then the original order cannot be deleted due to shopify api limitations. Otherwise, an unknown error occurred:  "
         );
         
       }

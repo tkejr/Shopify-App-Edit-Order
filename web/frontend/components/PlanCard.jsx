@@ -8,7 +8,7 @@ import {
   Icon,
   BlockStack,
 } from "@shopify/polaris";
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+import { CheckCircleIcon, MinusCircleIcon } from "@shopify/polaris-icons";
 function PlanCard({ features, price, planName, upgrade, newPrice }) {
   return (
     <BlockStack align="center">
@@ -30,11 +30,11 @@ function PlanCard({ features, price, planName, upgrade, newPrice }) {
               planName === "Starter Annual Plan") &&
             index > 2 ? (
               <BlockStack inlineAlign="end">
-                <Icon source={CircleCancelMajor} tone="critical" backdrop />
+                <Icon source={MinusCircleIcon} tone="critical" backdrop />
               </BlockStack>
             ) : (
               <div style={{ float: "right" }}>
-                <Icon source={CircleTickMajor} tone="success" backdrop />
+                <Icon source={CheckCircleIcon} tone="success" backdrop />
               </div>
             )}
             <div style={{ float: "right" }}>

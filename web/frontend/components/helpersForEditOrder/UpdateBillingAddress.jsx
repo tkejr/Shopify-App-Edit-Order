@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Modal,
-  TextContainer,
+  Checkbox,
   Banner,
   Button,
   TextField,
   FormLayout
 } from "@shopify/polaris";
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
@@ -19,6 +19,13 @@ const fetch = useAuthenticatedFetch();
 const navigate = useNavigate();
 const orderId = useSelector((state) => state.orderId);
 const [updateButton, setUpdateButton] = useState("Update");
+/*
+const [checked, setChecked] = useState(false);
+  const handleChange = useCallback(
+    (newChecked) => setChecked(newChecked),
+    [],
+  );
+  */
   //you can have addShippingAddy here
   const addBillingAddress = () => {
     props.setBillingDetails({
@@ -30,13 +37,20 @@ const [updateButton, setUpdateButton] = useState("Update");
       province:'',
       city: '',
       zip: '',
-
+      company:'',
+      province_code:''
        });
   };
+   //
+   const [checked, setChecked] = useState(false);
+   const handleChange = useCallback(
+   (newChecked) => setChecked(newChecked),
+   [],
+   );
   const updateOrderBilling = async () => {
     setUpdateButton("Loading...");
     try {
-      const response = await fetch(`/api/orderBilling/${orderId}`, {
+      const response = await fetch(`/api/orderBilling/${checked}/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -197,12 +211,21 @@ const [updateButton, setUpdateButton] = useState("Update");
             />
           </FormLayout.Group>
           <FormLayout.Group>
-            {/* <TextField
+            { <TextField
             type="text"
-            label="Province Code"
-            value={billingDetails.province_code}
-            onChange={(value) => handleFieldChange("province_code", value)}
-          /> */}
+            label="Company"
+            value={props.billingDetails?.company}
+            onChange={(value) => props.handleFieldChangeBilling("company", value)}
+          /> }
+            <TextField
+              type="text"
+              label="Province Code"
+              value={props.billingDetails?.province_code}
+              onChange={(value) => props.handleFieldChangeBilling("province_code", value)}
+            />
+          </FormLayout.Group>
+          <FormLayout.Group>
+           
             <TextField
               type="text"
               label="ZIP"
@@ -210,10 +233,20 @@ const [updateButton, setUpdateButton] = useState("Update");
               onChange={(value) => props.handleFieldChangeBilling("zip", value)}
             />
           </FormLayout.Group>
+          <br></br>
+        <FormLayout>
+        <Checkbox
+          label="Get rid of taxes in new order (has to be a paid order)"
+          checked={checked}
+          onChange={handleChange}
+        />
+        </FormLayout>
           </>
           )}
         </FormLayout>
-
+       
+       
+        
         <br></br>
         <Banner tone="warning">
           <p>

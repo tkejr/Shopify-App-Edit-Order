@@ -10,7 +10,7 @@ import {
   Thumbnail,
 
 } from "@shopify/polaris";
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+
 
 
 const LineItemList = (props)  =>{

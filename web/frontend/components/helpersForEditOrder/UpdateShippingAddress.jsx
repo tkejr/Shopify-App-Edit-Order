@@ -7,7 +7,7 @@ import {
   TextField,
   FormLayout
 } from "@shopify/polaris";
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../../hooks";
 
@@ -34,6 +34,8 @@ const [updateButton, setUpdateButton] = useState("Update");
       province:'',
       city: '',
       zip: '',
+      company:'',
+
 
        });
   };
@@ -146,10 +148,10 @@ const [updateButton, setUpdateButton] = useState("Update");
           <FormLayout.Group>
             {/* <TextField
             type="text"
-            label="Latitude"
-            value={billingDetails.latitude || ""}
-            onChange={(value) => handleFieldChange("latitude", value)}
-          /> */}
+            label="Company"
+            value={props.shippingDetails?.company || ""}
+            onChange={(value) => props.handleFieldChangeShipping("company", value)}
+            /> */}
           </FormLayout.Group>
 
           <FormLayout.Group>
@@ -171,13 +173,23 @@ const [updateButton, setUpdateButton] = useState("Update");
             />
           </FormLayout.Group>
           <FormLayout.Group>
-            {/* <TextField
+          <TextField
+            type="text"
+            label="Company"
+            value={props.shippingDetails?.company || ""}
+            onChange={(value) => props.handleFieldChangeShipping("company", value)}
+            /> 
+            { <TextField
             type="text"
             label="Province Code"
-            value={billingDetails.province_code}
-            onChange={(value) => handleFieldChange("province_code", value)}
-          /> */}
-            <TextField
+            value={props.shippingDetails?.province_code}
+            onChange={(value) => props.handleFieldChangeShipping("province_code", value)}
+          /> }
+            
+          </FormLayout.Group>
+          <FormLayout.Group>
+            
+           <TextField
               type="text"
               label="ZIP"
               value={props.shippingDetails?.zip}
