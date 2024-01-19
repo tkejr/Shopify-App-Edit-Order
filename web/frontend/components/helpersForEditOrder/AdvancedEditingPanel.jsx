@@ -10,10 +10,7 @@ import {
   TextField,
   ButtonGroup
 } from "@shopify/polaris";
-import {
-    GaugeMinor
-  } from '@shopify/polaris-icons';
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../../hooks";
 

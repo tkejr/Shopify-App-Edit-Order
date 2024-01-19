@@ -6,7 +6,7 @@ import {
   
   TextField
 } from "@shopify/polaris";
-import { CircleTickMajor, CircleCancelMajor } from "@shopify/polaris-icons";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthenticatedFetch } from "../../hooks";
 

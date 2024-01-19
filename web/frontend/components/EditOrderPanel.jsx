@@ -14,9 +14,9 @@ import {
     TextContainer
 } from '@shopify/polaris'; 
 import {
-   DuplicateMinor,
-   SendMajor,
-   MobileBackArrowMajor
+  SendIcon,
+  ArrowLeftIcon
+  
   } from '@shopify/polaris-icons';
 import {useState, useCallback, useEffect} from 'react';
 import { useNavigate, useAuthenticatedFetch} from '@shopify/app-bridge-react';
@@ -417,27 +417,27 @@ export function EditOrderPanel (){
   
   
 };
-
+//{dispatch({ type: "SET_PROPS_ORDER_ID", payload: false }); dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false }}
    
     return (
     <Frame>
         
       { (planName === 'pro' || planName === 'proAnnual') && isPremiumUser ? (
       <Page
-        //backAction={{content: 'Orders', url: '#'}}
+        //backAction={() => alert('dsfsdf')}
         //backAction={<Button onClick={() => console.log('dfnsjfjk')}>dsfdsf</Button>}
         title={orderNameNative ? orderNameNative : orderName}
         primaryAction={showSave && (selected !== "Simple Mode") && <Button variant="primary" loading={loading} onClick={()=> updateOrderShippingCosts()}>Save</Button>}
         secondaryActions={[
           {
             content: "Back to Orders",
-            icon:  MobileBackArrowMajor,
+            icon:  ArrowLeftIcon,
             accessibilityLabel: "Secondary action label",
             onAction: () => {dispatch({ type: "SET_PROPS_ORDER_ID", payload: false }); dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false })},
           },
           {
             content: "Send Invoice",
-            icon: SendMajor,
+            icon: SendIcon,
             accessibilityLabel: "Secondary action label",
             onAction: () => handleInvoiceModal(),
           },
