@@ -72,7 +72,7 @@ export default function HomePage() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data.data);
+          //console.log(data.data);
           setShopDeets(data.data);
           if (data.data.no_back_orders > 0) {
             setEditedIcon(

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Modal,
-  TextContainer,
+  Checkbox,
   Banner,
   Button,
   TextField,
@@ -19,6 +19,13 @@ const fetch = useAuthenticatedFetch();
 const navigate = useNavigate();
 const orderId = useSelector((state) => state.orderId);
 const [updateButton, setUpdateButton] = useState("Update");
+/*
+const [checked, setChecked] = useState(false);
+  const handleChange = useCallback(
+    (newChecked) => setChecked(newChecked),
+    [],
+  );
+  */
   //you can have addShippingAddy here
   const addBillingAddress = () => {
     props.setBillingDetails({
@@ -34,10 +41,16 @@ const [updateButton, setUpdateButton] = useState("Update");
       province_code:''
        });
   };
+   //
+   const [checked, setChecked] = useState(false);
+   const handleChange = useCallback(
+   (newChecked) => setChecked(newChecked),
+   [],
+   );
   const updateOrderBilling = async () => {
     setUpdateButton("Loading...");
     try {
-      const response = await fetch(`/api/orderBilling/${orderId}`, {
+      const response = await fetch(`/api/orderBilling/${checked}/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -220,10 +233,20 @@ const [updateButton, setUpdateButton] = useState("Update");
               onChange={(value) => props.handleFieldChangeBilling("zip", value)}
             />
           </FormLayout.Group>
+          <br></br>
+        <FormLayout>
+        <Checkbox
+          label="Get rid of taxes in new order (has to be a paid order)"
+          checked={checked}
+          onChange={handleChange}
+        />
+        </FormLayout>
           </>
           )}
         </FormLayout>
-
+       
+       
+        
         <br></br>
         <Banner tone="warning">
           <p>
