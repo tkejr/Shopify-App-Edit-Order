@@ -38,7 +38,8 @@ const [checked, setChecked] = useState(false);
       city: '',
       zip: '',
       company:'',
-      province_code:''
+      province_code:'',
+      country_code:''
        });
   };
    //
@@ -232,11 +233,17 @@ const [checked, setChecked] = useState(false);
               value={props.billingDetails?.zip}
               onChange={(value) => props.handleFieldChangeBilling("zip", value)}
             />
+            <TextField
+            type="text"
+            label="Country Code"
+            value={props.billingDetails?.country_code || ""}
+            onChange={(value) => props.handleFieldChangeBilling("country_code", value)}
+          />
           </FormLayout.Group>
           <br></br>
         <FormLayout>
         <Checkbox
-          label="Get rid of taxes in new order (has to be a paid order)"
+          label="Make order tax inclusive"
           checked={checked}
           onChange={handleChange}
         />

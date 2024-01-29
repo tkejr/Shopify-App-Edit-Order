@@ -35,7 +35,8 @@ const [updateButton, setUpdateButton] = useState("Update");
       city: '',
       zip: '',
       company:'',
-
+      province_code:'',
+      country_code:''
 
        });
   };
@@ -195,6 +196,12 @@ const [updateButton, setUpdateButton] = useState("Update");
               value={props.shippingDetails?.zip}
               onChange={(value) => props.handleFieldChangeShipping("zip", value)}
             />
+            <TextField
+            type="text"
+            label="Country Code"
+            value={props.shippingDetails?.country_code || ""}
+            onChange={(value) => props.handleFieldChangeShipping("country_code", value)}
+          />
           </FormLayout.Group>
           </>
           )}
