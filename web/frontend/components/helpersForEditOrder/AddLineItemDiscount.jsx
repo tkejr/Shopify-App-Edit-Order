@@ -74,7 +74,7 @@ const AddLineItemDiscount = (props)  =>{
     <Modal
     open={props.activeLineItemDiscounts}
     onClose={props.handleChangeAddLineItemDiscounts}
-    title="Add Discount"
+    title="Add Line Item Discount"
     primaryAction={{
       content: updateButton,
       onAction: () => addLineItemDiscount(),
@@ -112,7 +112,7 @@ const AddLineItemDiscount = (props)  =>{
       />
     </Modal.Section>
     <Modal.Section>
-        <Banner
+        {<Banner
           title="Important"
           //onDismiss={}
           tone="warning"
@@ -120,6 +120,7 @@ const AddLineItemDiscount = (props)  =>{
           <p>This can only be done on unpaid components of an order. Also, this cannot be done more than once on the same line item.
              If you make a mistake, then the only way to get rid of the discount is to add the product again and remove the old one. If you cannot add a new product, add a Custom Item</p>
         </Banner>
+    }
     </Modal.Section>
    
   </Modal>

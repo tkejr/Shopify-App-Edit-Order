@@ -498,6 +498,18 @@ app.put("/api/orders/:id", async (_req, res) => {
     }
   }
   order2.line_items = orderTesting?.line_items;
+  //console.log(orderTesting?.line_items)
+  /*
+  order2.line_items.forEach((line_item) => {
+    
+    //line_item. = ; 
+    line_item.fulfillment_service = 'manual';
+    line_item.fulfillment_status = 'fulfilled';
+    
+
+  });
+  console.log(order2.line_items)
+  */
   order2.financial_status = orderTesting?.financial_status;
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
@@ -506,7 +518,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.discount_applications = orderTesting?.discount_applications;
   //order2.fulfillments = []
   //
-  console.log('in here ====', orderTesting?.shipping_address, orderTesting?.billing_address, orderTesting?.customer)
+  
   if(orderTesting?.shipping_address == null){
     //order2.shipping_address = {}
     status = 503;
@@ -613,23 +625,58 @@ app.put("/api/orders/:id", async (_req, res) => {
   order2.total_weight = orderTesting?.total_weight;
 
   order2.phone = orderTesting?.phone;
+
+  /*
+  let fulfillments = await shopify.api.rest.Fulfillment.all({
+    session: res.locals.shopify.session,
+    id: _req.params["id"],
+  });
+
+  console.log(fulfillments)
+  order2.fulfillments = fulfillments;
+  */ 
+  /*
+  console.log("this is it", orderTesting?.fulfillments)
+  console.log("this is it", orderTesting?.line_items)
+  if(orderTesting?.fulfillments){
+    orderTesting.fulfillments.forEach((fulfillment) => {
+      fulfillment.created_at = newDate; 
+    });
+    order2.fulfillments = orderTesting.fulfillments;
+  }
+  */
+//console.log('fgdgdgfdg',orderTesting?.fulfillments[0].line_items)
+//console.log(order2)
 if(status < 500){
   try {
-    // console.log(orderTesting)
+     
     //saving the newly created order here
     // @ts-ignore
+    
 
-    await order2.save({
+     await order2.save({
       update: true,
     });
+   //console.log('dfsfsdf', order2.fulfillments)
+  
+
+  
+  //console.log('hewwrwesfdsf', order2)
+    /*
+    order2.line_items.forEach((lineItem) => {
+      lineItem.fulfillment_date = newDate; 
+    });
+    */
     //await orderTesting.save({update:true})
     //await orderTesting.cancel({})
     // deleting the old order with the old date
+
 
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: _req.params["id"],
     });
+    
   } catch (e) {
     console.log(`Failed to create orders:  ${e.message}`);
     status = 500;
