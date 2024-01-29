@@ -497,6 +497,7 @@ app.put("/api/orders/:id", async (_req, res) => {
   }
   order2.line_items = orderTesting?.line_items;
   //console.log(orderTesting?.line_items)
+  /*
   order2.line_items.forEach((line_item) => {
     
     //line_item. = ; 
@@ -506,6 +507,7 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   });
   console.log(order2.line_items)
+  */
   order2.financial_status = orderTesting?.financial_status;
   order2.taxes_included = orderTesting?.taxes_included;
   order2.total_tax = orderTesting?.total_tax;
