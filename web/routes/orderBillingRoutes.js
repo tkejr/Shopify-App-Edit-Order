@@ -411,13 +411,20 @@ if(taxesOff && order.financial_status === "paid"){
       {
         kind: "sale",
         status: "success",
-        amount: parseFloat(order.total_price - order.total_tax),
+        //amount: parseFloat(order.total_price - order.total_tax),
+        amount: parseFloat(order.subtotal_price),
       },
     ];
   }
   
-  newOrder.total_price = order.subtotal_price; 
-  newOrder.taxes_included = false;
+  //newOrder.total_price = order.subtotal_price; 
+
+  //newOrder.total_tax = order.total_tax;
+  //newOrder.taxes_included = order.taxes_included;
+  //newOrder.total_tax_set = order.total_tax_set; 
+  newOrder.tax_lines = order.tax_lines;
+  //newOrder.current_total_price = order.subtotal_price; 
+  newOrder.taxes_included = true;
   /*
   if(order.tax_exemptions){
     newOrder.tax_exemptions; 
@@ -492,7 +499,7 @@ else{
 }
 if(status < 500){
   try {
-    console.log(order)
+    
     //saving the newly created order here
     // @ts-ignore
     
