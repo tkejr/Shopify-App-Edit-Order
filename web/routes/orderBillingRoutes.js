@@ -417,7 +417,12 @@ if(taxesOff && order.financial_status === "paid"){
   }
   
   newOrder.total_price = order.subtotal_price; 
- 
+  newOrder.taxes_included = false;
+  /*
+  if(order.tax_exemptions){
+    newOrder.tax_exemptions; 
+  }
+  */
 }
 else{
   if (order.financial_status === "paid") {
@@ -487,8 +492,10 @@ else{
 }
 if(status < 500){
   try {
+    console.log(order)
     //saving the newly created order here
     // @ts-ignore
+    
     await newOrder.save({
       update: true,
     });
@@ -497,6 +504,7 @@ if(status < 500){
       session: res.locals.shopify.session,
       id: req.params["id"],
     });
+    
   } catch (e) {
     console.log(`Failed to update billing:  ${e.message}`);
     status = 500;
