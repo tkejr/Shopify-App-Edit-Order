@@ -400,12 +400,14 @@ newOrder.refunds = order.refunds;
 newOrder.total_tip_received = order.total_tip_received;
 newOrder.shipping_lines = order.shipping_lines; 
 
+newOrder.financial_status = order.financial_status; 
 //console.log('==============', taxesOff)
 if(taxesOff && order.financial_status === "paid"){
   //console.log('in here djsfjksfkjkmk', taxesOff)
   newOrder.line_items.forEach((line_item) =>{
     line_item.tax_lines = []
   }) 
+  console.log('in here dfdsfsdf', order.financial_status, taxesOff)
   if (order.financial_status === "paid") {
     newOrder.transactions = [
       {
@@ -442,6 +444,7 @@ else{
     ];
   }
   else{
+    console.log('should be in here')
     if(order.total_price - order.total_outstanding > 0){
     newOrder.transactions = [
       {
