@@ -1,9 +1,4 @@
 import express from "express";
-import {
-  updateUserPreference,
-  getUserIdByUrl,
-  getUserPreferences,
-} from "../db.js";
 import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 import shopify from "../shopify.js";
@@ -11,8 +6,7 @@ import shopify from "../shopify.js";
 const router = express.Router();
 
 router.put("/:id/:lineItemId/:quantity", async (req, res) => {
-    
-    /*
+  /*
     const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
     const updatedUserDetails = await updateUserDetails(
       uid,
@@ -30,53 +24,53 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
       });
     }
     */
-    //get all the vars
+  //get all the vars
 
-    console.log('in jherwer dfgdsg ====================')
-    const session = res.locals.shopify.session;
-    const client = new shopify.api.clients.Graphql({ session });
-    const order = await shopify.api.rest.Order.find({
-        session: session,
-        id: req.params["id"],
-      });
-    console.log(order)
-    const newOrder = new shopify.api.rest.Order({
-        session: res.locals.shopify.session,
-      });
+  console.log("in jherwer dfgdsg ====================");
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({ session });
+  const order = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+  });
+  console.log(order);
+  const newOrder = new shopify.api.rest.Order({
+    session: res.locals.shopify.session,
+  });
 
-      newOrder.line_items = [
+  newOrder.line_items = [
+    {
+      title: "Big Brown Bear Boots",
+      price: 74.99,
+      grams: "1300",
+      quantity: 3,
+      //"applied_discount": { "value_type": 'fixed_amount', "value": '100' },
+      discount_codes: [{ code: "FAKE30", amount: "9.00", type: "percentage" }],
+      tax_lines: [
         {
-          "title": "Big Brown Bear Boots",
-          "price": 74.99,
-          "grams": "1300",
-          "quantity": 3,
-          //"applied_discount": { "value_type": 'fixed_amount', "value": '100' },
-          "discount_codes":[{"code":"FAKE30","amount":"9.00","type":"percentage"}],
-          "tax_lines": [
-            {
-              "price": 13.5,
-              "rate": 0.06,
-              "title": "State tax"
-            }
-          ]
-        }
-      ];
-      newOrder.transactions = [
-        {
-          "kind": "sale",
-          "status": "success",
-          "amount": 50.0
-        }
-      ];
-      newOrder.financial_status = "paid";
-      newOrder.discount_codes = [
-        {
-          "code": "FAKE30",
-          "amount": "9.00",
-          "type": "percentage"
-        }
-      ];
-      /*
+          price: 13.5,
+          rate: 0.06,
+          title: "State tax",
+        },
+      ],
+    },
+  ];
+  newOrder.transactions = [
+    {
+      kind: "sale",
+      status: "success",
+      amount: 50.0,
+    },
+  ];
+  newOrder.financial_status = "paid";
+  newOrder.discount_codes = [
+    {
+      code: "FAKE30",
+      amount: "9.00",
+      type: "percentage",
+    },
+  ];
+  /*
      newOrder.discount_applications =  [ {
         "title": "CHRISMAS",
         "description": "Promotional item for blackfriday.",
@@ -88,7 +82,7 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
         "application_type": "automatic"
       }]
       */
-      /*
+  /*
       newOrder.discount_applications = [
             {
         target_type: 'line_item',
@@ -112,10 +106,10 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
         
         }
         */
-        
-    //newOrder.total_discounts = '5.00';
 
-    /*
+  //newOrder.total_discounts = '5.00';
+
+  /*
     newOrder.line_items[0].discount_allocations = [{
         amount:'7.00',
         amount_set:{
@@ -130,24 +124,26 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
         title:'Custome sfdsf'
     }]
     */
-    //newOrder.line_items = order.line_items
-    //newOrder.line_items[1].total_discount = '3.00';
-    //newOrder.line_items[1].total_discount_set.presentment_money.amount = '3.00';
-    //newOrder.line_items[1].total_discount_set.shop_money.amount = '3.00';
-    //order.line_items[1].total_discount_set.presentment_money = '3.00';
-    console.log(order.line_items[0].total_discount_set.presentment_money.amount)
-    console.log(order.line_items[0].total_discount_set.presentment_money.currency_code)
-    console.log(order.line_items[0].discount_allocations)
-     const orderId = req.params["id"];
-    const lineItemId = req.params["lineItemId"];
-    let status = 200;
-    let error = null;
-    const quantity = parseInt(req.params["quantity"]);
-    try {
-        await newOrder.save({
-          update: true,
-          });
-        /*
+  //newOrder.line_items = order.line_items
+  //newOrder.line_items[1].total_discount = '3.00';
+  //newOrder.line_items[1].total_discount_set.presentment_money.amount = '3.00';
+  //newOrder.line_items[1].total_discount_set.shop_money.amount = '3.00';
+  //order.line_items[1].total_discount_set.presentment_money = '3.00';
+  console.log(order.line_items[0].total_discount_set.presentment_money.amount);
+  console.log(
+    order.line_items[0].total_discount_set.presentment_money.currency_code
+  );
+  console.log(order.line_items[0].discount_allocations);
+  const orderId = req.params["id"];
+  const lineItemId = req.params["lineItemId"];
+  let status = 200;
+  let error = null;
+  const quantity = parseInt(req.params["quantity"]);
+  try {
+    await newOrder.save({
+      update: true,
+    });
+    /*
       const openOrder = await client.query({
         data: {
           query: `mutation orderEditBegin($id: ID!) {
@@ -224,34 +220,32 @@ router.put("/:id/:lineItemId/:quantity", async (req, res) => {
           },
         },
       })*/
-      //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
-    } catch (e) {
-      console.log(`Failed to edit quantity:  ${e.message}`);
-      status = 500;
-      error = e.message;
-    }
-  
-    res.status(status).send({ success: status === 200, error });
-  });
+    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+  } catch (e) {
+    console.log(`Failed to edit quantity:  ${e.message}`);
+    status = 500;
+    error = e.message;
+  }
 
-  router.get("/:id", async (req, res) => {
-    const session = res.locals.shopify.session;
-    const shopUrl = session.shop;
-    console.log("========== In get discount routes =============");
-    const orderData = await shopify.api.rest.Order.find({
-      session: session,
-      id: req.params["id"],
-      fields: "discount_codes",
-    });
-    let returnObj = orderData.discount_codes
-    console.log("======== shiping addy", orderData);
-   if(!orderData.discount_codes){
-     console.log('here, there is no discount codes');
-     returnObj = {status: 'none'}
-     
-   }
-    res.json(returnObj);
-  });
+  res.status(status).send({ success: status === 200, error });
+});
 
+router.get("/:id", async (req, res) => {
+  const session = res.locals.shopify.session;
+  const shopUrl = session.shop;
+  console.log("========== In get discount routes =============");
+  const orderData = await shopify.api.rest.Order.find({
+    session: session,
+    id: req.params["id"],
+    fields: "discount_codes",
+  });
+  let returnObj = orderData.discount_codes;
+  console.log("======== shiping addy", orderData);
+  if (!orderData.discount_codes) {
+    console.log("here, there is no discount codes");
+    returnObj = { status: "none" };
+  }
+  res.json(returnObj);
+});
 
 export default router;

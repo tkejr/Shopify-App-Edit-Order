@@ -145,17 +145,12 @@ export default {
       console.log("======= Inside App Subcription Update ========");
       const payload = JSON.parse(body);
 
-      console.log(payload.app_subscription.status);
-
       mixpanel.track("Subscription Update", {
         distinct_id: shop,
         name: payload.app_subscription.name,
         status: payload.app_subscription.status,
         capped_amount: payload.app_subscription.capped_amount,
       });
-
-      console.log("======= IN UPDATE SUBSCRIPTION ========= ");
-      console.log(payload.app_subscription.status);
 
       if (payload.app_subscription.status === "ACTIVE") {
         try {

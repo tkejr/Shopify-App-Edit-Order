@@ -1,10 +1,4 @@
 import express from "express";
-import {
-  updateUserPreference,
-  getUserIdByUrl,
-  getUserPreferences,
-  updateUser,
-} from "../db.js";
 import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 import shopify from "../shopify.js";

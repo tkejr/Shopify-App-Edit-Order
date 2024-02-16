@@ -1,9 +1,4 @@
 import express from "express";
-import {
-  updateUserPreference,
-  getUserIdByUrl,
-  getUserPreferences,
-} from "../db.js";
 import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 import shopify from "../shopify.js";
@@ -40,9 +35,9 @@ router.put("/:id", async (req, res) => {
   const shopUrl = session.shop;
   const shipping_and_discount_info = req.body;
   const updated_shipping_lines = shipping_and_discount_info.shippingCostDetails;
-  const discountCodes = shipping_and_discount_info.discount_codes; 
-  
-  console.log('=====', discountCodes, updated_shipping_lines)
+  const discountCodes = shipping_and_discount_info.discount_codes;
+
+  console.log("=====", discountCodes, updated_shipping_lines);
   //console.log("========",updated_shipping_lines, shipping_and_tax_info)
   //const updated_tax_lines  = shipping_and_tax_info.taxLines;
   //console.log('==========',updated_tax_lines)
@@ -70,87 +65,84 @@ router.put("/:id", async (req, res) => {
   //console.log(order)
   const newOrder = new shopify.api.rest.Order({ session: session });
   //newOrder.shipping_lines = updated_shipping_lines;
-  //set the values 
-  if(updated_shipping_lines.length > 0){
-    console.log('hetwds =====', updated_shipping_lines)
+  //set the values
+  if (updated_shipping_lines.length > 0) {
+    console.log("hetwds =====", updated_shipping_lines);
     newOrder.shipping_lines = [
-        {
-          title: "" + updated_shipping_lines[0]?.title,
-          price: "" + updated_shipping_lines[0]?.price,
-        },
-      ];
-  }
-  else
-  {
+      {
+        title: "" + updated_shipping_lines[0]?.title,
+        price: "" + updated_shipping_lines[0]?.price,
+      },
+    ];
+  } else {
     //console.log('here in klkllkklkl')
-    newOrder.shipping_lines = order?.shipping_lines
+    newOrder.shipping_lines = order?.shipping_lines;
   }
   //console.log("======", discountCodes)
-  
-  if(discountCodes.length > 0){
-    //console.log('in here ===================', discountCodes)
-    if(order?.discount_codes){
-        //newOrder.discount_codes= order?.discount_codes;
-       // console.log('========{{{{{}}}}}}}', newOrder.discount_codes, discountCodes)
-       // newOrder.discount_codes.push(discountCodes[0]) ;
-       newOrder.discount_codes = discountCodes;
-        //console.log(newOrder.discount_codes)
 
-    } 
-     
-  }
-  
-  else{
+  if (discountCodes.length > 0) {
+    //console.log('in here ===================', discountCodes)
+    if (order?.discount_codes) {
+      //newOrder.discount_codes= order?.discount_codes;
+      // console.log('========{{{{{}}}}}}}', newOrder.discount_codes, discountCodes)
+      // newOrder.discount_codes.push(discountCodes[0]) ;
+      newOrder.discount_codes = discountCodes;
+      //console.log(newOrder.discount_codes)
+    }
+  } else {
     //console.log("====== here in the discountCodes dont exist", discountCodes)
-/*
+    /*
     if(order?.discount_codes){
         newOrder.discount_codes= order?.discount_codes;
 
     }
     */
-   ////new logic
-   //console.log('in here 2 ===============', discountCodes)
-   if(order?.discount_codes?.length === 1){
-    if(order?.discount_codes[0].type === 'percentage'){
-      
-      let code = '';
-      if(order.discount_codes[0].code === ''){
-        code = 'Custom Discount'
+    ////new logic
+    //console.log('in here 2 ===============', discountCodes)
+    if (order?.discount_codes?.length === 1) {
+      if (order?.discount_codes[0].type === "percentage") {
+        let code = "";
+        if (order.discount_codes[0].code === "") {
+          code = "Custom Discount";
+        } else {
+          code = order.discount_codes[0].code;
+        }
+        let discount_code = [
+          {
+            code: code,
+            amount: order.discount_codes[0].amount,
+            type: "fixed_amount",
+          },
+        ];
+
+        newOrder.discount_codes = discount_code;
+      } else {
+        let code = "";
+        if (order.discount_codes[0].code === "") {
+          code = "Custom Discount";
+        } else {
+          code = order.discount_codes[0].code;
+        }
+        let discount_code = [
+          {
+            code: code,
+            amount: order.discount_codes[0].amount,
+            type: "fixed_amount",
+          },
+        ];
+
+        newOrder.discount_codes = discount_code;
+        //order2.discount_codes = orderTesting?.discount_codes;
       }
-      else{
-        code = order.discount_codes[0].code
-      }
-      let discount_code = [{code: code , amount: order.discount_codes[0].amount, type:'fixed_amount'}]
-      
-      newOrder.discount_codes = discount_code;
-      
-    } 
-    else{
-      let code = '';
-      if(order.discount_codes[0].code === ''){
-        code = 'Custom Discount'
-      }
-      else{
-        code = order.discount_codes[0].code
-      }
-      let discount_code = [{code: code , amount: order.discount_codes[0].amount, type:'fixed_amount'}]
-      
-      newOrder.discount_codes = discount_code;
-      //order2.discount_codes = orderTesting?.discount_codes;
+    } else {
+      newOrder.current_total_discounts = order?.current_total_discounts;
+      newOrder.current_total_discounts_set = order?.current_total_discounts_set;
+      newOrder.discount_applications = order?.discount_applications;
+      newOrder.total_discounts = order?.total_discounts;
+      newOrder.total_discounts_set = order?.total_discounts_set;
     }
-    
-    
   }
-  else{
-    newOrder.current_total_discounts = order?.current_total_discounts;
-    newOrder.current_total_discounts_set = order?.current_total_discounts_set;
-    newOrder.discount_applications = order?.discount_applications; 
-    newOrder.total_discounts = order?.total_discounts;
-    newOrder.total_discounts_set = order?.total_discounts_set;
-  }
-  
-  }
-  
+
   if (order.financial_status === "paid") {
     newOrder.transactions = [
       {
@@ -159,49 +151,43 @@ router.put("/:id", async (req, res) => {
         amount: parseFloat(order.total_price),
       },
     ];
-  }else{
-  
-    if(order.total_price - order.total_outstanding > 0){
-       
-          newOrder.transactions = [
-            {
-              "kind": "authorization",
-              "status": "success",
-              "amount": parseFloat( order.total_price - order.total_outstanding)
-            }
-          ];
+  } else {
+    if (order.total_price - order.total_outstanding > 0) {
+      newOrder.transactions = [
+        {
+          kind: "authorization",
+          status: "success",
+          amount: parseFloat(order.total_price - order.total_outstanding),
+        },
+      ];
     }
-   
   }
 
   //newOrder.tax_lines = updated_tax_lines;
   newOrder.line_items = order.line_items;
-  
+
   if (order.tags) {
     newOrder.tags = order.tags;
   }
-  if(order.email !== ''){
+  if (order.email !== "") {
     newOrder.email = order.email;
   }
- 
-  
+
   newOrder.customer = order.customer;
   newOrder.billing_address = order.billing_address;
   newOrder.shipping_address = order.shipping_address;
   newOrder.order_number = order.order_number;
   newOrder.number = order.number;
   newOrder.name = order.name;
-  newOrder.financial_status = 'partially_paid';
- 
+  newOrder.financial_status = "partially_paid";
+
   newOrder.created_at = order.created_at;
   newOrder.processed_at = order.processed_at;
-  
-  
-  
+
   newOrder.note = order.note;
   newOrder.note_attributes = order.note_attributes;
   //newOrder.total_tax = order.total_tax;
- //misc
+  //misc
   newOrder.total_weight = order.total_weight;
   //newOrder.payment_gateway_names = order.payment_gateway_names;
   newOrder.phone = order.phone;
@@ -220,26 +206,20 @@ router.put("/:id", async (req, res) => {
   newOrder.taxes_included = order.taxes_included;
   newOrder.total_tax = order.total_tax;
 
- //newOrder.total_discounts = order.total_discounts;
- // newOrder.total_discounts_set = order.total_discounts_set;
- 
+  //newOrder.total_discounts = order.total_discounts;
+  // newOrder.total_discounts_set = order.total_discounts_set;
+
   //newOrder.total_outstanding = order.total_outstanding;
   //newOrder.total_price = order.total_price;
 
   //newOrder.total_price_set = order.total_price_set;
- // newOrder.total_shipping_price_set = order.total_shipping_price_set;
- 
- // newOrder.total_tax_set = order.total_tax_set;
-  
-  
- // newOrder.updated_at = order.updated_at; //
+  // newOrder.total_shipping_price_set = order.total_shipping_price_set;
+
+  // newOrder.total_tax_set = order.total_tax_set;
+
+  // newOrder.updated_at = order.updated_at; //
   //newOrder.user_id = order.user_id; //
 
-  
-  
- 
-  
- 
   /*
     
   order.shipping_lines=  [
@@ -266,7 +246,7 @@ order.tax_lines =  [
       update: true,
     });
     //cancel the old order
-    //await order?.cancel({}); 
+    //await order?.cancel({});
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],
