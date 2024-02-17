@@ -11,15 +11,74 @@ router.get("/viewLast", async (req, res) => {
     distinct_id: res.locals.shopify.session.shop,
   });
   try {
-    const data = await shopify.api.rest.Order.all({
+    const order = new shopify.api.rest.Order({
       session: res.locals.shopify.session,
-      status: "any",
-      limit: 1, // new to make the limit 250 instead of 50
+    });
+    order.line_items = [
+      {
+        title: "Big Brown Bear Boots",
+        price: 74.99,
+        grams: "1300",
+        quantity: 3,
+        tax_lines: [
+          {
+            price: 13.5,
+            rate: 0.06,
+            title: "State tax",
+          },
+        ],
+      },
+    ];
+    order.transactions = [
+      {
+        kind: "sale",
+        status: "success",
+        amount: 238.47,
+      },
+    ];
+    order.total_tax = 13.5;
+    order.customer = {
+      first_name: "Paul",
+      last_name: "Norman",
+      email: "paul.norman@example.com",
+    };
+    order.billing_address = {
+      first_name: "John",
+      last_name: "Smith",
+      address1: "123 Fake Street",
+      phone: "555-555-5555",
+      city: "Fakecity",
+      province: "Ontario",
+      country: "Canada",
+      zip: "K2P 1L4",
+    };
+    order.shipping_address = {
+      first_name: "Test",
+      last_name: "Test",
+      address1: "123 Fake Street",
+      phone: "777-777-7777",
+      city: "Fakecity",
+      province: "Ontario",
+      country: "Canada",
+      zip: "K2P 1L4",
+    };
+    order.email = "test@example.com";
+    order.transactions = [
+      {
+        kind: "authorization",
+        status: "success",
+        amount: 50.0,
+      },
+    ];
+    order.financial_status = "paid";
+    await order.save({
+      update: true,
     });
 
-    console.log(data);
+    console.log("===================== data =====================");
+    console.log(order);
     res.status(200).json({
-      data,
+      order,
     });
   } catch (error) {
     // Handle errors

@@ -10,17 +10,17 @@ import {
   Toast,
   Frame,
   Select,
-  MediaCard,
-  Banner,
-  Link,
-  Modal,
-  //TextContainer,
+  BlockStack,
+  ButtonGroup,
+  Card,
+  InlineStack,
+  List,
+  Text,
+  InlineGrid,
 } from "@shopify/polaris";
-import { cust1, edit_paywall } from "../assets";
-import { cust2 } from "../assets";
+import { customer_portal } from "../assets";
 import { cust3 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
-import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
@@ -44,13 +44,6 @@ export default function CustomerPortal() {
   //new
   const [loading, setLoading] = useState(false);
   const [userStateLoading, setUserStateLoading] = useState(true);
-  const [copiedContent, setCopiedContent] =
-    useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
-    {% if customer %}
-      {% assign timestamp = 'now' | date: '%s' %} {% assign eo_sig = "t=" | append: timestamp | append: "&oid=" | append: checkout.order_id | append: "&shop=" | append: shop.permanent_domain | hmac_sha256: "ec0617d142ddf3b85e017ae2e3a39744" %}
-      <script id="customer-portal_button" src="https://editify-cportal.kejrtech.com/getScript" data-timestamp="{{timestamp}}" data-token={{eo_sig}} data-baseurl="editify-cportal.kejrtech.com" defer></script>
-    {% endif %}
-    <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
@@ -166,7 +159,6 @@ export default function CustomerPortal() {
         },
         // You can include any request body data here if needed
       });
-
       if (response.ok) {
         const data = await response.json();
         setIsError(false);
@@ -277,23 +269,62 @@ export default function CustomerPortal() {
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
   }, []);
-  const checkPremiumUserContent = () => {
+  const nonPremiumUserContent = () => {
     return (
       <Page title="Customer Portal" defaultWidth>
-        <LegacyCard title="Discover how the Customer Portal can help you">
-          <LegacyCard.Section>
-            {/*
-                <TextContainer>
-                  <p>
-                  Upgrade to Pro to let customers be able to edit orders without contacting you. This helps reduce returns and saves you money. Go to the plans page a select the Pro plan
-                  </p>
-                </TextContainer>
-    */}
-          </LegacyCard.Section>
-          <LegacyCard.Section>
-            <Button onClick={() => navigate("/Plans")}>Go to Plans</Button>
-          </LegacyCard.Section>
-        </LegacyCard>
+        <Card roundedAbove="sm">
+          <BlockStack gap="100">
+            <InlineGrid columns={["twoThirds", "oneThird"]}>
+              <BlockStack gap="200">
+                <Text as="h2" variant="headingSm">
+                  Discover how the Customer Portal can help you
+                </Text>
+                <Text as="h3" variant="headingSm" fontWeight="medium">
+                  How it can help you and your customers
+                </Text>
+                <List>
+                  <List.Item>
+                    Reduce returns by <b>57%</b>
+                  </List.Item>
+                  <List.Item>
+                    <b>67%</b> of the customers like self serve portal
+                  </List.Item>
+                  <List.Item>
+                    <b>93%</b> less emails for order changes and cancellations
+                  </List.Item>
+                  <List.Item>
+                    Increase customer retention by <b>45% </b>with self serve
+                    portal and increase customer satisfaction
+                  </List.Item>
+                </List>
+              </BlockStack>
+              <div
+                style={{
+                  paddingLeft: "100px",
+                }}
+              >
+                <img
+                  src={customer_portal}
+                  alt="Customer Portal"
+                  width="200px"
+                />
+              </div>
+            </InlineGrid>
+            <InlineStack>
+              <ButtonGroup>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    navigate("/Plans");
+                  }}
+                  accessibilityLabel="Edit shipment"
+                >
+                  Go To Plans
+                </Button>
+              </ButtonGroup>
+            </InlineStack>
+          </BlockStack>
+        </Card>
       </Page>
     );
   };
@@ -364,7 +395,7 @@ export default function CustomerPortal() {
             </LegacyCard.Section>
           </LegacyCard>
           <LegacyCard
-            title="Customer editing"
+            title="Determine the time frame for customers to modify orders"
             primaryFooterAction={{
               content: preferenceText,
               onAction: () => {
@@ -377,7 +408,7 @@ export default function CustomerPortal() {
             {/* Content of the LegacyCard */}
 
             <LegacyCard.Section>
-              <h1>Adjust when customers can edit their orders.</h1>
+              <h1></h1>
               <br></br>
               <Select
                 options={options}
@@ -400,7 +431,7 @@ export default function CustomerPortal() {
           <br></br>
         </Page>
       ) : (
-        checkPremiumUserContent()
+        nonPremiumUserContent()
       )}
     </Frame>
   );
