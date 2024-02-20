@@ -346,34 +346,24 @@ export default function CustomerPortal() {
             },
           }}
         >
-          <LegacyCard title="About">
-            <LegacyCard.Section>
-              <p>
-                Allow Customers to manage and edit their orders through their
-                customer order status page. To use Order Editor's Customer
-                Portal, you must have customer accounts enabled for your store.
-              </p>
-              {/* <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
-                }}
-                src={cust1} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "} */}
-            </LegacyCard.Section>
-          </LegacyCard>
-          <LegacyCard title="Install Customer Portal">
-            <LegacyCard.Section>
-              {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
-              <p>
-                The customer portal is automcatically installed when you enable
-                it a page is created and a script tag is added to the order
-                status page
-              </p>
-              <br></br>
-            </LegacyCard.Section>
-            <LegacyCard.Section title="See Customer Portal">
+          <BlockStack gap="500">
+            <Card>
+              <BlockStack gap="100">
+                <Text as="h2" variant="headingSm">
+                  About
+                </Text>
+                <Text>
+                  Allow Customers to manage and edit their orders through their
+                  customer order status page. To use Order Editor's Customer
+                  Portal, you must have customer accounts enabled for your
+                  store.
+                </Text>
+              </BlockStack>
+            </Card>
+            <Card>
+              <Text as="h2" variant="headingSm">
+                Install Customer Portal
+              </Text>
               <h1>
                 Click on View Order to see the checkout page and see the
                 customer portal box embedded onto that page
@@ -392,43 +382,46 @@ export default function CustomerPortal() {
               <Button onClick={getOrder} variant="primary" disabled={!enabled}>
                 View Customer Portal
               </Button>
-            </LegacyCard.Section>
-          </LegacyCard>
-          <LegacyCard
-            title="Determine the time frame for customers to modify orders"
-            primaryFooterAction={{
-              content: preferenceText,
-              onAction: () => {
-                updatePreference({
-                  time_to_edit: timeStringToSeconds(selected),
-                });
-              },
-            }}
-          >
-            {/* Content of the LegacyCard */}
+            </Card>
+            <Card>
+              <BlockStack gap="200">
+                <Text as="h2" variant="headingSm">
+                  Determine the time frame for customers to modify orders
+                </Text>
 
-            <LegacyCard.Section>
-              <h1></h1>
-              <br></br>
-              <Select
-                options={options}
-                onChange={handleSelectChange}
-                value={selected}
-              />
-            </LegacyCard.Section>
-          </LegacyCard>
-          <ErrorBanner
-            open={error}
-            onClose={handleError}
-            content={toastContent}
-            buttonText="Contact Support"
-            buttonAction={() => {
-              navigate("/Help");
-            }}
-          />
-          {toastMarkup}
-          <br></br>
-          <br></br>
+                <Select
+                  options={options}
+                  onChange={handleSelectChange}
+                  value={selected}
+                />
+                <InlineStack align="end">
+                  <ButtonGroup>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        updatePreference({
+                          time_to_edit: timeStringToSeconds(selected),
+                        });
+                      }}
+                      accessibilityLabel="Edit shipment"
+                    >
+                      {preferenceText}
+                    </Button>
+                  </ButtonGroup>
+                </InlineStack>
+              </BlockStack>
+            </Card>
+            <ErrorBanner
+              open={error}
+              onClose={handleError}
+              content={toastContent}
+              buttonText="Contact Support"
+              buttonAction={() => {
+                navigate("/Help");
+              }}
+            />
+            {toastMarkup}
+          </BlockStack>
         </Page>
       ) : (
         nonPremiumUserContent()
