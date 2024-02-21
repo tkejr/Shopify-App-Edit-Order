@@ -25,6 +25,7 @@ import orderBillingRoutes from "./routes/orderBillingRoutes.js";
 import shippingRoutes from "./routes/shippingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
 import sendInvoice from "./routes/sendInvoice.js";
+import taxRoutes from "./routes/taxRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -61,23 +62,20 @@ app.get(
   async (req, res, next) => {
     //sending email on install
 
-    const plans = Object.keys(billingConfig);
+    //const plans = Object.keys(billingConfig);
     const session = res.locals.shopify.session;
 
-    const url = session.shop;
-    const access_token = session.accessToken;
+    // const url = session.shop;
+    //const access_token = session.accessToken;
 
     //Tracking the install event
-
+    
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
+    console.log("=================shop details", shopDetails)
+    //email
 
-    const hasPayment = await shopify.api.billing.check({
-      session,
-      plans: plans,
-      isTest: !prod,
-    });
     if (prod) {
       mixpanel.people.set(session.shop, {
         $first_name: shopDetails.data[0].shop_owner,
@@ -92,12 +90,17 @@ app.get(
         $shopify_plan: shopDetails.data[0].plan_name,
         $eligibility: shopDetails.data[0].eligible_for_payments,
         plan: "free",
-      });
+      }); 
+      /*
       if (hasPayment) {
         mixpanel.people.set(session.shop, {
           plan: "premium",
         });
       }
+      */
+
+    
+   
     }
 
     next();
@@ -1230,8 +1233,11 @@ app.use("/api/orderBilling", orderBillingRoutes);
 //customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
 
-//customer portal preferences
+//shipping
 app.use("/api/shipping", shippingRoutes);
+
+//tax routes 
+app.use("/api/tax", taxRoutes);
 
 //misc cportal routes
 app.use("/api", cPortalRoutes);

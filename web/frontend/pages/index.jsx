@@ -164,6 +164,9 @@ export default function HomePage() {
                     Backdate Orders, Edit Orders, Customer Self Service Editing
                     and Much More
                   </p>
+                  <Text as="p" tone="subdued">
+                    Built by <Link target="_blank" url="https://shopvana.io">Shopvana</Link>
+                  </Text>
                 </TextContainer>
               </LegacyCard.Section>
             </LegacyCard>
@@ -312,7 +315,7 @@ export default function HomePage() {
             </Layout>
             <FooterHelp>
               Learn more about{" "}
-              <Link target="_blank" url="https://editify.kejrtech.com">
+              <Link target="_blank" url="https://www.shopvana.io/blog/managing-orders-efficiently-with-editify-order-editor">
                 Editify
               </Link>
             </FooterHelp>
