@@ -1,14 +1,10 @@
 import express from "express";
-import {
-  updateUserPreference,
-  getUserIdByUrl,
-  getUserPreferences,
-} from "../db.js";
 import Mixpanel from "mixpanel";
 const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 import shopify from "../shopify.js";
 
 const router = express.Router();
+
 
 router.get("/:id", async (req, res) => {
   const session = res.locals.shopify.session;
@@ -38,11 +34,13 @@ router.get("/taxLines/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const session = res.locals.shopify.session;
   const shopUrl = session.shop;
-  const shipping_and_discount_info = req.body;
-  const updated_shipping_lines = shipping_and_discount_info.shippingCostDetails;
-  const discountCodes = shipping_and_discount_info.discount_codes; 
+  const newInfo = req.body;
+  const updated_shipping_lines =  newInfo.shippingCostDetails;
+  const discountCodes = newInfo.discount_codes; 
   
-  console.log('=====', discountCodes, updated_shipping_lines)
+  //new
+  const taxes = newInfo.taxes
+  console.log('===== this is taxes', taxes)
   //console.log("========",updated_shipping_lines, shipping_and_tax_info)
   //const updated_tax_lines  = shipping_and_tax_info.taxLines;
   //console.log('==========',updated_tax_lines)
@@ -71,21 +69,30 @@ router.put("/:id", async (req, res) => {
   const newOrder = new shopify.api.rest.Order({ session: session });
   //newOrder.shipping_lines = updated_shipping_lines;
   //set the values 
+  console.log('isfdsfds updated shipping', updated_shipping_lines)
+  
   if(updated_shipping_lines.length > 0){
-    console.log('hetwds =====', updated_shipping_lines)
+    
     newOrder.shipping_lines = [
         {
+          
           title: "" + updated_shipping_lines[0]?.title,
           price: "" + updated_shipping_lines[0]?.price,
+          discounted_price: "" + updated_shipping_lines[0]?.discounted_price,
+          delivery_category: "" + updated_shipping_lines[0]?.delivery_category,
+          tax_lines: "" + updated_shipping_lines[0]?.tax_lines,
+          discount_allocations: "" + updated_shipping_lines[0]?.discount_allocations,
+         
         },
       ];
+   
   }
   else
   {
-    //console.log('here in klkllkklkl')
+    
     newOrder.shipping_lines = order?.shipping_lines
   }
-  //console.log("======", discountCodes)
+
   
   if(discountCodes.length > 0){
     //console.log('in here ===================', discountCodes)
@@ -176,7 +183,19 @@ router.put("/:id", async (req, res) => {
 
   //newOrder.tax_lines = updated_tax_lines;
   newOrder.line_items = order.line_items;
-  
+  if(taxes.length > 0){
+    
+    newOrder.line_items.forEach((lineItem)=>{
+      lineItem.tax_lines = [];//taxes
+      
+
+    })
+    newOrder.tax_lines = taxes
+  }
+  else
+  {
+    newOrder.total_tax = order.total_tax;
+  }
   if (order.tags) {
     newOrder.tags = order.tags;
   }
@@ -184,10 +203,37 @@ router.put("/:id", async (req, res) => {
     newOrder.email = order.email;
   }
  
+
+  if (order.shipping_address == null) {
+    //order2.shipping_address = {}
+    status = 503;
+    error = "s";
+  } else {
+    newOrder.shipping_address = order.shipping_address;
+  }
   
-  newOrder.customer = order.customer;
-  newOrder.billing_address = order.billing_address;
-  newOrder.shipping_address = order.shipping_address;
+  if (order.billing_address == null) {
+    status = 501;
+    error = "s";
+  } else {
+    newOrder.billing_address = order.billing_address;
+  }
+
+
+  if (JSON.stringify(order.customer) === "{}") {
+    status = 502;
+    error = "s";
+    //order2.customer = {};
+  } else {
+     newOrder.customer = order.customer;
+  }
+
+
+
+  
+  //newOrder.customer = order.customer;
+  //newOrder.billing_address = order.billing_address;
+  //newOrder.shipping_address = order.shipping_address;
   newOrder.order_number = order.order_number;
   newOrder.number = order.number;
   newOrder.name = order.name;
@@ -218,7 +264,16 @@ router.put("/:id", async (req, res) => {
   newOrder.total_tip_received = order.total_tip_received;
 
   newOrder.taxes_included = order.taxes_included;
-  newOrder.total_tax = order.total_tax;
+  
+  
+ 
+  
+  
+  /*
+  newOrder.line_items.forEach((line_item)=>{
+    line_item.tax 
+  })
+  */
 
  //newOrder.total_discounts = order.total_discounts;
  // newOrder.total_discounts_set = order.total_discounts_set;
@@ -236,37 +291,11 @@ router.put("/:id", async (req, res) => {
   //newOrder.user_id = order.user_id; //
 
   
-  
- 
-  
- 
-  /*
-    
-  order.shipping_lines=  [
-    {
-        //"id": 2824129971363,
-        "title": "UPS® Ground",
-        "price": "11.13",
-        //"code": "03",
-        //"source": "ups_shipping"
-    }
-]
-
-order.tax_lines =  [
-    {
-      "price": 13.5,
-      "rate": 0.06,
-      "title": "State tax"
-    }
-  ]
-  */
-
-  try {
+if(status < 500){
+  try { 
     await newOrder.save({
       update: true,
     });
-    //cancel the old order
-    //await order?.cancel({}); 
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],
@@ -276,8 +305,13 @@ order.tax_lines =  [
     error = e.message;
     console.log(e);
   }
-  console.log("=====", status, error);
+  
   res.status(status).send({ success: status === 200, error });
+}else{
+  
+  res.status(status).send({ success: status === 200, error });
+}
+  
 });
 
 export default router;

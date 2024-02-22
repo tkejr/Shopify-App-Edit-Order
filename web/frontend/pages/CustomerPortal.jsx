@@ -24,14 +24,12 @@ import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
-import { sendToAnalytics } from "../../lcp-helper";
-import { getLCP } from "web-vitals";
 //import CustomSkeletonPage from "../components/SkeletonPage";
 
 export default function CustomerPortal() {
   const fetch = useAuthenticatedFetch();
   const [active, setActive] = useState(false);
-  const [enabled, setEnabled] = useState(true);
+  const [enabled, setEnabled] = useState(false);
   const handleToggle = useCallback(() => setEnabled((enabled) => !enabled), []);
   const badgeStatus = enabled ? "success" : undefined;
   const badgeContent = enabled ? "On" : "Off";
@@ -190,13 +188,6 @@ export default function CustomerPortal() {
   const toastMarkup = active ? (
     <Toast content={toastContent} error={isError} onDismiss={toggleActive} />
   ) : null;
-  const handleCopyClick = () => {
-    // Copy the content to the clipboard
-    setToastContent("Copied Successfully");
-    toggleActive();
-    //handleError();
-    navigator.clipboard.writeText(copiedContent);
-  };
 
   const settingStatusMarkup = (
     <Badge
@@ -230,12 +221,13 @@ export default function CustomerPortal() {
           setEnabled(data.enable);
         } else {
           // Handle non-successful response (e.g., show an error message)
-          setToastContent("Some Problem Occurred With API");
+          const errorMessage = await response.text(); // Get the error message from the response
+          setToastContent(`Some Problem Occurred With API: ${errorMessage}`);
           handleError();
         }
       } catch (error) {
         console.error("Error updating preference:", error);
-        setToastContent("Some Problem Occurred With API" + response);
+        setToastContent(`Some Problem Occurred With API: ${error}`);
         handleError();
       }
     };
@@ -284,10 +276,6 @@ export default function CustomerPortal() {
     dispatch({ type: "SET_PROPS_ORDER_ID", payload: false });
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
-    function handleLCP(metric) {
-      sendToAnalytics(metric, "Customer Order Page");
-    }
-    getLCP(handleLCP);
   }, []);
   const checkPremiumUserContent = () => {
     return (
@@ -348,47 +336,13 @@ export default function CustomerPortal() {
             <LegacyCard.Section>
               {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
               <p>
-                Add the Customer Portal snippet to the additional scripts in
-                your order status page. This snippet contains your unique
-                account token that should be kept secret. Make sure you have
-                customer accounts enabled
+                The customer portal is automcatically installed when you enable
+                it a page is created and a script tag is added to the order
+                status page
               </p>
               <br></br>
             </LegacyCard.Section>
-            <LegacyCard.Section title="Step 1: Copy the install snippet">
-              <TextField
-                value={copiedContent}
-                multiline={4}
-                disabled
-                style={{
-                  backgroundColor: "#f0f0f0", // Light grey background color
-                  color: "#888888", // Grey text color
-                }}
-                labelStyle={{
-                  fontWeight: "bold", // Make the label bold
-                }}
-              />
-              <br></br>
-              <Button onClick={handleCopyClick}>Copy to Clipboard</Button>
-            </LegacyCard.Section>
-            <LegacyCard.Section title="Step 2: Add to your order status page">
-              <h1>
-                Add the snippet to the additional scripts in your{" "}
-                <a href={dynamicLink} target="_blank">
-                  order status page
-                </a>
-              </h1>
-              <br></br>
-              <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "80%", // This ensures the image never exceeds the size of its container
-                }}
-                src={cust2} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "}
-            </LegacyCard.Section>
-            <LegacyCard.Section title="Step 3: View Order">
+            <LegacyCard.Section title="See Customer Portal">
               <h1>
                 Click on View Order to see the checkout page and see the
                 customer portal box embedded onto that page
@@ -404,7 +358,9 @@ export default function CustomerPortal() {
               />{" "}
               <br></br>
               <br></br>
-              <Button onClick={getOrder}>View Order Status</Button>
+              <Button onClick={getOrder} variant="primary" disabled={!enabled}>
+                View Customer Portal
+              </Button>
             </LegacyCard.Section>
           </LegacyCard>
           <LegacyCard

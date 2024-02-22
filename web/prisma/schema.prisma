@@ -12,6 +12,8 @@ model custom_preferences {
   user_id      Int?
   time_to_edit Int?
   enable       Boolean? @default(false)
+  script_id    String?  // Optional string field, can be null or undefined
+  page_id      String? // Optional string field, can be null or undefined
   users        users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 

@@ -31,10 +31,14 @@ const AdvancedEditingPanel = (props)  =>{
     //
   const addShipping = () => {
     props.setShippingCostDetails([{ title: "", price: "" }]);
-    props.setShowSave(true)
+    //props.setShowSave(true)
   };
   const addDiscount = () => {
     props.setDiscounts([{ code: "", amount: "" , type: ""}]);
+    //props.setShowSave(true)
+  };
+  const addTaxes = () => {
+    props.setTaxes([{ price: "", rate: "" , title: ""}]);
     //props.setShowSave(true)
   };
   const shippingLines = props.shippingCostDetails?.map((shippingDetail, index) => (
@@ -48,6 +52,7 @@ const AdvancedEditingPanel = (props)  =>{
       <TextField
         type="text"
         label="Price"
+        error= {shippingDetail.price<0 && "Cannot be below 0"}
         value={shippingDetail.price || ""}
         onChange={(value) => {props.handleShippingLines("price", value, index);props.setShowSave(true)}}
       />
@@ -76,6 +81,34 @@ const AdvancedEditingPanel = (props)  =>{
     </ButtonGroup>
     </FormLayout.Group>
   ))
+
+  const taxLines = props.taxes?.map((tax, index) => (
+   
+    <FormLayout.Group>
+     <TextField
+        type="text"
+        label="Price"
+        disabled={true}
+        value={tax.price || ""}
+        onChange={(value) => {props.handleTaxes("price", value, index); props.setShowSave(true);props.setDiscountsChanged(true)}}
+      />
+      <TextField
+        type="text"
+        label="Tax Rate"
+        error= {tax.rate<0 && "Cannot be below 0"}
+        value={tax.rate || ""}
+        onChange={(value) => {props.handleTaxes("rate", value, index);props.setShowSave(true);props.handleTaxesChanged(true)}}
+      />
+      <TextField
+        type="text"
+        disabled={true}
+        label="Title"
+        
+        value={tax.title || ""}
+        onChange={(value) => {props.handleTitle("title", value, index);props.setShowSave(true);props.setDiscountsChanged(true)}}
+      />
+    </FormLayout.Group>
+  ))
   return (
     <LegacyCard title="Order Details" sectioned>
         <LegacyCard.Section title="Shipping Cost">
@@ -94,6 +127,16 @@ const AdvancedEditingPanel = (props)  =>{
                 <Button onClick={() => addDiscount()}>Add Discount</Button>
               ) : (
                 <>{discountLines}</>
+              )}
+              
+            </FormLayout>
+        </LegacyCard.Section>
+        <LegacyCard.Section title="Tax Lines">
+          <FormLayout>
+              {props.taxes == false ? (
+                <Button onClick={() => addTaxes()}>Add Tax Lines</Button>
+              ) : (
+                <>{taxLines}</>
               )}
               
             </FormLayout>

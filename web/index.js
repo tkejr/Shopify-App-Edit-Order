@@ -25,6 +25,7 @@ import orderBillingRoutes from "./routes/orderBillingRoutes.js";
 import shippingRoutes from "./routes/shippingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
 import sendInvoice from "./routes/sendInvoice.js";
+import taxRoutes from "./routes/taxRoutes.js";
 
 //new for billing
 import { billingConfig } from "./shopify.js";
@@ -62,25 +63,19 @@ app.get(
     //sending email on install
 
     //const plans = Object.keys(billingConfig);
-    //const session = res.locals.shopify.session;
+    const session = res.locals.shopify.session;
 
     // const url = session.shop;
     //const access_token = session.accessToken;
 
     //Tracking the install event
-    /*
+    
     const shopDetails = await shopify.api.rest.Shop.all({
       session: session,
     });
     console.log("=================shop details", shopDetails)
     //email
 
-    const hasPayment = await shopify.api.billing.check({
-      session,
-      plans: plans,
-      isTest: !prod,
-    });
-    /*
     if (prod) {
       
       mixpanel.people.set(session.shop, {
@@ -97,14 +92,18 @@ app.get(
         $eligibility: shopDetails.data[0].eligible_for_payments,
         plan: "free",
       }); 
+      /*
       if (hasPayment) {
         mixpanel.people.set(session.shop, {
           plan: "premium",
         });
       }
-      
-   }
-   */
+      */
+
+    
+   
+    }
+
     next();
   },
   // Load the app otherwise
@@ -129,7 +128,7 @@ app.post("/api/email", async (req, res) => {
   const url = sess.shop;
   const { name, email, message } = req.body;
   const feedbackMsg = {
-    to: [ "contact@shopvana.io"], // Change to your recipient "tanmaykejriwal28@gmail.com",
+    to: ["contact@shopvana.io"], // Change to your recipient "tanmaykejriwal28@gmail.com",
     from: "editifyshopify@gmail.com", // Change to your verified sender
     subject: `Feedback form has been submitted by ${name}`,
     text: `A feedback form was filled with feedbacl message ${message} and their email is ${email}`,
@@ -518,23 +517,22 @@ app.put("/api/orders/:id", async (_req, res) => {
   //order2.discount_applications = orderTesting?.discount_applications;
   //order2.fulfillments = []
   //
-  
-  if(orderTesting?.shipping_address == null){
+
+  if (orderTesting?.shipping_address == null) {
     //order2.shipping_address = {}
     status = 503;
-    error = "s"; 
-  }else{
+    error = "s";
+  } else {
     order2.shipping_address = orderTesting?.shipping_address;
   }
-  console.log(order2.shipping_address)
-  if(orderTesting?.billing_address == null){
+  console.log(order2.shipping_address);
+  if (orderTesting?.billing_address == null) {
     status = 501;
-    error = "s"; 
+    error = "s";
     //order2.billing_address = {first_name:"test", last_name:"editify", address1:"6029 Bridal", country:"Singapore", zip:"179399"}
-  }else{
+  } else {
     order2.billing_address = orderTesting?.billing_address;
-   }
-  
+  }
 
   if (orderTesting.shipping_lines) {
     order2.shipping_lines = orderTesting?.shipping_lines;
@@ -542,9 +540,9 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   if (JSON.stringify(orderTesting.customer) === "{}") {
     status = 502;
-    error = "s"; 
-    //order2.customer = {}; 
-  }else{
+    error = "s";
+    //order2.customer = {};
+  } else {
     order2.customer = orderTesting?.customer;
   }
 
@@ -634,7 +632,7 @@ app.put("/api/orders/:id", async (_req, res) => {
 
   console.log(fulfillments)
   order2.fulfillments = fulfillments;
-  */ 
+  */
   /*
   console.log("this is it", orderTesting?.fulfillments)
   console.log("this is it", orderTesting?.line_items)
@@ -645,64 +643,54 @@ app.put("/api/orders/:id", async (_req, res) => {
     order2.fulfillments = orderTesting.fulfillments;
   }
   */
-//console.log('fgdgdgfdg',orderTesting?.fulfillments[0].line_items)
-//console.log(order2)
-if(status < 500){
-  try {
-     
-    //saving the newly created order here
-    // @ts-ignore
-    
+  //console.log('fgdgdgfdg',orderTesting?.fulfillments[0].line_items)
+  //console.log(order2)
+  if (status < 500) {
+    try {
+      //saving the newly created order here
+      // @ts-ignore
 
-     await order2.save({
-      update: true,
-    });
-   //console.log('dfsfsdf', order2.fulfillments)
-  
+      await order2.save({
+        update: true,
+      });
+      //console.log('dfsfsdf', order2.fulfillments)
 
-  
-  //console.log('hewwrwesfdsf', order2)
-    /*
+      //console.log('hewwrwesfdsf', order2)
+      /*
     order2.line_items.forEach((lineItem) => {
       lineItem.fulfillment_date = newDate; 
     });
     */
-    //await orderTesting.save({update:true})
-    //await orderTesting.cancel({})
-    // deleting the old order with the old date
+      //await orderTesting.save({update:true})
+      //await orderTesting.cancel({})
+      // deleting the old order with the old date
 
+      await shopify.api.rest.Order.delete({
+        session: res.locals.shopify.session,
+        id: _req.params["id"],
+      });
+    } catch (e) {
+      console.log(`Failed to create orders:  ${e.message}`);
+      status = 500;
 
-    await shopify.api.rest.Order.delete({
-      session: res.locals.shopify.session,
-      id: _req.params["id"],
-    });
-    
-  } catch (e) {
-    console.log(`Failed to create orders:  ${e.message}`);
-    status = 500;
-
+      if (prod) {
+        mixpanel.track("Backdate Fail", {
+          distinct_id: res.locals.shopify.session.shop,
+          error: e.message,
+        });
+      }
+      error = e.message;
+    }
     if (prod) {
-      mixpanel.track("Backdate Fail", {
+      mixpanel.track("Edited Order", {
         distinct_id: res.locals.shopify.session.shop,
-        error: e.message,
+        order_number: order2.order_number,
       });
     }
-    error = e.message;
+    res.status(status).send({ success: status === 200, error });
+  } else {
+    res.status(status).send({ success: status === 200, error });
   }
-  if (prod) {
-    mixpanel.track("Edited Order", {
-      distinct_id: res.locals.shopify.session.shop,
-      order_number: order2.order_number,
-    });
-  }
-  res.status(status).send({ success: status === 200, error });
-}else{
-  res.status(status).send({ success: status === 200, error });
-}
- 
-
-
-  
 });
 app.get("/api/orderName/:id", async (req, res) => {
   const session = res.locals.shopify.session;
@@ -1246,8 +1234,11 @@ app.use("/api/orderBilling", orderBillingRoutes);
 //customer portal preferences
 app.use("/api/preferences", preferenceRoutes);
 
-//customer portal preferences
+//shipping
 app.use("/api/shipping", shippingRoutes);
+
+//tax routes 
+app.use("/api/tax", taxRoutes);
 
 //misc cportal routes
 app.use("/api", cPortalRoutes);

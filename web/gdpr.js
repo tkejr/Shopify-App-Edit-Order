@@ -104,7 +104,7 @@ export default {
 
       //Send Email to us so we know uninstalled happen
       const Installmsg = {
-        to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+        to: [ "albertogaucin.ag@gmail.com"], // Change to your recipient
         from: "contact@shopvana.io", // Change to your verified sender
         subject: `Fucking Hell - ${shop_data.name} Uninstalled`,
         text: `IMPROVE THE APP ALREADY`,
@@ -145,17 +145,12 @@ export default {
       console.log("======= Inside App Subcription Update ========");
       const payload = JSON.parse(body);
 
-      console.log(payload.app_subscription.status);
-
       mixpanel.track("Subscription Update", {
         distinct_id: shop,
         name: payload.app_subscription.name,
         status: payload.app_subscription.status,
         capped_amount: payload.app_subscription.capped_amount,
       });
-
-      console.log("======= IN UPDATE SUBSCRIPTION ========= ");
-      console.log(payload.app_subscription.status);
 
       if (payload.app_subscription.status === "ACTIVE") {
         try {
@@ -166,7 +161,7 @@ export default {
         }
         //send email to us
         const Installmsg = {
-          to: ["tanmaykejriwal28@gmail.com", "albertogaucin.ag@gmail.com"], // Change to your recipient
+          to: [ "albertogaucin.ag@gmail.com"], // Change to your recipient
           from: "contact@shopvana.io", // Change to your verified sender
           subject: `LFG Ka-ching-$$  ${payload.app_subscription.name}`,
           text: `An Installation was made by ${shop} `,

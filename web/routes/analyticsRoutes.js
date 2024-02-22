@@ -8,10 +8,6 @@ const mixpanel = Mixpanel.init("834378b3c2dc7daf1b144cacdce98bd0");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  mixpanel.track("View Analytics", {
-    distinct_id: res.locals.shopify.session.shop,
-  });
-
   try {
     const data = await getUser(res.locals.shopify.session.shop);
 
