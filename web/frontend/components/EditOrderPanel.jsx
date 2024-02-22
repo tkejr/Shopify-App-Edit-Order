@@ -232,15 +232,39 @@ export function EditOrderPanel (){
           },
           body: JSON.stringify(data),
         });
-  
+        
+
+        
         if (!response.ok) {
           setLoading(false);
-         setErrorContent(
-          "There was an error updating the order details to the order. Contact Support: "
-        );
-        //setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
-        handleError();
+         //setErrorContent("There was an error updating the order details to the order. Contact Support: ");
+         handleError();
+         if(response.status === 502){
+          setErrorContent(
+            "There was an error updating the date. Make sure the order you are trying to backdate has a customer. If the error persists, contact support:  "
+          );
+          
+         
         }
+        else if(response.status === 501){
+          setErrorContent(
+            "There was an error updating the date. Make sure the order you are trying to backdate has a billing address. If the error persists, contact support:  "
+          );
+         
+        }
+        else if(response.status === 503){
+          setErrorContent(
+            "There was an error updating the date. Make sure the order you are trying to backdate has a shipping address. If the error persists, contact support:   "
+          );
+         
+        }
+        else{
+          setErrorContent(
+            "If a duplicate order was created, then the original order cannot be deleted due to shopify api limitations. Otherwise, an unknown error occurred:  "
+          );
+        }
+        
+      }
         else{
           setLoading(false);
           setToastProps({ content: "Order details updated successfully" });
@@ -253,18 +277,12 @@ export function EditOrderPanel (){
        
       } catch (error) {
         // Handle error, e.g., show an error message
-        //console.error("Error updating shipping details:", error);
         setLoading(false);
-       setErrorContent(
-          "There was an error updating the order details to the order. Contact Support: "
+        setErrorContent(
+         "There was an error updating the order details to the order. Contact Support: "
         );
-        //setUrl("https://help.shopify.com/en/manual/orders/edit-orders");
         handleError();
       }
-     // setUpdateButton("Update");
-      //props.setReloadComp(!props.reloadComp);
-     
-     
     };
     //
    
@@ -404,29 +422,22 @@ export function EditOrderPanel (){
     const handleTaxesChanged = () =>{
       
       setTaxesChanged(true)
-     // getNewTaxPrice()
-      
-      //setTaxPrice( orderSubtotal *  taxes[index].rate)
+   
     }
-    const getNewTaxPrice = () =>{
-
-      getOrderSubtotal()
-    }
+   
     const handleTaxes = (fieldName, value, index) => {
       let update = [...taxes];
       
       if (fieldName === "rate") {
-        update[0].rate = value;
+        update[index].rate = value;
       }else if(fieldName === "price"){
-          update[0].price = taxPrice;
+          update[index].price = taxPrice;
       } else {
-        update[0].title = value;
+        update[index].title = value;
       }
-      //getNewTaxPrice()
       
-      //setTaxPrice( orderSubtotal *  taxes[index].rate)
-      update[0].price = orderSubtotal *  taxes[index].rate
-      console.log('this is update', update[0].price)
+      update[index].price = orderSubtotal *  taxes[index].rate
+      
       setTaxes(update);
     };
     const getOrderTaxes = async () => {
@@ -434,7 +445,7 @@ export function EditOrderPanel (){
         .then((response) => response.json())
         .then((json) => {
           setTaxes(json);
-          console.log('this is taxdsfksjk', json)
+          //console.log('this is taxdsfksjk', json)
         });
     };
     const getOrderEmail = async () => {
@@ -463,7 +474,7 @@ export function EditOrderPanel (){
     .then((response) => response.json())
     .then((json) => {
       setOrderSubtotal(json);
-      console.log("======= subtotal",json)
+      //console.log("======= subtotal",json)
     });  
     };
  

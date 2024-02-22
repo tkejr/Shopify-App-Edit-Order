@@ -72,8 +72,7 @@ router.put("/:id", async (req, res) => {
   console.log('isfdsfds updated shipping', updated_shipping_lines)
   
   if(updated_shipping_lines.length > 0){
-    console.log('hetwds =====', updated_shipping_lines)
-    //testing the order
+    
     newOrder.shipping_lines = [
         {
           
@@ -83,50 +82,17 @@ router.put("/:id", async (req, res) => {
           delivery_category: "" + updated_shipping_lines[0]?.delivery_category,
           tax_lines: "" + updated_shipping_lines[0]?.tax_lines,
           discount_allocations: "" + updated_shipping_lines[0]?.discount_allocations,
-          /*
-          "carrier_identifier": null,
-          "code": "Free Shipping",
-          "discounted_price": "0.00",
-          "discounted_price_set": {
-            "shop_money": {
-              "amount": "0.00",
-              "currency_code": "USD"
-            },
-            "presentment_money": {
-              "amount": "0.00",
-              "currency_code": "USD"
-            }
-          },
-          "phone": null,
-          "price": "0.00",
-          "price_set": {
-            "shop_money": {
-              "amount": "0.00",
-              "currency_code": "USD"
-            },
-            "presentment_money": {
-              "amount": "0.00",
-              "currency_code": "USD"
-            }
-          },
-          "requested_fulfillment_service_id": null,
-          "source": "shopify",
-          "title": "Free Shipping",
-          "tax_lines": [],
-          "discount_allocations": []
-          */
+         
         },
       ];
-    console.log('this is order',order)
+   
   }
   else
   {
-    //console.log('here in klkllkklkl')
+    
     newOrder.shipping_lines = order?.shipping_lines
   }
 
-  
-  //console.log("======", discountCodes)
   
   if(discountCodes.length > 0){
     //console.log('in here ===================', discountCodes)
@@ -218,7 +184,7 @@ router.put("/:id", async (req, res) => {
   //newOrder.tax_lines = updated_tax_lines;
   newOrder.line_items = order.line_items;
   if(taxes.length > 0){
-    console.log('hetwds =====', taxes)
+    
     newOrder.line_items.forEach((lineItem)=>{
       lineItem.tax_lines = [];//taxes
       
@@ -237,10 +203,37 @@ router.put("/:id", async (req, res) => {
     newOrder.email = order.email;
   }
  
+
+  if (order.shipping_address == null) {
+    //order2.shipping_address = {}
+    status = 503;
+    error = "s";
+  } else {
+    newOrder.shipping_address = order.shipping_address;
+  }
   
-  newOrder.customer = order.customer;
-  newOrder.billing_address = order.billing_address;
-  newOrder.shipping_address = order.shipping_address;
+  if (order.billing_address == null) {
+    status = 501;
+    error = "s";
+  } else {
+    newOrder.billing_address = order.billing_address;
+  }
+
+
+  if (JSON.stringify(order.customer) === "{}") {
+    status = 502;
+    error = "s";
+    //order2.customer = {};
+  } else {
+     newOrder.customer = order.customer;
+  }
+
+
+
+  
+  //newOrder.customer = order.customer;
+  //newOrder.billing_address = order.billing_address;
+  //newOrder.shipping_address = order.shipping_address;
   newOrder.order_number = order.order_number;
   newOrder.number = order.number;
   newOrder.name = order.name;
@@ -273,7 +266,7 @@ router.put("/:id", async (req, res) => {
   newOrder.taxes_included = order.taxes_included;
   
   
-  
+ 
   
   
   /*
@@ -298,27 +291,27 @@ router.put("/:id", async (req, res) => {
   //newOrder.user_id = order.user_id; //
 
   
-
-  try {
-    
+if(status < 500){
+  try { 
     await newOrder.save({
       update: true,
     });
-    
-    
     await shopify.api.rest.Order.delete({
       session: res.locals.shopify.session,
       id: req.params["id"],
     });
-    
-    
   } catch (e) {
     status = 500;
     error = e.message;
     console.log(e);
   }
-  console.log("=====", status, error);
+  
   res.status(status).send({ success: status === 200, error });
+}else{
+  
+  res.status(status).send({ success: status === 200, error });
+}
+  
 });
 
 export default router;
