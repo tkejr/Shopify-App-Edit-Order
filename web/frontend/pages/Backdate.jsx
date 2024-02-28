@@ -170,7 +170,7 @@ export default function Backdate() {
         //activator={activator}
         open={activeReview}
         onClose={handleChangeReview}
-        title="Leave a Review on this app and get one month free!"
+        title="Leave a Review"
         primaryAction={{
           content: "Leave a Review",
           onAction: redirectToEditify,
@@ -180,7 +180,7 @@ export default function Backdate() {
           {
           <TextContainer>
             <p>
-              Leave us a review on the Shopify app store and get one month free!
+              Leave us a review on the Shopify app store to tell us what you think!
             </p>
           </TextContainer>
     }
