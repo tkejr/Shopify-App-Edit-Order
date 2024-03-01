@@ -17,9 +17,14 @@ import {
   List,
   Text,
   InlineGrid,
+  Layout,
+  Divider,
+  Checkbox,
+  FormLayout,
+  Tag,
 } from "@shopify/polaris";
 import { customer_portal } from "../assets";
-import { cust3 } from "../assets";
+import { cust3, cust4 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
@@ -41,6 +46,32 @@ export default function CustomerPortal() {
   const [statusUrl, setStatusUrl] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
   const [error, setError] = useState(false);
+
+  const [tags, setTags] = useState([]);
+  const [textFieldValue, setTagTextFieldValue] = useState("");
+  const removeTag = useCallback(
+    (tag) => () => {
+      setTags((previousTags) =>
+        previousTags.filter((previousTag) => previousTag !== tag)
+      );
+    },
+    []
+  );
+
+  const handleTagFieldChange = useCallback((value) => {
+    setTagTextFieldValue(value);
+  }, []);
+
+  const verticalContentMarkup =
+    tags.length > 0 ? (
+      <InlineStack gap={200}>
+        {tags.map((tag) => (
+          <Tag key={tag} onRemove={removeTag(tag)}>
+            {tag}
+          </Tag>
+        ))}
+      </InlineStack>
+    ) : null;
   //new
   const [loading, setLoading] = useState(false);
   const [userStateLoading, setUserStateLoading] = useState(true);
@@ -361,56 +392,290 @@ export default function CustomerPortal() {
               </BlockStack>
             </Card>
             <Card>
-              <Text as="h2" variant="headingSm">
-                Install Customer Portal
-              </Text>
-              <h1>
-                Click on View Order to see the checkout page and see the
-                customer portal box embedded onto that page
-              </h1>
-              <br></br>
-              <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
-                }} // Set the width using inline styles
-                src={cust3} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "}
-              <br></br>
-              <br></br>
-              <Button onClick={getOrder} variant="primary" disabled={!enabled}>
-                View Customer Portal
-              </Button>
-            </Card>
-            <Card>
-              <BlockStack gap="200">
+              <BlockStack gap="100">
                 <Text as="h2" variant="headingSm">
-                  Determine the time frame for customers to modify orders
+                  Install Customer Portal
                 </Text>
-
-                <Select
-                  options={options}
-                  onChange={handleSelectChange}
-                  value={selected}
-                />
-                <InlineStack align="end">
-                  <ButtonGroup>
-                    <Button
-                      variant="primary"
-                      onClick={() => {
-                        updatePreference({
-                          time_to_edit: timeStringToSeconds(selected),
-                        });
-                      }}
-                      accessibilityLabel="Edit shipment"
-                    >
-                      {preferenceText}
-                    </Button>
-                  </ButtonGroup>
+                <h1>
+                  Click on View Order to see the checkout page and see the
+                  customer portal box embedded onto that page
+                </h1>
+                <img
+                  style={{
+                    width: "80vw", // This makes the image take up to 80% of the viewport width
+                    maxWidth: "50%", // This ensures the image never exceeds the size of its container
+                  }} // Set the width using inline styles
+                  src={cust4} // Make sure cust1 contains a valid image URL
+                  alt="Customer Image"
+                />{" "}
+                <InlineStack>
+                  <Button
+                    onClick={getOrder}
+                    variant="primary"
+                    disabled={!enabled}
+                  >
+                    View Customer Portal
+                  </Button>
                 </InlineStack>
               </BlockStack>
             </Card>
+
+            <BlockStack gap="500">
+              <InlineGrid gap="400" columns={2}>
+                <div>
+                  <Text variant="headingMd" as="h3">
+                    Edit Orders Settings
+                  </Text>
+                  <Text as="p" variant="body">
+                    Customise the settings for editing orders. Allow customers
+                    to edit their orders within a certain time frame. This would
+                    allow customers to change the quantity, add or remove items
+                    from their order.
+                  </Text>
+                </div>
+                <BlockStack gap="200">
+                  <Card>
+                    <div>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyLg">
+                          Allow customers to edit orders for
+                        </Text>
+
+                        <Select
+                          options={options}
+                          onChange={handleSelectChange}
+                          value={selected}
+                        />
+                      </BlockStack>
+                    </div>
+                  </Card>
+                  <Card>
+                    <div>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyLg">
+                          What changes Customers can make
+                        </Text>
+                        <Checkbox
+                          label="Customers remove items from their order"
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <Checkbox
+                          label="Customers add items to their order"
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <Checkbox
+                          label="Customers can change item variants {size, color, etc}"
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <Checkbox
+                          label="Customers can change the quantity of items"
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <InlineStack gap={200}>
+                          <Checkbox
+                            label="Customers can increase only upto"
+                            checked={true}
+                            onChange={() => {}}
+                          />
+
+                          <Select
+                            options={options}
+                            onChange={handleSelectChange}
+                            value={selected}
+                          />
+                        </InlineStack>
+                      </BlockStack>
+                    </div>
+                  </Card>
+                </BlockStack>
+              </InlineGrid>
+              <Divider />
+            </BlockStack>
+
+            <BlockStack gap="500">
+              <InlineGrid gap="400" columns={2}>
+                <div>
+                  <Text variant="headingMd" as="h3">
+                    Cancel Orders
+                  </Text>
+                  <Text as="p" variant="body">
+                    Customise the settings for cancelling orders. Allowing
+                    customers to cancel their orders builds trust and loyalty
+                    with your customers. It also reduces the number of customer
+                    service requests and returns
+                  </Text>
+                </div>
+                <Card>
+                  <div>
+                    <BlockStack gap="200">
+                      <Text as="p" variant="bodyLg">
+                        Consider whether customers should be allowed to cancel
+                        their orders
+                      </Text>
+
+                      <Checkbox
+                        label="Allow customers to cancel their orders"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+
+                      <Checkbox
+                        label="Automcatically refund the order"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+                    </BlockStack>
+                  </div>
+                </Card>
+              </InlineGrid>
+              <Divider />
+            </BlockStack>
+            <BlockStack gap="500">
+              <InlineGrid gap="400" columns={2}>
+                <div>
+                  <Text variant="headingMd" as="h3">
+                    Anti Fraud
+                  </Text>
+                  <Text as="p" variant="body">
+                    Customise the settings for anti fraud. Uncheck all boxes for
+                    minimising fraud
+                  </Text>
+                </div>
+                <Card>
+                  <div>
+                    <BlockStack gap="200">
+                      <Text as="p" variant="bodyLg">
+                        Consider whether customers should be allowed to cancel
+                        their orders
+                      </Text>
+                      <Checkbox
+                        label="Customers can change shipping address"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+                      <Checkbox
+                        label="Customers can change country"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+
+                      <Checkbox
+                        label="Customers with low fraud risk can edit their orders"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+                      <Checkbox
+                        label="Customers with high fraud risk can edit their orders"
+                        checked={true}
+                        onChange={() => {}}
+                      />
+                      <InlineStack gap={200}>
+                        <Checkbox
+                          label="Dont allow csutomers to edit orders tagged with "
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <div
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              if (textFieldValue) {
+                                setTags([...tags, textFieldValue]);
+                                setTagTextFieldValue("");
+                              }
+                            }
+                          }}
+                        >
+                          <TextField
+                            value={textFieldValue}
+                            onChange={handleTagFieldChange}
+                            placeholder="Add tags"
+                            verticalContent={verticalContentMarkup}
+                          />
+                        </div>
+                      </InlineStack>
+                    </BlockStack>
+                  </div>
+                </Card>
+              </InlineGrid>
+              <Divider />
+            </BlockStack>
+
+            <BlockStack gap="500">
+              <InlineGrid gap="400" columns={2}>
+                <div>
+                  <Text variant="headingMd" as="h3">
+                    Communication
+                  </Text>
+                  <Text as="p" variant="body">
+                    Customise the settings for communication. Allowing customers
+                    to communicate with the store when they have additional
+                    questions
+                  </Text>
+                </div>
+                <BlockStack gap="200">
+                  <Card>
+                    <div>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyLg">
+                          Allow customers to communicate with the store when
+                          they have additional questions
+                        </Text>
+
+                        <FormLayout>
+                          <FormLayout.Group>
+                            <TextField
+                              type="text"
+                              label="Customer Support Email"
+                              onChange={() => {}}
+                              autoComplete="off"
+                              helpText="if left blank the store email will be used"
+                            />
+                            <TextField
+                              type="number"
+                              label="Customer Support Phone(optional)"
+                              onChange={() => {}}
+                              autoComplete="off"
+                            />
+                          </FormLayout.Group>
+                        </FormLayout>
+                      </BlockStack>
+                    </div>
+                  </Card>
+                  <Card>
+                    <div>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyLg">
+                          Customer Portal Email Notifications
+                        </Text>
+
+                        <Text as="p" variant="bodyMd" tone="subdued">
+                          Email notifications are sent to merchants when they
+                          edit or cancel their orders
+                        </Text>
+                        <FormLayout>
+                          <FormLayout.Group>
+                            <TextField
+                              type="text"
+                              label="Notifcations Email"
+                              onChange={() => {}}
+                              autoComplete="off"
+                              helpText="if left blank the store email will be used"
+                            />
+                          </FormLayout.Group>
+                        </FormLayout>
+                      </BlockStack>
+                    </div>
+                  </Card>
+                </BlockStack>
+              </InlineGrid>
+              <Divider />
+            </BlockStack>
+
             <ErrorBanner
               open={error}
               onClose={handleError}
