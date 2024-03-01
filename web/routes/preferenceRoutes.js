@@ -56,7 +56,8 @@ router.put("/", async (req, res) => {
 
   const updatedUser = await updateUser(shopUrl, updateData);
   const userPreference = await getUserPreferences(updatedUser.id);
-  console.log("userPreference", userPreference);
+  console.log("UPDATE DATA", updateData);
+  console.log("userPreference", session);
 
   console.log("TEST IN CP ROUTE");
   if (req.body.enable == true) {

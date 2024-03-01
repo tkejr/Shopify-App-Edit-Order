@@ -10,17 +10,17 @@ import {
   Toast,
   Frame,
   Select,
-  MediaCard,
-  Banner,
-  Link,
-  Modal,
-  //TextContainer,
+  BlockStack,
+  ButtonGroup,
+  Card,
+  InlineStack,
+  List,
+  Text,
+  InlineGrid,
 } from "@shopify/polaris";
-import { cust1, edit_paywall } from "../assets";
-import { cust2 } from "../assets";
+import { customer_portal } from "../assets";
 import { cust3 } from "../assets";
 import { useAuthenticatedFetch } from "../hooks";
-import { isError } from "react-query";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "@shopify/app-bridge-react";
 import ErrorBanner from "../components/ErrorBanner";
@@ -44,13 +44,6 @@ export default function CustomerPortal() {
   //new
   const [loading, setLoading] = useState(false);
   const [userStateLoading, setUserStateLoading] = useState(true);
-  const [copiedContent, setCopiedContent] =
-    useState(`<!-- BEGIN EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->
-    {% if customer %}
-      {% assign timestamp = 'now' | date: '%s' %} {% assign eo_sig = "t=" | append: timestamp | append: "&oid=" | append: checkout.order_id | append: "&shop=" | append: shop.permanent_domain | hmac_sha256: "ec0617d142ddf3b85e017ae2e3a39744" %}
-      <script id="customer-portal_button" src="https://editify-cportal.kejrtech.com/getScript" data-timestamp="{{timestamp}}" data-token={{eo_sig}} data-baseurl="editify-cportal.kejrtech.com" defer></script>
-    {% endif %}
-    <!-- END EDIT ORDER CUSTOMER PORTAL ORDER STATUS SNIPPET -->`);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
@@ -146,7 +139,7 @@ export default function CustomerPortal() {
       }
     } catch (error) {
       console.error("Error updating preference:", error);
-      setToastContent("Some Problem Occurred With API" + response);
+      setToastContent("Some Problem Occurred With API");
       handleError();
     }
     // setLoading(false);
@@ -166,7 +159,6 @@ export default function CustomerPortal() {
         },
         // You can include any request body data here if needed
       });
-
       if (response.ok) {
         const data = await response.json();
         setIsError(false);
@@ -277,23 +269,62 @@ export default function CustomerPortal() {
     dispatch({ type: "SET_PROPS_ORDER_NAME", payload: false });
     //dispatch({ type: "SET_PROPS_LINE_ITEMS", payload: [] });
   }, []);
-  const checkPremiumUserContent = () => {
+  const nonPremiumUserContent = () => {
     return (
       <Page title="Customer Portal" defaultWidth>
-        <LegacyCard title="Discover how the Customer Portal can help you">
-          <LegacyCard.Section>
-            {/*
-                <TextContainer>
-                  <p>
-                  Upgrade to Pro to let customers be able to edit orders without contacting you. This helps reduce returns and saves you money. Go to the plans page a select the Pro plan
-                  </p>
-                </TextContainer>
-    */}
-          </LegacyCard.Section>
-          <LegacyCard.Section>
-            <Button onClick={() => navigate("/Plans")}>Go to Plans</Button>
-          </LegacyCard.Section>
-        </LegacyCard>
+        <Card roundedAbove="sm">
+          <BlockStack gap="100">
+            <InlineGrid columns={["twoThirds", "oneThird"]}>
+              <BlockStack gap="200">
+                <Text as="h2" variant="headingSm">
+                  Discover how the Customer Portal can help you
+                </Text>
+                <Text as="h3" variant="headingSm" fontWeight="medium">
+                  How it can help you and your customers
+                </Text>
+                <List>
+                  <List.Item>
+                    Reduce returns by <b>57%</b>
+                  </List.Item>
+                  <List.Item>
+                    <b>67%</b> of the customers like self serve portal
+                  </List.Item>
+                  <List.Item>
+                    <b>93%</b> less emails for order changes and cancellations
+                  </List.Item>
+                  <List.Item>
+                    Increase customer retention by <b>45% </b>with self serve
+                    portal and increase customer satisfaction
+                  </List.Item>
+                </List>
+              </BlockStack>
+              <div
+                style={{
+                  paddingLeft: "100px",
+                }}
+              >
+                <img
+                  src={customer_portal}
+                  alt="Customer Portal"
+                  width="200px"
+                />
+              </div>
+            </InlineGrid>
+            <InlineStack>
+              <ButtonGroup>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    navigate("/Plans");
+                  }}
+                  accessibilityLabel="Edit shipment"
+                >
+                  Go To Plans
+                </Button>
+              </ButtonGroup>
+            </InlineStack>
+          </BlockStack>
+        </Card>
       </Page>
     );
   };
@@ -315,34 +346,24 @@ export default function CustomerPortal() {
             },
           }}
         >
-          <LegacyCard title="About">
-            <LegacyCard.Section>
-              <p>
-                Allow Customers to manage and edit their orders through their
-                customer order status page. To use Order Editor's Customer
-                Portal, you must have customer accounts enabled for your store.
-              </p>
-              {/* <img
-                style={{
-                  width: "80vw", // This makes the image take up to 80% of the viewport width
-                  maxWidth: "50%", // This ensures the image never exceeds the size of its container
-                }}
-                src={cust1} // Make sure cust1 contains a valid image URL
-                alt="Customer Image"
-              />{" "} */}
-            </LegacyCard.Section>
-          </LegacyCard>
-          <LegacyCard title="Install Customer Portal">
-            <LegacyCard.Section>
-              {/* <Button onClick={createScriptTag}>Install Automatically</Button> */}
-              <p>
-                The customer portal is automcatically installed when you enable
-                it a page is created and a script tag is added to the order
-                status page
-              </p>
-              <br></br>
-            </LegacyCard.Section>
-            <LegacyCard.Section title="See Customer Portal">
+          <BlockStack gap="500">
+            <Card>
+              <BlockStack gap="100">
+                <Text as="h2" variant="headingSm">
+                  About
+                </Text>
+                <Text>
+                  Allow Customers to manage and edit their orders through their
+                  customer order status page. To use Order Editor's Customer
+                  Portal, you must have customer accounts enabled for your
+                  store.
+                </Text>
+              </BlockStack>
+            </Card>
+            <Card>
+              <Text as="h2" variant="headingSm">
+                Install Customer Portal
+              </Text>
               <h1>
                 Click on View Order to see the checkout page and see the
                 customer portal box embedded onto that page
@@ -361,46 +382,49 @@ export default function CustomerPortal() {
               <Button onClick={getOrder} variant="primary" disabled={!enabled}>
                 View Customer Portal
               </Button>
-            </LegacyCard.Section>
-          </LegacyCard>
-          <LegacyCard
-            title="Customer editing"
-            primaryFooterAction={{
-              content: preferenceText,
-              onAction: () => {
-                updatePreference({
-                  time_to_edit: timeStringToSeconds(selected),
-                });
-              },
-            }}
-          >
-            {/* Content of the LegacyCard */}
+            </Card>
+            <Card>
+              <BlockStack gap="200">
+                <Text as="h2" variant="headingSm">
+                  Determine the time frame for customers to modify orders
+                </Text>
 
-            <LegacyCard.Section>
-              <h1>Adjust when customers can edit their orders.</h1>
-              <br></br>
-              <Select
-                options={options}
-                onChange={handleSelectChange}
-                value={selected}
-              />
-            </LegacyCard.Section>
-          </LegacyCard>
-          <ErrorBanner
-            open={error}
-            onClose={handleError}
-            content={toastContent}
-            buttonText="Contact Support"
-            buttonAction={() => {
-              navigate("/Help");
-            }}
-          />
-          {toastMarkup}
-          <br></br>
-          <br></br>
+                <Select
+                  options={options}
+                  onChange={handleSelectChange}
+                  value={selected}
+                />
+                <InlineStack align="end">
+                  <ButtonGroup>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        updatePreference({
+                          time_to_edit: timeStringToSeconds(selected),
+                        });
+                      }}
+                      accessibilityLabel="Edit shipment"
+                    >
+                      {preferenceText}
+                    </Button>
+                  </ButtonGroup>
+                </InlineStack>
+              </BlockStack>
+            </Card>
+            <ErrorBanner
+              open={error}
+              onClose={handleError}
+              content={toastContent}
+              buttonText="Contact Support"
+              buttonAction={() => {
+                navigate("/Help");
+              }}
+            />
+            {toastMarkup}
+          </BlockStack>
         </Page>
       ) : (
-        checkPremiumUserContent()
+        nonPremiumUserContent()
       )}
     </Frame>
   );

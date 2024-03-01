@@ -6,26 +6,6 @@ import shopify from "../shopify.js";
 const router = express.Router();
 
 router.put("/:id/:lineItemId/:quantity", async (req, res) => {
-  /*
-    const uid = await getUserIdByUrl(res.locals.shopify.session.shop);
-    const updatedUserDetails = await updateUserDetails(
-      uid,
-      undefined,
-      undefined,
-      1
-    );
-  
-    const session = res.locals.shopify.session;
-    const client = new shopify.api.clients.Graphql({ session });
-    if (prod) {
-      mixpanel.track("EO Amount Change Quantity", {
-        distinct_id: res.locals.shopify.session.shop,
-        orderId: req.params["id"],
-      });
-    }
-    */
-  //get all the vars
-
   console.log("in jherwer dfgdsg ====================");
   const session = res.locals.shopify.session;
   const client = new shopify.api.clients.Graphql({ session });

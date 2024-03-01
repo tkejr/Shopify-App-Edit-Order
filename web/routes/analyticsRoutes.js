@@ -1,5 +1,5 @@
 import express from "express";
-import { getUser, addUser, updateUser } from "../db.js";
+import { getUser, updateUser } from "../db.js";
 import shopify from "../shopify.js";
 import Mixpanel from "mixpanel";
 import { DataType } from "@shopify/shopify-api";
