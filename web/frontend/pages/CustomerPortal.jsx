@@ -139,7 +139,7 @@ export default function CustomerPortal() {
       }
     } catch (error) {
       console.error("Error updating preference:", error);
-      setToastContent("Some Problem Occurred With API" + response);
+      setToastContent("Some Problem Occurred With API");
       handleError();
     }
     // setLoading(false);
