@@ -150,7 +150,7 @@ app.get("/api/check", async (req, res) => {
   const url = sess.shop;
   const access_token = sess.accessToken;
   console.log("access token", access_token);
-
+  
   const HAS_PAYMENTS_QUERY = `
   query appSubscription {  
     currentAppInstallation {
@@ -184,6 +184,17 @@ app.get("/api/check", async (req, res) => {
   const client = new shopify.api.clients.Graphql({ session });
   let subscriptionLineItem = {};
   let hasPayment;
+  
+  //hardcoding the shop urls
+  if (
+    url == "sapinca-lt.myshopify.com" ||
+    url == "kippah-falls-direct.myshopify.com" ||
+    url == "shop.concular.de"
+  ) {
+    hasPayment = "pro";
+    res.json({ hasPayment });
+    return;
+  }
   //const planName = Object.keys(billingConfig)[0];
 
   //const planDescription = billingConfig[planName].usageTerms;
@@ -232,7 +243,7 @@ app.get("/api/check", async (req, res) => {
       throw error;
     }
   }
-
+  
   res.json({ hasPayment });
 });
 
