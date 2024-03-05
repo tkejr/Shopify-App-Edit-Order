@@ -18,6 +18,8 @@ import {
   InlineGrid,
   ButtonGroup,
   Button,
+  Popover,
+  ActionList
 } from "@shopify/polaris";
 import React, { useState, useCallback, useEffect } from "react";
 
@@ -42,6 +44,7 @@ export default function HomePage() {
   const dispatch = useDispatch();
   const [shopDeets, setShopDeets] = useState();
   const [planIcon, setPlanIcon] = useState(null);
+  const [active, setActive] = useState(false);
   const [editedIcon, setEditedIcon] = useState(null);
   const [loader, setLoader] = useState(true);
   const [showPlan, setShowPlan] = useState(false);
@@ -311,7 +314,29 @@ export default function HomePage() {
                   </Card>
                 )}
               </Layout.Section>
-              <Layout.Section oneHalf></Layout.Section>
+              <Layout.Section>
+              <Card>
+      <BlockStack gap="400" align="start">
+        <BlockStack gap="200">
+          <Text as="h2" variant="headingMd">
+            Schedule an Onboarding Call
+          </Text>
+          <Text as="p" variant="bodyMd" tone="subdued">
+            If you are curious about the app, or just want to give some feedback, we are available! Just click the button below to schedule a meeting. 
+          </Text>
+        </BlockStack>
+        
+            
+              <Link target="_blank" url="https://cal.com/shopvana/15min">
+              <Button variant="primary">
+                Schedule
+                </Button>
+              </Link>
+    
+      </BlockStack>
+    </Card>
+                
+              </Layout.Section>
             </Layout>
             <FooterHelp>
               Learn more about{" "}

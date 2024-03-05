@@ -11,9 +11,7 @@ import {
 const getFreeTrialDays = async (shop) => {
   if (
     shop == "audittesting.myshopify.com" ||
-    shop == "systemsdirect-com.myshopify.com" ||
-    shop == "sapinca-lt.myshopify.com" ||
-    shop == "kippah-falls-direct.myshopify.com"
+    shop == "systemsdirect-com.myshopify.com" 
   ) {
     return 3;
   }
