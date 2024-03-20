@@ -32,6 +32,7 @@ import UpdateShippingAddress from '../components/helpersForEditOrder/UpdateShipp
 import AdvancedEditingPanel from '../components/helpersForEditOrder/AdvancedEditingPanel';
 import UpdateBillingAddress from '../components/helpersForEditOrder/UpdateBillingAddress';
 import InvoiceModal from '../components/SendInvoice';
+import UnpaidOrder from './helpersForEditOrder/UnpaidOrder';
 export function EditOrderPanel (){
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
@@ -214,7 +215,7 @@ export function EditOrderPanel (){
       setLoading(true);
       
       if(!taxesChanged){
-          alert("here, discounts did not change")
+          //alert("here, discounts did not change")
           //console.log(discounts)
           //setDiscounts([])
       }
@@ -603,6 +604,10 @@ export function EditOrderPanel (){
               }
                
         </LegacyCard>
+        {selected === "Advanced Mode" && <LegacyCard title="Make Order Unpaid" sectioned>    
+           <UnpaidOrder setLineItems={setLineItems} handleError={handleError} setErrorContent={setErrorContent} setToastProps={setToastProps}></UnpaidOrder>
+        </LegacyCard>
+}
       </Layout.Section>
           
       </Layout>

@@ -79,7 +79,7 @@ router.put("/:id", async (req, res) => {
           title: "" + updated_shipping_lines[0]?.title,
           price: "" + updated_shipping_lines[0]?.price,
           discounted_price: "" + updated_shipping_lines[0]?.discounted_price,
-          delivery_category: "" + updated_shipping_lines[0]?.delivery_category,
+          //delivery_category: "" + updated_shipping_lines[0]?.delivery_category, deprecated
           tax_lines: "" + updated_shipping_lines[0]?.tax_lines,
           discount_allocations: "" + updated_shipping_lines[0]?.discount_allocations,
          

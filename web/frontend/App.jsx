@@ -41,6 +41,10 @@ export default function App() {
                     destination: "/Plans",
                   },
                   {
+                    label: "FAQ",
+                    destination: "/FAQ",
+                  },
+                  {
                     label: "Help and Support",
                     destination: "/Help",
                   },

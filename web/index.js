@@ -26,7 +26,7 @@ import shippingRoutes from "./routes/shippingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
 import sendInvoice from "./routes/sendInvoice.js";
 import taxRoutes from "./routes/taxRoutes.js";
-
+import unpaidRoutes from "./routes/unpaidRoutes.js";
 //new for billing
 import { billingConfig } from "./shopify.js";
 
@@ -1254,7 +1254,7 @@ app.use("/api/tax", taxRoutes);
 //misc cportal routes
 app.use("/api", cPortalRoutes);
 
-//anyltcis routes
+//analytics routes
 app.use("/api/analytics", analyticsRoutes);
 
 //send Invoice
@@ -1262,6 +1262,8 @@ app.use("/api/sendInvoice", sendInvoice);
 
 //Order discount routes
 app.use("/api/discount", discountRoutes);
+
+app.use("/api/unpaid", unpaidRoutes);
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
