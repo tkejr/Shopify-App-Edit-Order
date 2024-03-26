@@ -779,6 +779,9 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
   let status = 200;
   let error = null;
   const quantity = parseInt(req.params["quantity"]);
+
+  console.log("==========staart of it")
+  console.log(orderId, lineItemId, quantity)
   try {
     const openOrder = await client.query({
       data: {
@@ -799,13 +802,13 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
       },
     });
 
-    //console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
+    console.log('this is the mutation response 1' , openOrder.body.data.orderEditBegin)//.calculatedOrder
     const calculatedOrderId =
       openOrder.body.data.orderEditBegin.calculatedOrder.id;
-    //console.log('order id', calculatedOrderId)
+    console.log('order id', calculatedOrderId)
     //console.log("this is the line item if", lineItemId)
     const calculatedLineItem = "gid://shopify/CalculatedLineItem/" + lineItemId;
-
+    console.log("=====calc line item",calculatedLineItem)
     const changeAmount = await client.query({
       data: {
         query: `mutation orderEditSetQuantity($id: ID!, $lineItemId: ID!, $quantity: Int!) {
@@ -839,7 +842,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
       },
     });
 
-    // console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
+    console.log('this is the mutation response 2' , changeAmount.body.data.orderEditSetQuantity)
     const commitChange = await client.query({
       data: {
         query: `mutation orderEditCommit($id: ID!) {
@@ -860,7 +863,7 @@ app.get("/api/changeAmount/:id/:lineItemId/:quantity", async (req, res) => {
         },
       },
     });
-    //console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
+    console.log('this is the mutation response' , commitChange.body.data.orderEditCommit)
   } catch (e) {
     console.log(`Failed to edit quantity:  ${e.message}`);
     status = 500;
